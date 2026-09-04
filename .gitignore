@@ -1,0 +1,21 @@
+node_modules/
+.next/
+out/
+build/
+*.tsbuildinfo
+next-env.d.ts
+
+# Secrets — ne jamais committer
+.env
+.env.local
+.env*.local
+
+# Données d'élèves : jamais dans le dépôt
+/donnees-test/
+*.sqlite
+
+.DS_Store
+*.log
+
+# Réglages locaux Claude Code
+.claude/settings.local.json

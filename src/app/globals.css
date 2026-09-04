@@ -1,0 +1,19 @@
+@import "tailwindcss";
+
+:root {
+  --fond: #ffffff;
+  --texte: #17150f;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --fond: #17150f;
+    --texte: #f5f2ea;
+  }
+}
+
+body {
+  background: var(--fond);
+  color: var(--texte);
+  -webkit-font-smoothing: antialiased;
+}
