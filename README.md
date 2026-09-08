@@ -96,6 +96,42 @@ récurrentes : côté serveur, protégés par la RLS. C'est le vrai actif.
 
 ---
 
+## Décisions d'architecture
+
+**Dépôt unique.** Il n'y a pas de backend séparé, parce qu'il n'y en a pas
+besoin : en Next.js App Router, les routes `/api`, les Server Actions, les
+Server Components et le middleware s'exécutent tous côté serveur. La clé
+Anthropic n'atteint jamais le navigateur.
+
+Le dépôt [TutorAI-Backend](https://github.com/steve20400/TutorAI-Backend) est
+réservé à la **v4** : traitement des enregistrements de séances, analyse IA,
+tâches planifiées. Ces travaux durent plusieurs minutes et ne rentrent pas dans
+une fonction serverless — ils iront sur un worker (Render).
+
+**Supabase plutôt que Neon.** Le contrôle d'accès repose sur des politiques RLS
+qui appellent `auth.uid()`, une fonction de Supabase Auth. Avec Postgres seul,
+il faudrait réécrire toute l'autorisation dans le code applicatif — le pire
+endroit où la réimplémenter à la main pour une application qui héberge des
+données de mineurs. Supabase apporte aussi le stockage sous RLS, nécessaire aux
+enregistrements de la v4.
+
+**Région Supabase : Paris (`eu-west-3`).** Le trafic ouest-africain transite par
+l'Europe. ⚠️ La région ne peut pas être changée après création du projet.
+
+## Garde-fous de coût
+
+Chaque message part chez Anthropic et se paie.
+
+| Garde-fou | Où | Valeur |
+|---|---|---|
+| Messages par élève et par heure | `src/app/api/seance/.../route.ts` | 30 |
+| Longueur d'un message | idem | 4000 caractères |
+| **Plafond de dépense mensuel** | **console.anthropic.com → Billing** | **à régler toi-même** |
+
+Le compteur horaire s'appuie sur la table `messages` — pas de service
+supplémentaire, et il résiste aux démarrages à froid de Vercel, ce qu'un
+compteur en mémoire ne ferait pas.
+
 ## Réglages à mesurer
 
 | Réglage | Où | Note |

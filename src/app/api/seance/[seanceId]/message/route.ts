@@ -5,6 +5,18 @@ import { repondreCommeTuteur } from "@/lib/anthropic"
 export const runtime = "nodejs"
 
 /**
+ * Garde-fous de coût. Chaque message part chez Anthropic et se paie.
+ *
+ * Sans ces deux limites, une boucle dans le code ou un élève qui s'amuse
+ * suffit à faire grimper la facture sans qu'aucune alerte ne se déclenche.
+ * Le compteur s'appuie sur la table `messages` : pas de service en plus,
+ * pas de Redis, et il fonctionne malgré les démarrages à froid de Vercel —
+ * ce qu'un compteur en mémoire ne ferait pas.
+ */
+const MESSAGES_PAR_HEURE = 30
+const LONGUEUR_MAX = 4000
+
+/**
  * POST /api/seance/:seanceId/message
  *
  * L'élève envoie un message ; le tuteur répond.
@@ -36,6 +48,35 @@ export async function POST(
   const contenu = corps.contenu?.trim()
   if (!contenu) {
     return NextResponse.json({ erreur: "message vide" }, { status: 400 })
+  }
+
+  if (contenu.length > LONGUEUR_MAX) {
+    return NextResponse.json(
+      {
+        erreur:
+          "Ce message est trop long. Découpe-le, ou photographie la page plutôt que de tout recopier.",
+      },
+      { status: 413 },
+    )
+  }
+
+  // La RLS restreint déjà `messages` aux séances de cet élève : ce décompte
+  // ne peut donc porter que sur les siens.
+  const ilYaUneHeure = new Date(Date.now() - 3_600_000).toISOString()
+  const { count } = await supabase
+    .from("messages")
+    .select("id", { count: "exact", head: true })
+    .eq("auteur", "eleve")
+    .gte("cree_le", ilYaUneHeure)
+
+  if ((count ?? 0) >= MESSAGES_PAR_HEURE) {
+    return NextResponse.json(
+      {
+        erreur:
+          "Tu as beaucoup travaillé cette heure-ci. Fais une pause et reviens dans un moment.",
+      },
+      { status: 429 },
+    )
   }
 
   // La RLS filtre : si la séance n'appartient pas à cet élève, rien ne remonte.
