@@ -1,5 +1,6 @@
 import { createServerClient } from "@supabase/ssr"
 import { cookies } from "next/headers"
+import { variableRequise } from "../env"
 
 /**
  * Client Supabase côté serveur, lié à la session de l'utilisateur.
@@ -10,8 +11,8 @@ export async function supabaseServeur() {
   const jar = await cookies()
 
   return createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    variableRequise("NEXT_PUBLIC_SUPABASE_URL"),
+    variableRequise("NEXT_PUBLIC_SUPABASE_ANON_KEY"),
     {
       cookies: {
         getAll: () => jar.getAll(),

@@ -33,24 +33,21 @@ export default async function PageTuteurs() {
 
       <ul className="flex flex-col gap-3">
         {tuteurs.map((t) => (
-          <li
-            key={t.id}
-            className="rounded-xl border border-black/10 p-5 dark:border-white/15"
-          >
-            <div className="font-medium">{t.matiere}</div>
-            <div className="text-sm opacity-70">{t.niveau}</div>
-            {Array.isArray(t.manuels) && t.manuels.length > 0 ? (
-              <div className="mt-2 text-xs opacity-50">
-                {(t.manuels as { titre: string }[])
-                  .map((m) => m.titre)
-                  .join(" · ")}
-              </div>
-            ) : null}
-
-            {/* L'écran de séance est la prochaine étape — pas de lien mort ici. */}
-            <div className="mt-3 text-xs uppercase tracking-wide opacity-40">
-              Séance — bientôt
-            </div>
+          <li key={t.id}>
+            <Link
+              href={`/tuteur/${t.id}`}
+              className="block rounded-xl border border-black/10 p-5 transition hover:bg-black/[0.03] dark:border-white/15 dark:hover:bg-white/[0.04]"
+            >
+              <div className="font-medium">{t.matiere}</div>
+              <div className="text-sm opacity-70">{t.niveau}</div>
+              {Array.isArray(t.manuels) && t.manuels.length > 0 ? (
+                <div className="mt-2 text-xs opacity-50">
+                  {(t.manuels as { titre: string }[])
+                    .map((m) => m.titre)
+                    .join(" · ")}
+                </div>
+              ) : null}
+            </Link>
           </li>
         ))}
       </ul>

@@ -1,5 +1,6 @@
 import { createServerClient } from "@supabase/ssr"
 import { NextResponse, type NextRequest } from "next/server"
+import { variableRequise } from "../env"
 
 /** Routes accessibles sans être connecté. Tout le reste est protégé. */
 const ROUTES_PUBLIQUES = ["/connexion", "/inscription", "/auth"]
@@ -15,8 +16,8 @@ export async function actualiserSession(requete: NextRequest) {
   let reponse = NextResponse.next({ request: requete })
 
   const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    variableRequise("NEXT_PUBLIC_SUPABASE_URL"),
+    variableRequise("NEXT_PUBLIC_SUPABASE_ANON_KEY"),
     {
       cookies: {
         getAll: () => requete.cookies.getAll(),
