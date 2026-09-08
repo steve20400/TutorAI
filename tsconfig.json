@@ -11,6 +11,9 @@
     "moduleResolution": "bundler",
     "resolveJsonModule": true,
     "isolatedModules": true,
+    // Les fichiers *.test.ts sont exécutés par `node --test`, qui exige
+    // l'extension explicite dans les imports. Sans cette option, tsc la refuse.
+    "allowImportingTsExtensions": true,
     "jsx": "preserve",
     "incremental": true,
     "plugins": [{ "name": "next" }],

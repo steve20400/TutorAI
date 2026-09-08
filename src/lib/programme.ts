@@ -49,12 +49,19 @@ export function tableDesMatieres(programme: Programme): string {
   return lecons.map((l) => `- ${l.id} : ${l.titre}`).join("\n")
 }
 
-/** Normalise pour une comparaison tolérante aux accents et à la casse. */
-function normaliser(s: string): string {
+/**
+ * Normalise pour une comparaison tolérante aux accents et à la casse :
+ * « Équations » et « equations » doivent se correspondre.
+ *
+ * La plage U+0300 a U+036F est écrite en échappements, jamais avec les
+ * caractères combinants littéraux : ceux-ci sont invisibles dans un éditeur
+ * et un simple reformatage les supprimerait sans que rien ne le signale.
+ */
+export function normaliser(s: string): string {
   return s
     .toLowerCase()
     .normalize("NFD")
-    .replace(/[̀-ͯ]/g, "")
+    .replace(/[\u0300-\u036f]/g, "")
     .replace(/[^a-z0-9 ]/g, " ")
     .replace(/\s+/g, " ")
     .trim()

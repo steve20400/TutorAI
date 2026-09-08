@@ -96,6 +96,25 @@ récurrentes : côté serveur, protégés par la RLS. C'est le vrai actif.
 
 ---
 
+## Vérifier
+
+```bash
+npm run verifier
+```
+
+Enchaîne typecheck, tests et build. À lancer avant chaque push.
+
+Les tests portent sur [`src/lib/programme.ts`](src/lib/programme.ts) — la
+reconnaissance de la leçon à partir de ce que l'élève raconte. C'est la logique
+qui distingue ce produit d'un assistant générique, donc celle qui mérite d'être
+testée en premier. Un test vérifie notamment que le tuteur **refuse de deviner**
+quand la correspondance est faible, plutôt que d'interroger sur une leçon qui
+n'est pas au programme.
+
+> Pas d'ESLint : `next lint` est déprécié et ouvre un questionnaire interactif
+> qui bloque le script. Le typecheck couvre l'essentiel. À rajouter plus tard
+> avec la CLI ESLint si le besoin se fait sentir.
+
 ## Décisions d'architecture
 
 **Dépôt unique.** Il n'y a pas de backend séparé, parce qu'il n'y en a pas
