@@ -142,12 +142,11 @@ create table tuteurs_humains (
   tarif_mensuel     integer,                      -- en FCFA
   verifie           boolean not null default false,
   verifie_le        timestamptz,
-  motif_refus       text,
-  visible           boolean not null default false generated always as (false) stored
+  motif_refus       text
 );
 
--- Le profil n'est visible dans l'annuaire que si `verifie` est vrai.
--- (colonne générée volontairement figée : la visibilité passera par une vue en v3)
+-- Le profil n'apparaît dans l'annuaire que si `verifie` est vrai. La règle sera
+-- portée par une vue en v3 ; inutile de dupliquer l'information en colonne.
 
 create table contrats (
   id           uuid primary key default gen_random_uuid(),
