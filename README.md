@@ -115,6 +115,28 @@ n'est pas au programme.
 > qui bloque le script. Le typecheck couvre l'essentiel. À rajouter plus tard
 > avec la CLI ESLint si le besoin se fait sentir.
 
+### Test d'isolation RLS
+
+`npm run verifier` ne teste pas la base. L'isolation entre élèves se vérifie
+séparément, contre la vraie base :
+
+```bash
+psql "$URL_BASE" -v ON_ERROR_STOP=1 -f supabase/tests/rls.sql
+```
+
+`URL_BASE` est la chaîne de connexion Postgres (Supabase → Project Settings →
+Database). Le script se déroule dans une transaction annulée : la base ressort
+dans l'état où elle est entrée.
+
+Onze contrôles, dont ceux-ci : un élève ne voit ni les séances, ni les messages,
+ni le profil d'un autre élève ; un parent voit son enfant mais pas celui d'un
+autre ; un visiteur non connecté ne voit rien, sauf les programmes publiés.
+
+**Relance-le après chaque modification du schéma.** Une politique RLS mal
+écrite ne casse rien de visible — l'application continue de fonctionner, elle
+montre simplement les données de quelqu'un d'autre. C'est le type de défaut
+qu'aucun typecheck ne rattrape.
+
 ## Décisions d'architecture
 
 **Dépôt unique.** Il n'y a pas de backend séparé, parce qu'il n'y en a pas
@@ -163,10 +185,16 @@ compteur en mémoire ne ferait pas.
 ## Reste à faire pour la v1
 
 - [x] Authentification (Supabase Auth + middleware de session)
-- [ ] Saisir le programme camerounais de Terminale D
-- [ ] Écran de création du tuteur (pays → classe → matières)
-- [ ] Écran de séance (conversation)
-- [ ] Historique des séances
+- [x] Écran de création du tuteur (pays → classe → matières)
+- [x] Écran de séance (conversation)
+- [x] Historique des séances
+- [x] Schéma installé et isolation RLS vérifiée
+- [ ] **Parcours complet testé dans le navigateur** — en attente des clés
+- [ ] **Saisir le programme camerounais de Terminale D** ← bloque la mise en service
+
+Le programme ivoirien est chargé en base (`publie = true`) : il permet de
+tester le produit de bout en bout dès aujourd'hui. Le contenu n'est pas celui
+des élèves camerounais, mais le parcours, lui, est vérifiable.
 
 ### Note sur la confirmation par email
 
