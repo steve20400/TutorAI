@@ -1,5 +1,5 @@
 -- =============================================================================
--- Schéma de base — Tuteur IA
+-- Schéma de base — TutorAI
 -- À exécuter dans l'éditeur SQL de Supabase.
 --
 -- Principes tenus dans ce schéma (voir SPEC_APPLICATION.md §6) :
@@ -17,7 +17,7 @@ create extension if not exists "pgcrypto";
 -- 1. TYPES
 -- =============================================================================
 
-create type role_utilisateur as enum ('eleve', 'parent', 'tuteur', 'admin');
+create type role_utilisateur as enum ('eleve', 'parent', 'repetiteur', 'admin');
 create type statut_seance    as enum ('en_cours', 'terminee', 'abandonnee');
 create type auteur_message   as enum ('eleve', 'tuteur');
 create type mode_seance      as enum ('texte', 'audio');
@@ -134,25 +134,37 @@ create table incidents_tuteur (
 -- `seances_humaines` portent déjà un statut de règlement renseigné à la main.
 -- =============================================================================
 
-create table tuteurs_humains (
-  id                uuid primary key references profils(id) on delete cascade,
-  bio               text,
-  matieres          text[] not null default '{}',
-  niveaux           text[] not null default '{}',
-  tarif_mensuel     integer,                      -- en FCFA
-  verifie           boolean not null default false,
-  verifie_le        timestamptz,
-  motif_refus       text
+create type statut_verification as enum
+  ('brouillon', 'en_attente', 'verifie', 'refuse');
+
+-- « Répétiteur » désigne l'humain ; « tuteur » désigne l'IA. C'est le mot
+-- employé au Cameroun, et la distinction évite que parents et élèves
+-- confondent les deux offres.
+create table repetiteurs (
+  id                  uuid primary key references profils(id) on delete cascade,
+  bio                 text,
+  ville               text,
+  matieres            text[] not null default '{}',
+  niveaux             text[] not null default '{}',
+  tarif_mensuel       integer,                    -- en FCFA
+  annees_experience   smallint,
+  disponibilites_texte text,                     -- « en semaine après 17h, samedi matin »
+  disponibilites      jsonb not null default '{}'::jsonb,  -- créneaux structurés, v5
+  photo_url           text,
+  statut              statut_verification not null default 'brouillon',
+  verifie_le          timestamptz,
+  motif_refus         text,
+  cree_le             timestamptz not null default now(),
+  maj_le              timestamptz not null default now()
 );
 
--- Le profil n'apparaît dans l'annuaire que si `verifie` est vrai. La règle sera
--- portée par une vue en v3 ; inutile de dupliquer l'information en colonne.
+create index on repetiteurs (statut);
 
 create table contrats (
   id           uuid primary key default gen_random_uuid(),
   parent_id    uuid not null references profils(id) on delete cascade,
   eleve_id     uuid not null references profils(id) on delete cascade,
-  tuteur_id    uuid not null references tuteurs_humains(id) on delete restrict,
+  repetiteur_id uuid not null references repetiteurs(id) on delete restrict,
   matiere      text not null,
   tarif        integer,
   frequence    text,
@@ -237,7 +249,7 @@ alter table memoire_eleve     enable row level security;
 alter table seances           enable row level security;
 alter table messages          enable row level security;
 alter table incidents_tuteur  enable row level security;
-alter table tuteurs_humains   enable row level security;
+alter table repetiteurs       enable row level security;
 alter table contrats          enable row level security;
 alter table seances_humaines  enable row level security;
 alter table signalements      enable row level security;
@@ -332,8 +344,27 @@ create policy "admin lit les incidents" on incidents_tuteur
 create policy "admin lit le journal" on journal_admin
   for select using (est_admin());
 
--- Les tables tuteurs_humains / contrats / seances_humaines / signalements
--- restent sans politique : fermées jusqu'aux v3/v4.
+-- --- répétiteurs ---
+-- Le répétiteur gère son propre profil.
+create policy "le repetiteur lit son profil" on repetiteurs
+  for select using (id = auth.uid() or est_admin());
+
+create policy "le repetiteur cree son profil" on repetiteurs
+  for insert with check (id = auth.uid());
+
+create policy "le repetiteur modifie son profil" on repetiteurs
+  for update using (id = auth.uid());
+
+-- Et surtout : un profil n'est visible des familles QUE s'il est vérifié.
+-- Cette règle est ici, dans la base, et pas seulement dans la requête de
+-- l'annuaire. Un oubli de `where statut = 'verifie'` côté application
+-- exposerait sinon des répétiteurs non contrôlés à des parents — exactement
+-- ce que le produit promet d'empêcher.
+create policy "les familles voient les repetiteurs verifies" on repetiteurs
+  for select using (statut = 'verifie');
+
+-- Les tables contrats / seances_humaines / signalements restent sans
+-- politique : fermées jusqu'aux v3/v4.
 
 -- =============================================================================
 -- 8. CRÉATION AUTOMATIQUE DU PROFIL À L'INSCRIPTION
@@ -342,13 +373,22 @@ create policy "admin lit le journal" on journal_admin
 create or replace function gerer_nouvel_utilisateur()
 returns trigger language plpgsql security definer set search_path = public as $$
 begin
-  insert into profils (id, role, prenom, pays)
+  insert into profils (id, role, prenom, nom, telephone, pays)
   values (
     new.id,
     coalesce((new.raw_user_meta_data ->> 'role')::role_utilisateur, 'eleve'),
     coalesce(new.raw_user_meta_data ->> 'prenom', 'Élève'),
+    nullif(new.raw_user_meta_data ->> 'nom', ''),
+    nullif(new.raw_user_meta_data ->> 'telephone', ''),
     coalesce(new.raw_user_meta_data ->> 'pays', 'CM')
   );
+
+  -- Un répétiteur a besoin d'une fiche dès l'inscription, même vide : sans
+  -- elle, sa première visite au formulaire de profil n'aurait rien à modifier.
+  -- Elle naît en 'brouillon', donc invisible des familles.
+  if coalesce(new.raw_user_meta_data ->> 'role', '') = 'repetiteur' then
+    insert into repetiteurs (id) values (new.id);
+  end if;
   return new;
 end;
 $$;

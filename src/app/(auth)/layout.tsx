@@ -1,11 +1,12 @@
+/**
+ * Laissé traversant : chaque page d'authentification pose son propre cadre,
+ * parce qu'elles n'ont pas toutes le même registre visuel — un élève et un
+ * parent ne s'inscrivent pas dans le même décor.
+ */
 export default function LayoutAuth({
   children,
 }: {
   children: React.ReactNode
 }) {
-  return (
-    <main className="mx-auto flex min-h-dvh max-w-sm flex-col justify-center gap-6 p-6">
-      {children}
-    </main>
-  )
+  return <>{children}</>
 }

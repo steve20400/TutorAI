@@ -107,4 +107,61 @@ select verifier('un visiteur non connecte ne voit aucun message',
 select verifier('un visiteur non connecte voit les programmes publies',
                 (select count(*)::int from programmes), 1);
 
+-- --- Répétiteurs : la règle de visibilité ------------------------------------
+-- C'est la promesse faite aux parents. Elle vit dans la base, pas seulement
+-- dans la requête de l'annuaire : un `where statut = 'verifie'` oublié côté
+-- application ne doit pas suffire à exposer un profil non contrôlé.
+
+reset role;
+set local "request.jwt.claims" = '';
+
+\set repet_ok '44444444-4444-4444-4444-444444444444'
+\set repet_ko '55555555-5555-5555-5555-555555555555'
+
+insert into auth.users (id, instance_id, aud, role, email, raw_user_meta_data)
+values
+  (:'repet_ok', '00000000-0000-0000-0000-000000000000', 'authenticated',
+   'authenticated', 'ok@test.local',
+   '{"prenom":"Ndongo","role":"repetiteur"}'),
+  (:'repet_ko', '00000000-0000-0000-0000-000000000000', 'authenticated',
+   'authenticated', 'ko@test.local',
+   '{"prenom":"Inconnu","role":"repetiteur"}');
+
+-- Le déclencheur a créé les deux fiches en 'brouillon' ; on en vérifie une.
+update repetiteurs set statut = 'verifie' where id = :'repet_ok';
+
+select verifier('le declencheur cree la fiche du repetiteur a l''inscription',
+                (select count(*)::int from repetiteurs
+                 where id in (:'repet_ok', :'repet_ko')), 2);
+
+select verifier('la fiche nait en brouillon, donc invisible',
+                (select count(*)::int from repetiteurs
+                 where id = :'repet_ko' and statut = 'brouillon'), 1);
+
+set local role authenticated;
+set local "request.jwt.claims" = '{"sub":"33333333-3333-3333-3333-333333333333","role":"authenticated"}';
+
+select verifier('un parent voit un repetiteur verifie',
+                (select count(*)::int from repetiteurs
+                 where id = '44444444-4444-4444-4444-444444444444'), 1);
+
+select verifier('un parent ne voit PAS un repetiteur non verifie',
+                (select count(*)::int from repetiteurs
+                 where id = '55555555-5555-5555-5555-555555555555'), 0);
+
+-- Vu par le répétiteur non vérifié lui-même.
+set local "request.jwt.claims" = '{"sub":"55555555-5555-5555-5555-555555555555","role":"authenticated"}';
+
+select verifier('un repetiteur voit sa propre fiche meme non verifiee',
+                (select count(*)::int from repetiteurs
+                 where id = '55555555-5555-5555-5555-555555555555'), 1);
+
+-- Vu par un visiteur non connecté.
+set local role anon;
+set local "request.jwt.claims" = '';
+
+select verifier('un visiteur non connecte ne voit pas les repetiteurs non verifies',
+                (select count(*)::int from repetiteurs
+                 where id = '55555555-5555-5555-5555-555555555555'), 0);
+
 rollback;

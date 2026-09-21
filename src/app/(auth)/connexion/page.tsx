@@ -1,6 +1,7 @@
 "use client"
 
 import Link from "next/link"
+import { CadreAuth } from "../cadre"
 import { useSearchParams } from "next/navigation"
 import { Suspense, useActionState } from "react"
 import { seConnecter, type EtatFormulaire } from "../actions"
@@ -14,11 +15,11 @@ function Formulaire() {
   const [etat, action, enCours] = useActionState(seConnecter, ETAT_INITIAL)
 
   return (
-    <>
+    <CadreAuth>
       <header>
-        <h1 className="text-2xl font-medium">Content de te revoir</h1>
-        <p className="mt-1 text-sm opacity-70">
-          Connecte-toi pour retrouver ton tuteur.
+        <h1 className="text-2xl font-medium">Se connecter</h1>
+        <p className="doux mt-1 text-sm">
+          Élève, parent ou répétiteur — même porte d&apos;entrée.
         </p>
       </header>
 
@@ -51,7 +52,7 @@ function Formulaire() {
           Créer un compte
         </Link>
       </p>
-    </>
+    </CadreAuth>
   )
 }
 

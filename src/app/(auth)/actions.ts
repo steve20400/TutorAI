@@ -46,9 +46,49 @@ export async function seConnecter(
   if (error) return { erreur: traduire(error.message) }
 
   revalidatePath("/", "layout")
+
   // On ne redirige que vers un chemin interne : une URL fournie par
   // l'utilisateur ne doit jamais servir à envoyer ailleurs.
-  redirect(suite.startsWith("/") ? suite : "/")
+  if (suite.startsWith("/") && suite !== "/") redirect(suite)
+
+  redirect(await accueilDeLUtilisateur(supabase))
+}
+
+/** Rôles qu'un visiteur peut se donner lui-même. `admin` n'en fait pas partie. */
+const ROLES_AUTORISES = ["eleve", "parent", "repetiteur"] as const
+type RoleInscription = (typeof ROLES_AUTORISES)[number]
+
+/** Où chaque rôle atterrit juste après son inscription. */
+const ACCUEIL_PAR_ROLE: Record<RoleInscription, string> = {
+  eleve: "/",
+  parent: "/parent",
+  repetiteur: "/repetiteur/profil",
+}
+
+/**
+ * Accueil correspondant au rôle de l'utilisateur connecté.
+ * Un répétiteur envoyé sur l'accueil élève verrait un espace qui ne le
+ * concerne pas — et se demanderait s'il s'est trompé de compte.
+ */
+async function accueilDeLUtilisateur(
+  supabase: Awaited<ReturnType<typeof supabaseServeur>>,
+): Promise<string> {
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+
+  if (!user) return "/"
+
+  const { data } = await supabase
+    .from("profils")
+    .select("role")
+    .eq("id", user.id)
+    .single()
+
+  const role = data?.role as RoleInscription | "admin" | undefined
+  if (role === "parent") return "/parent"
+  if (role === "repetiteur") return "/repetiteur/profil"
+  return "/"
 }
 
 export async function sInscrire(
@@ -56,11 +96,22 @@ export async function sInscrire(
   donnees: FormData,
 ): Promise<EtatFormulaire> {
   const prenom = String(donnees.get("prenom") ?? "").trim()
+  const nom = String(donnees.get("nom") ?? "").trim()
+  const telephone = String(donnees.get("telephone") ?? "").trim()
   const email = String(donnees.get("email") ?? "").trim()
   const motDePasse = String(donnees.get("motDePasse") ?? "")
+  const roleBrut = String(donnees.get("role") ?? "")
 
-  if (!prenom) return { erreur: "Dis-moi ton prénom." }
-  if (!email) return { erreur: "Il me faut ton email." }
+  // Le rôle arrive du navigateur : il est vérifié contre une liste fermée.
+  // Sans ce contrôle, un champ modifié à la main suffirait à se déclarer
+  // administrateur — et `est_admin()` ouvre toutes les politiques RLS.
+  if (!ROLES_AUTORISES.includes(roleBrut as RoleInscription)) {
+    return { erreur: "Choisis d'abord si tu es élève, parent ou répétiteur." }
+  }
+  const role = roleBrut as RoleInscription
+
+  if (!prenom) return { erreur: "Il me faut un prénom." }
+  if (!email) return { erreur: "Il me faut un email." }
   if (motDePasse.length < 8) {
     return { erreur: "Le mot de passe doit faire au moins 8 caractères." }
   }
@@ -75,7 +126,9 @@ export async function sInscrire(
     options: {
       data: {
         prenom,
-        role: "eleve",
+        nom: nom || null,
+        telephone: telephone || null,
+        role,
         pays: process.env.NEXT_PUBLIC_PAYS_PAR_DEFAUT ?? "CM",
       },
     },
@@ -92,7 +145,7 @@ export async function sInscrire(
   }
 
   revalidatePath("/", "layout")
-  redirect("/")
+  redirect(ACCUEIL_PAR_ROLE[role])
 }
 
 export async function seDeconnecter(): Promise<void> {
