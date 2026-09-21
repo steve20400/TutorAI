@@ -1,0 +1,52 @@
+# Empêche la mise en pause du projet Supabase.
+#
+# L'offre gratuite met un projet en pause après 7 jours sans activité. En phase
+# de développement, une semaine sans toucher au code arrive vite — et au retour
+# il faut passer par le tableau de bord pour relancer.
+#
+# Cette tâche interroge la base deux fois par semaine. Deux, pas une : si une
+# exécution échoue (panne GitHub, jeton expiré), la seconde reste dans la
+# fenêtre des 7 jours.
+#
+# Secrets à créer dans GitHub → Settings → Secrets and variables → Actions :
+#   SUPABASE_URL       https://xxxx.supabase.co
+#   SUPABASE_ANON_KEY  la Publishable key (sb_publishable_…)
+#
+# Ces deux valeurs sont publiques par nature — elles partent déjà dans le
+# navigateur de chaque visiteur. Les mettre en secrets GitHub évite seulement
+# de les afficher dans les journaux d'exécution.
+
+name: Garder Supabase active
+
+on:
+  schedule:
+    # Lundi et jeudi, 6h00 UTC (7h00 à Yaoundé).
+    - cron: "0 6 * * 1,4"
+  workflow_dispatch: # déclenchement manuel depuis l'onglet Actions
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Interroger la base
+        run: |
+          if [ -z "${{ secrets.SUPABASE_URL }}" ]; then
+            echo "::error::Secret SUPABASE_URL absent. Voir l'en-tête de ce fichier."
+            exit 1
+          fi
+
+          code=$(curl -s -o /tmp/reponse -w "%{http_code}" \
+            --max-time 30 \
+            "${{ secrets.SUPABASE_URL }}/rest/v1/programmes?select=id&limit=1" \
+            -H "apikey: ${{ secrets.SUPABASE_ANON_KEY }}")
+
+          echo "Code HTTP : $code"
+
+          # 200 ou 206 : la base a répondu, l'activité est enregistrée.
+          if [ "$code" != "200" ] && [ "$code" != "206" ]; then
+            echo "::error::Le projet ne répond pas — il est peut-être déjà en pause."
+            cat /tmp/reponse
+            exit 1
+          fi
+
+          echo "Projet actif."
