@@ -1,8 +1,55 @@
-import type { NextRequest } from "next/server"
+import { NextResponse, type NextRequest } from "next/server"
+
+import {
+  estLangue,
+  langueDepuisEntete,
+  type Langue,
+} from "@/langues"
 import { actualiserSession } from "@/lib/supabase/middleware"
 
+/** Mémorise la langue choisie d'une visite à l'autre. */
+const COOKIE_LANGUE = "tutela-langue"
+const UN_AN = 60 * 60 * 24 * 365
+
+/**
+ * Toute adresse porte sa langue : /fr/connexion, /en/connexion.
+ *
+ * Le choix de l'URL plutôt que d'un cookie n'est pas esthétique. Un cookie ne
+ * vaut que pour l'appareil qui le porte : un parent de Bamenda qui partage le
+ * lien d'inscription dans un groupe WhatsApp l'enverrait en français, et le
+ * destinataire tomberait sur une page qu'il ne lit pas. Avec la langue dans
+ * l'adresse, le lien arrive dans la langue de celui qui l'a envoyé.
+ */
+function langueVoulue(requete: NextRequest): Langue {
+  const memorisee = requete.cookies.get(COOKIE_LANGUE)?.value
+  if (estLangue(memorisee)) return memorisee
+  return langueDepuisEntete(requete.headers.get("accept-language"))
+}
+
 export async function middleware(requete: NextRequest) {
-  return actualiserSession(requete)
+  const chemin = requete.nextUrl.pathname
+  const premierSegment = chemin.split("/")[1]
+
+  if (!estLangue(premierSegment)) {
+    const langue = langueVoulue(requete)
+    const url = requete.nextUrl.clone()
+    url.pathname = `/${langue}${chemin === "/" ? "" : chemin}`
+    return NextResponse.redirect(url)
+  }
+
+  const reponse = await actualiserSession(requete, premierSegment)
+
+  // On n'écrit le cookie qu'une fois la langue effectivement servie : sinon un
+  // aller-retour de redirection pourrait figer une langue jamais affichée.
+  if (requete.cookies.get(COOKIE_LANGUE)?.value !== premierSegment) {
+    reponse.cookies.set(COOKIE_LANGUE, premierSegment, {
+      maxAge: UN_AN,
+      sameSite: "lax",
+      path: "/",
+    })
+  }
+
+  return reponse
 }
 
 export const config = {
@@ -10,8 +57,9 @@ export const config = {
     /*
      * Toutes les routes sauf :
      *   - les fichiers internes de Next (_next/static, _next/image)
+     *   - l'API, qui n'a pas de langue
      *   - les fichiers statiques (favicon, images, manifeste PWA)
      */
-    "/((?!_next/static|_next/image|favicon.ico|manifest.webmanifest|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico)$).*)",
+    "/((?!_next/static|_next/image|api/|favicon.ico|manifest.webmanifest|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico)$).*)",
   ],
 }

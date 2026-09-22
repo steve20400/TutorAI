@@ -1,8 +1,13 @@
 import { createServerClient } from "@supabase/ssr"
 import { NextResponse, type NextRequest } from "next/server"
+
+import type { Langue } from "@/langues"
 import { variableRequise } from "../env"
 
-/** Routes accessibles sans être connecté. Tout le reste est protégé. */
+/**
+ * Routes accessibles sans être connecté, une fois le préfixe de langue retiré.
+ * Tout le reste est protégé — fermé par défaut.
+ */
 const ROUTES_PUBLIQUES = ["/connexion", "/inscription", "/auth"]
 
 /**
@@ -10,9 +15,12 @@ const ROUTES_PUBLIQUES = ["/connexion", "/inscription", "/auth"]
  *
  * Sans ce middleware, le jeton d'accès expire et l'élève est déconnecté en
  * pleine séance. Il doit tourner sur toutes les routes sauf les fichiers
- * statiques (voir src/middleware.ts).
+ * statiques et l'API (voir src/middleware.ts).
  */
-export async function actualiserSession(requete: NextRequest) {
+export async function actualiserSession(
+  requete: NextRequest,
+  langue: Langue,
+): Promise<NextResponse> {
   let reponse = NextResponse.next({ request: requete })
 
   const supabase = createServerClient(
@@ -41,18 +49,21 @@ export async function actualiserSession(requete: NextRequest) {
   } = await supabase.auth.getUser()
 
   const chemin = requete.nextUrl.pathname
-  const estPublique = ROUTES_PUBLIQUES.some((r) => chemin.startsWith(r))
+  const sansLangue = chemin.slice(`/${langue}`.length) || "/"
+  const estPublique = ROUTES_PUBLIQUES.some((r) => sansLangue.startsWith(r))
 
   if (!user && !estPublique) {
     const url = requete.nextUrl.clone()
-    url.pathname = "/connexion"
+    url.pathname = `/${langue}/connexion`
+    // `suite` garde la langue : on doit pouvoir y revenir tel quel après
+    // la connexion.
     url.searchParams.set("suite", chemin)
     return NextResponse.redirect(url)
   }
 
   if (user && estPublique) {
     const url = requete.nextUrl.clone()
-    url.pathname = "/"
+    url.pathname = `/${langue}`
     url.search = ""
     return NextResponse.redirect(url)
   }
