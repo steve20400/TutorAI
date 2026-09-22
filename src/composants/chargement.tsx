@@ -12,10 +12,23 @@ import { Marque } from "./marque"
 const DUREE_MINIMALE = 3200
 
 /**
+ * Plafond dur. L'écran s'efface au plus tard ici, même si la page n'a pas
+ * fini de charger.
+ *
+ * Sans lui, l'attente était bornée par `window.load` : sur une connexion
+ * lente, l'écran pouvait rester dix secondes ou davantage, ce qui se lit
+ * comme une panne et non comme un chargement. La page continue de se charger
+ * derrière — un écran d'attente ne rend rien plus rapide, il cache seulement
+ * ce qui n'est pas prêt, et il vaut mieux montrer une page qui se complète
+ * qu'un logo qui ne bouge plus.
+ */
+const DUREE_MAXIMALE = 5000
+
+/**
  * Au-delà, on prévient. Un parent qui attend sans explication ne conclut pas
  * que sa connexion est lente : il conclut que l'application est cassée.
  */
-const SEUIL_LENTEUR = 5000
+const SEUIL_LENTEUR = 3800
 
 /** Durée de la sortie — doit rester en phase avec .chargement-sortie. */
 const DUREE_SORTIE = 560
@@ -74,7 +87,15 @@ export function EcranChargement() {
     }, SEUIL_LENTEUR)
     minuteries.push(avertissement)
 
-    void Promise.all([pageChargee, dureeMinimale]).then(() => {
+    // Le plafond court en parallèle : le premier des deux qui arrive gagne.
+    const plafond = new Promise<void>((resolve) => {
+      minuteries.push(setTimeout(resolve, DUREE_MAXIMALE))
+    })
+
+    void Promise.race([
+      Promise.all([pageChargee, dureeMinimale]),
+      plafond,
+    ]).then(() => {
       if (annule) return
       clearTimeout(avertissement)
       try {
