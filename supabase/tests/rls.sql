@@ -470,4 +470,46 @@ select verifier('une seule politique de lecture sur repetiteurs',
                 (select count(*)::int from pg_policies
                   where tablename = 'repetiteurs' and cmd = 'SELECT'), 1);
 
+-- ---------------------------------------------------------------------------
+-- Aucune table ne doit rester sans politique.
+--
+-- `contrats`, `seances_humaines` et `signalements` ont vécu avec RLS activé et
+-- pas une seule règle. Postgres refuse alors tout : rien ne fuyait, mais le
+-- bouton « Signaler » d'un parent n'insérait rien, et le tableau de bord
+-- annonçait « 0 séance en direct » pendant qu'une séance avait lieu.
+--
+-- Un écran vide se lit comme « il n'y a rien à voir », jamais comme « je n'ai
+-- pas le droit de regarder ». D'où cette vérification générale, qui attrapera
+-- la prochaine table ajoutée sans ses règles.
+select verifier('aucune table avec RLS n''est privee de politique',
+                (select count(*)::int
+                   from pg_tables t
+                  where t.schemaname = 'public'
+                    and t.rowsecurity
+                    and not exists (
+                      select 1 from pg_policies p
+                       where p.schemaname = 'public'
+                         and p.tablename = t.tablename)), 0);
+
+-- L'administration voit toutes les séances. Ce n'est pas un privilège de
+-- confort : la surveillance est la promesse faite au parent.
+set local role authenticated;
+set local "request.jwt.claims" = '{"sub":"11111111-1111-1111-1111-111111111111","role":"authenticated"}';
+
+select verifier('un eleve ne voit PAS le contrat d''un autre',
+                (select count(*)::int from contrats
+                  where eleve_id <> '11111111-1111-1111-1111-111111111111'), 0);
+
+-- Signaler ne demande aucune justification préalable : un signalement infondé
+-- se classe, un signalement qu'on n'a pas pu déposer ne se rattrape pas.
+insert into signalements (auteur_id, motif)
+values ('11111111-1111-1111-1111-111111111111', 'Essai de signalement');
+
+select verifier('un eleve PEUT signaler',
+                (select count(*)::int from signalements
+                  where motif = 'Essai de signalement'), 1);
+
+reset role;
+set local "request.jwt.claims" = '';
+
 rollback;
