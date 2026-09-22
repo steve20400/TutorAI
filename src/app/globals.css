@@ -623,3 +623,83 @@ body {
   --carte-chiffre: #14203a;
   --carte-nom: #93a0bb;
 }
+
+/* ── La carte de couverture ────────────────────────────────────────────────
+   MapLibre pose ses propres commandes en blanc sur blanc ; elles doivent
+   suivre le thème comme le reste de l'administration. */
+.carte-cadre {
+  height: 100%;
+  min-height: 230px;
+  border-radius: 9px;
+  overflow: hidden;
+  border: 1px solid var(--bordure);
+  background: var(--surface);
+}
+
+.pastille-ville {
+  display: grid;
+  place-items: center;
+  border-radius: 999px;
+  background: var(--carte-pastille);
+  color: var(--carte-chiffre);
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  border: 2px solid var(--surface);
+  box-shadow: 0 1px 4px rgb(0 0 0 / 0.3);
+}
+
+.pastille-ville.vide {
+  background: transparent;
+  border: 2px dashed var(--carte-pastille);
+  box-shadow: none;
+  opacity: 0.7;
+}
+
+.maplibregl-ctrl-group {
+  background: var(--surface) !important;
+  border: 1px solid var(--bordure) !important;
+  box-shadow: none !important;
+}
+
+.maplibregl-ctrl-group button + button {
+  border-top: 1px solid var(--bordure) !important;
+}
+
+.maplibregl-ctrl-group button span {
+  filter: var(--carte-commande);
+}
+
+.maplibregl-ctrl-scale {
+  background: color-mix(in srgb, var(--surface) 82%, transparent) !important;
+  border-color: var(--bordure) !important;
+  color: var(--texte) !important;
+}
+
+.maplibregl-popup-content {
+  background: var(--surface) !important;
+  color: var(--texte) !important;
+  border: 1px solid var(--bordure);
+  border-radius: 8px;
+  font-size: 12px;
+  padding: 6px 10px;
+}
+
+.maplibregl-popup-tip {
+  border-top-color: var(--surface) !important;
+  border-bottom-color: var(--surface) !important;
+}
+
+[data-theme] {
+  --carte-commande: none;
+}
+
+@media (prefers-color-scheme: dark) {
+  [data-theme]:not([data-mode="clair"]) {
+    --carte-commande: invert(1);
+  }
+}
+
+[data-theme][data-mode="sombre"] {
+  --carte-commande: invert(1);
+}

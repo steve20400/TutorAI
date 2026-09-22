@@ -26,7 +26,7 @@ export default async function TableauDeBord({
   const { supabase } = await exigerAdmin(langue)
   const parametres = await lireParametres()
 
-  const [attente, verifies, familles, enCours, villes] = await Promise.all([
+  const [attente, verifies, familles, enCours, villes, cles] = await Promise.all([
     supabase
       .from("repetiteurs")
       .select("id", { count: "exact", head: true })
@@ -43,24 +43,50 @@ export default async function TableauDeBord({
       .is("terminee_le", null),
     supabase
       .from("villes")
-      .select("nom, x, y")
+      .select("nom, lon, lat")
       .eq("visible", true)
       .order("nom"),
+    supabase
+      .from("cles_api")
+      .select("nom, valeur")
+      .in("nom", ["carte_style", "carte_cle"]),
   ])
 
   const aVerifier = attente.count ?? 0
   const nbFamilles = familles.count ?? 0
   const nbEnCours = enCours.count ?? 0
 
-  const ouvertes = (villes.data ?? []) as { nom: string; x: number; y: number }[]
+  const ouvertes = (villes.data ?? []) as {
+    nom: string
+    lon: number | null
+    lat: number | null
+  }[]
+
+  // Le style de la carte vient de la base : changer de fournisseur de tuiles,
+  // ou passer à des tuiles hébergées à la maison, ne doit pas demander un
+  // déploiement. `{cle}` y est remplacé par la clé du fournisseur — beaucoup
+  // l'attendent en paramètre d'URL, et aucun ne s'accorde sur son nom.
+  const parNom = new Map(
+    ((cles.data ?? []) as { nom: string; valeur: string | null }[]).map((c) => [
+      c.nom,
+      c.valeur,
+    ]),
+  )
+  const styleCarte = (
+    parNom.get("carte_style") ?? "https://demotiles.maplibre.org/style.json"
+  ).replace("{cle}", parNom.get("carte_cle") ?? "")
 
   // Répartition par ville, calculée ici : la base ne sait pas regrouper sans
   // vue dédiée, et le volume reste minuscule pendant des années.
-  const parVille = new Map<string, number>()
+  //
+  // Un objet et non une Map : une Map ne franchit pas la frontière vers un
+  // composant client, elle y arriverait vide.
+  const comptes: Record<string, number> = {}
   for (const r of verifies.data ?? []) {
     const ville = (r.ville ?? "").trim()
-    if (ville) parVille.set(ville, (parVille.get(ville) ?? 0) + 1)
+    if (ville) comptes[ville] = (comptes[ville] ?? 0) + 1
   }
+  const parVille = new Map(Object.entries(comptes))
 
   // Le titre dit ce que la page raconte aujourd'hui, pas le nom de la rubrique.
   //
@@ -91,8 +117,10 @@ export default async function TableauDeBord({
           <div className="min-h-[230px] flex-1 sm:min-h-[300px]">
             <CarteCouverture
               villes={ouvertes}
-              parVille={parVille}
+              comptes={comptes}
+              styleUrl={styleCarte}
               legendeVide={t.aucuneVille}
+              etiquetteCarte={t.couverture}
             />
           </div>
 

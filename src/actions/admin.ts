@@ -248,3 +248,48 @@ export async function refuserDossier(donnees: FormData): Promise<void> {
   revalidatePath("/", "layout")
   redirect(chemin(langue, "/admin/dossiers"))
 }
+
+/** Noms de clés acceptés. Une liste fermée : la valeur vient d'un formulaire. */
+const CLES_CONNUES = [
+  "carte_style",
+  "carte_cle",
+  "anthropic",
+  "orange",
+  "mtn",
+] as const
+
+/**
+ * Pose une clé d'accès.
+ *
+ * L'écriture passe par `poser_cle` en base et non par un `update` direct :
+ * c'est elle qui calcule l'aperçu au moment où la valeur est encore connue.
+ * Le faire ici obligerait à relire `valeur` plus tard, ce que justement
+ * personne ne doit pouvoir faire pour une clé secrète.
+ */
+export async function poserCle(donnees: FormData): Promise<void> {
+  const langue = langueDeFormulaire(donnees)
+  const nom = String(donnees.get("nom") ?? "")
+  const valeur = String(donnees.get("valeur") ?? "").trim()
+
+  if (!(CLES_CONNUES as readonly string[]).includes(nom)) return
+
+  const { supabase, adminId } = await exigerAdmin(langue)
+
+  const { error } = await supabase.rpc("poser_cle", {
+    nom_cle: nom,
+    nouvelle_valeur: valeur,
+  })
+  if (error) return
+
+  // La valeur n'entre pas au registre : un journal qui recopie les clés qu'on
+  // vient de poser est un second endroit où elles traînent.
+  await journaliser(
+    supabase,
+    adminId,
+    valeur ? "activation" : "desactivation",
+    "cle",
+    nom,
+  )
+
+  revalidatePath("/", "layout")
+}

@@ -421,6 +421,15 @@ export const en: Dictionnaire = {
       orange: "Orange Money",
       mtn: "MTN MoMo",
       identifiantMarchand: "Merchant ID",
+      carte_style: "Base map — style URL",
+      carte_cle: "Base map — provider key",
+      carteDetail:
+        "The dashboard shows national coverage on this map. With no key, TUTELA uses MapLibre's demo tiles: enough to place the towns, not to read the streets. \u00ab {cle} \u00bb in the URL is replaced by the key below.",
+      publique:
+        "This key ships to every visitor's browser with the first tile. Restricting it to your domain at the provider is what protects it.",
+      posee: "Saved",
+      enregistrer: "Save",
+      effacer: "Clear",
     },
     registre: {
       etiquette: "Log — everything is recorded",

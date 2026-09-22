@@ -426,6 +426,15 @@ export const fr = {
       orange: "Orange Money",
       mtn: "MTN MoMo",
       identifiantMarchand: "Identifiant marchand",
+      carte_style: "Fond de carte — adresse du style",
+      carte_cle: "Fond de carte — clé du fournisseur",
+      carteDetail:
+        "Le tableau de bord affiche la couverture du pays sur cette carte. Sans clé, TUTELA utilise les tuiles de démonstration de MapLibre : elles suffisent à situer les villes, pas à lire les rues. « {cle} » dans l'adresse est remplacé par la clé ci-dessous.",
+      publique:
+        "Cette clé part dans le navigateur de chaque visiteur avec la première tuile. La restreindre à votre domaine chez le fournisseur est ce qui la protège.",
+      posee: "Enregistrée",
+      enregistrer: "Enregistrer",
+      effacer: "Effacer",
     },
     registre: {
       etiquette: "Registre — tout est consigné",

@@ -396,4 +396,36 @@ set local "request.jwt.claims" = '';
 select verifier('un parent ne change PAS son identifiant',
                 (select count(*)::int from profils where identifiant = 'GALILEE-BIS'), 0);
 
+-- ---------------------------------------------------------------------------
+-- Les clés d'accès aux services extérieurs.
+--
+-- La clé Anthropic paie à l'appel : qui la lit dépense l'argent de la
+-- plateforme. Elle ne doit sortir de la base par aucun chemin ouvert à un
+-- navigateur — pas même celui d'un administrateur, dont les extensions voient
+-- tout ce que la page reçoit.
+update cles_api set valeur = 'sk-ant-NE-DOIT-PAS-SORTIR', apercu = '…TIR'
+where nom = 'anthropic';
+
+set local role authenticated;
+set local "request.jwt.claims" = '{"sub":"33333333-3333-3333-3333-333333333333","role":"authenticated"}';
+
+select verifier('un parent ne lit PAS la cle Anthropic',
+                (select count(*)::int from cles_api where nom = 'anthropic'), 0);
+
+select verifier('un parent lit le fond de carte, qui est public',
+                (select count(*)::int from cles_api where nom = 'carte_style'), 1);
+
+reset role;
+set local "request.jwt.claims" = '';
+
+-- Et l'administration elle-même : elle voit que la clé est posée, jamais sa
+-- valeur. `lister_cles` ne renvoie pas la colonne.
+select verifier('lister_cles ne renvoie aucune colonne de valeur',
+                (select count(*)::int
+                   from information_schema.routines r
+                   join information_schema.parameters p
+                     on p.specific_name = r.specific_name
+                  where r.routine_name = 'lister_cles'
+                    and p.parameter_name = 'valeur'), 0);
+
 rollback;
