@@ -6,21 +6,21 @@ const ROLES = {
   eleve: {
     titre: "Créer ton compte élève",
     sous_titre: "Tu choisiras ta classe et tes matières juste après.",
-    registre: "eleve",
+    phare: "Bienvenue.",
     tutoiement: true,
   },
   parent: {
     titre: "Créer votre compte parent",
     sous_titre:
       "Vous pourrez ensuite rattacher vos enfants et consulter leur suivi.",
-    registre: "adulte",
+    phare: "Vous saurez toujours ce qui s'est passé.",
     tutoiement: false,
   },
   repetiteur: {
     titre: "Créer votre compte répétiteur",
     sous_titre:
       "Votre profil ne sera visible des familles qu'une fois la vérification faite.",
-    registre: "adulte",
+    phare: "Votre sérieux, prouvé.",
     tutoiement: false,
   },
 } as const
@@ -40,11 +40,13 @@ export default async function PageInscription({
   const config = ROLES[role as keyof typeof ROLES]
 
   return (
-    <CadreAuth registre={config.registre}>
-      <header>
-          <h1 className="text-2xl font-medium">{config.titre}</h1>
-        <p className="doux mt-1 text-sm">{config.sous_titre}</p>
-      </header>
+    <CadreAuth etiquette="Inscription" phare={config.phare}>
+      <div>
+        <h2 className="text-[28px] font-medium leading-tight tracking-[-0.01em]">
+          {config.titre}
+        </h2>
+        <p className="doux mt-1.5 text-sm">{config.sous_titre}</p>
+      </div>
 
       <Formulaire role={role} tutoiement={config.tutoiement} />
     </CadreAuth>

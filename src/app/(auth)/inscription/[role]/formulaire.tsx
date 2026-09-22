@@ -2,6 +2,8 @@
 
 import Link from "next/link"
 import { useActionState } from "react"
+
+import { Bouton, Champ, Message } from "../../champs"
 import { sInscrire, type EtatFormulaire } from "../../actions"
 
 const ETAT_INITIAL: EtatFormulaire = {}
@@ -22,7 +24,7 @@ export function Formulaire({
 
   return (
     <>
-      <form action={action} className="flex flex-col gap-4">
+      <form action={action} className="flex flex-col gap-3">
         <input type="hidden" name="role" value={role} />
 
         <Champ label={t.prenom} name="prenom" autoComplete="given-name" required />
@@ -58,22 +60,9 @@ export function Formulaire({
           required
         />
 
-        {(etat.erreur || etat.info) && (
-          <p
-            role="status"
-            className={
-              etat.erreur
-                ? "rounded-lg bg-red-600/10 px-3 py-2 text-sm text-red-700 dark:text-red-400"
-                : "rounded-lg bg-emerald-600/10 px-3 py-2 text-sm text-emerald-700 dark:text-emerald-400"
-            }
-          >
-            {etat.erreur ?? etat.info}
-          </p>
-        )}
+        <Message erreur={etat.erreur} info={etat.info} />
 
-        <button type="submit" disabled={enCours} className="bouton mt-1 px-4 py-2.5">
-          {enCours ? "Un instant…" : "Créer le compte"}
-        </button>
+        <Bouton enCours={enCours}>Créer le compte</Bouton>
       </form>
 
       <div className="doux flex justify-between text-sm">
@@ -85,22 +74,5 @@ export function Formulaire({
         </Link>
       </div>
     </>
-  )
-}
-
-function Champ({
-  label,
-  aide,
-  ...props
-}: React.InputHTMLAttributes<HTMLInputElement> & {
-  label: string
-  aide?: string
-}) {
-  return (
-    <label className="flex flex-col gap-1.5">
-      <span className="text-sm font-medium">{label}</span>
-      <input {...props} className="champ px-3 py-2.5" />
-      {aide ? <span className="doux text-xs">{aide}</span> : null}
-    </label>
   )
 }

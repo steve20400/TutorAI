@@ -356,7 +356,10 @@ body {
    de la page, pas un écran de plus. */
 @media (min-width: 768px) {
   .chargement-sortie .chargement-bloc {
-    transform: translate(calc(-50vw + 7.5rem), calc(-50vh + 3.5rem)) scale(0.3);
+    /* Cible le centre de la marque en tête de page : en-tête à px-12/pt-8,
+       marque de 26 px. Si l'en-tête bouge dans cadre.tsx, ces deux valeurs
+       doivent bouger avec lui, sinon la marque atterrit à côté de sa place. */
+    transform: translate(calc(-50vw + 3.8rem), calc(-50vh + 3.4rem)) scale(0.3);
     opacity: 0;
   }
   .chargement-sortie .chargement-slogan {
@@ -368,4 +371,81 @@ body {
 @media (prefers-reduced-motion: reduce) {
   .chargement-barre i { animation-duration: 2.4s; }
   .chargement-bloc { transition: opacity 0.3s ease-in; transform: none !important; }
+}
+
+/* --- Champ à étiquette flottante --------------------------------------------
+   Pas de bordure au repos : le champ est un creux dans la page, pas une boîte
+   posée dessus. Sur un fond entièrement occupé par le motif, une bordure de
+   plus ajoute une ligne là où il n'y a rien à séparer.                       */
+
+.champ-flottant {
+  position: relative;
+  display: block;
+}
+
+.champ-flottant input {
+  width: 100%;
+  padding: 23px 14px 9px;
+  border: 1px solid transparent;
+  border-radius: var(--rayon-petit);
+  background: color-mix(in srgb, var(--texte) 5%, var(--fond));
+  color: inherit;
+  /* 16px minimum : en dessous, iOS zoome à la mise au point du champ. */
+  font-size: 16px;
+  outline: none;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.champ-flottant input:hover {
+  background: color-mix(in srgb, var(--texte) 8%, var(--fond));
+}
+
+.champ-flottant input:focus {
+  border-color: var(--accent);
+  background: color-mix(in srgb, var(--texte) 8%, var(--fond));
+}
+
+.champ-flottant span {
+  position: absolute;
+  top: 16px;
+  left: 15px;
+  color: var(--texte-doux);
+  font-size: 15px;
+  pointer-events: none;
+  transform-origin: left top;
+  transition: transform 0.14s ease, opacity 0.14s ease;
+}
+
+.champ-flottant input:focus + span,
+.champ-flottant input:not(:placeholder-shown) + span {
+  transform: translateY(-9px) scale(0.76);
+  opacity: 0.75;
+}
+
+/* Le remplissage automatique du navigateur impose son propre fond, souvent
+   bleu clair, illisible dans un thème sombre. */
+.champ-flottant input:-webkit-autofill,
+.champ-flottant input:-webkit-autofill:focus {
+  -webkit-text-fill-color: var(--texte);
+  -webkit-box-shadow: 0 0 0 100px color-mix(in srgb, var(--fond) 92%, var(--texte)) inset;
+  caret-color: var(--texte);
+}
+
+/* Choix du rôle : un creux dans la page, comme les champs — pas une carte
+   posée par-dessus le motif. */
+.choix-role {
+  display: block;
+  padding: 16px 18px;
+  border: 1px solid transparent;
+  border-radius: var(--rayon);
+  background: color-mix(in srgb, var(--texte) 5%, var(--fond));
+  transition: background 0.15s, border-color 0.15s;
+}
+.choix-role:hover {
+  background: color-mix(in srgb, var(--texte) 10%, var(--fond));
+  border-color: color-mix(in srgb, var(--texte) 14%, transparent);
+}
+.choix-role:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
 }
