@@ -352,4 +352,48 @@ select verifier('un repetiteur ne se declare PAS verifie lui-meme',
                 (select case when statut = 'verifie' then 1 else 0 end
                    from repetiteurs where id = '55555555-5555-5555-5555-555555555555'), 0);
 
+-- ---------------------------------------------------------------------------
+-- Se nommer administrateur soi-même.
+--
+-- C'est l'attaque qui marchait : un parent connecté écrivait sa propre ligne
+-- `profils`, colonne `role`, et obtenait l'administration entière. Le
+-- middleware et la garde de page relisent tous deux cette colonne — ils
+-- validaient donc l'élévation qu'ils étaient censés empêcher.
+set local role authenticated;
+set local "request.jwt.claims" = '{"sub":"33333333-3333-3333-3333-333333333333","role":"authenticated"}';
+
+do $$
+begin
+  update profils set role = 'admin'
+  where id = '33333333-3333-3333-3333-333333333333';
+exception when insufficient_privilege then
+  null;
+end $$;
+
+reset role;
+set local "request.jwt.claims" = '';
+
+select verifier('un parent ne se nomme PAS administrateur',
+                (select case when role = 'admin' then 1 else 0 end
+                   from profils where id = '33333333-3333-3333-3333-333333333333'), 0);
+
+-- L'identifiant sert de nom de connexion à l'administration. Un compte
+-- supprimé libérerait le sien ; personne ne doit pouvoir le reprendre.
+set local role authenticated;
+set local "request.jwt.claims" = '{"sub":"33333333-3333-3333-3333-333333333333","role":"authenticated"}';
+
+do $$
+begin
+  update profils set identifiant = 'GALILEE-BIS'
+  where id = '33333333-3333-3333-3333-333333333333';
+exception when insufficient_privilege then
+  null;
+end $$;
+
+reset role;
+set local "request.jwt.claims" = '';
+
+select verifier('un parent ne change PAS son identifiant',
+                (select count(*)::int from profils where identifiant = 'GALILEE-BIS'), 0);
+
 rollback;

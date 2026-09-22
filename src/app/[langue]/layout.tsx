@@ -71,7 +71,19 @@ export default async function LayoutRacine({
   const d = dictionnaire(langue)
 
   return (
-    <html lang={d.meta.htmlLang} data-theme="indigo">
+    // `suppressHydrationWarning` ne vaut que pour cette balise et ses attributs,
+    // pas pour l'arbre en dessous. Il est nécessaire : le script ci-dessous
+    // pose `data-theme` et `data-mode` sur <html> AVANT l'hydratation, à partir
+    // du choix rangé dans le navigateur. Le serveur, lui, ne connaît pas ce
+    // choix — il n'est pas dans un cookie — et rend donc toujours « indigo »
+    // sans mode. Pour quiconque a choisi Forêt, Clair ou Sombre, React
+    // comparait un DOM déjà corrigé à un HTML qui ne l'était pas, et signalait
+    // un écart à chaque chargement de page.
+    <html
+      lang={d.meta.htmlLang}
+      data-theme="indigo"
+      suppressHydrationWarning
+    >
       <head>
         {/* Avant tout rendu, sinon la page clignote dans le mauvais thème. */}
         <script dangerouslySetInnerHTML={{ __html: SCRIPT_THEME }} />
