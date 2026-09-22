@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server"
+import { lireParametres } from "@/lib/parametres"
 import { supabaseServeur } from "@/lib/supabase/server"
 import { repondreCommeTuteur } from "@/lib/anthropic"
 
@@ -38,6 +39,19 @@ export async function POST(
 
   if (!user) {
     return NextResponse.json({ erreur: "non authentifié" }, { status: 401 })
+  }
+
+  // Le tuteur IA est un module qu'on allume depuis l'administration, et chaque
+  // appel coûte des crédits Anthropic. La garde est ici et pas seulement sur
+  // la page : masquer un écran n'empêche personne d'appeler la route qui se
+  // trouve derrière. Sans elle, n'importe quel compte connecté pouvait faire
+  // dépenser la plateforme alors que le module était éteint.
+  const { ia_active } = await lireParametres()
+  if (!ia_active) {
+    return NextResponse.json(
+      { erreur: "module_desactive" },
+      { status: 403 },
+    )
   }
 
   const corps = (await requete.json()) as {

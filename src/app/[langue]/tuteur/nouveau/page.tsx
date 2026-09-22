@@ -2,6 +2,7 @@ import Link from "next/link"
 import { redirect } from "next/navigation"
 
 import { chemin, dictionnaire, estLangue, LANGUE_PAR_DEFAUT } from "@/langues"
+import { exigerModulePage } from "@/lib/parametres"
 import { supabaseServeur } from "@/lib/supabase/server"
 import { Assistant, type OptionProgramme } from "./assistant"
 
@@ -12,6 +13,11 @@ export default async function PageNouveauTuteur({
 }) {
   const { langue: brut } = await params
   const langue = estLangue(brut) ? brut : LANGUE_PAR_DEFAUT
+
+  // Le tuteur IA est un module qu'on allume depuis l'administration. Tant
+  // qu'il est éteint, cette page n'existe pas — le middleware ne peut pas le
+  // savoir, il ne lit pas la base.
+  await exigerModulePage("ia_active", langue)
   const d = dictionnaire(langue)
 
   const supabase = await supabaseServeur()

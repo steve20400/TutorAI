@@ -3,6 +3,7 @@
 import { redirect } from "next/navigation"
 import { revalidatePath } from "next/cache"
 import { chemin, langueDeFormulaire } from "@/langues"
+import { lireParametres } from "@/lib/parametres"
 import { supabaseServeur } from "@/lib/supabase/server"
 
 export type EtatCreation = { erreur?: string }
@@ -26,6 +27,12 @@ export async function creerTuteur(
   } = await supabase.auth.getUser()
 
   if (!user) redirect(chemin(langue, "/connexion"))
+
+  // Troisième serrure, et la seule qui tienne : la page est gardée, le
+  // formulaire n'est pas affiché, mais une action serveur s'appelle
+  // directement. Un module éteint doit refuser ici aussi.
+  const { ia_active } = await lireParametres()
+  if (!ia_active) redirect(chemin(langue, "/"))
 
   const programmeIds = donnees.getAll("programmeId").map(String).filter(Boolean)
   const manuels = String(donnees.get("manuels") ?? "")

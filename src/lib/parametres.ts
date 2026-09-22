@@ -1,3 +1,6 @@
+import { redirect } from "next/navigation"
+
+import { chemin, type Langue } from "@/langues"
 import { supabaseServeur } from "./supabase/server"
 
 /**
@@ -78,4 +81,26 @@ export async function exigerModuleActif(module: Interrupteur): Promise<void> {
 export async function placeDisponible(dejaPresents: number): Promise<boolean> {
   const { participants_max } = await lireParametres()
   return dejaPresents < participants_max
+}
+
+/**
+ * Garde d'une PAGE appartenant à un module désactivable.
+ *
+ * `exigerModuleActif` lève, ce qui convient à une action serveur mais produit
+ * un écran d'erreur pour quelqu'un qui a simplement suivi un vieux lien. Ici
+ * on renvoie à l'accueil, sans expliquer : la page n'existe pas pour cette
+ * personne aujourd'hui, et détailler pourquoi reviendrait à annoncer ce que
+ * la plateforme prépare.
+ *
+ * À placer en TÊTE de chaque page concernée. Le middleware ne peut pas s'en
+ * charger : il ne lit pas la base, et rendre les modules dépendants d'une
+ * requête à chaque navigation coûterait cher pour un réglage qui bouge deux
+ * fois par an.
+ */
+export async function exigerModulePage(
+  module: Interrupteur,
+  langue: Langue,
+): Promise<void> {
+  const parametres = await lireParametres()
+  if (parametres[module] !== true) redirect(chemin(langue, "/"))
 }
