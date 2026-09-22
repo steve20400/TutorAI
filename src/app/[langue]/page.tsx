@@ -44,9 +44,20 @@ export default async function Accueil({
 
   const { data: profil } = await supabase
     .from("profils")
-    .select("prenom")
+    .select("prenom, role")
     .eq("id", user.id)
     .single()
+
+  // Chaque rôle a son chez-soi, et la racine n'est celui que de l'élève.
+  //
+  // L'aiguillage existait déjà, mais seulement au moment de la connexion : un
+  // répétiteur qui revenait sur l'adresse racine — depuis un favori, un lien
+  // partagé, ou simplement en effaçant la fin de l'adresse — tombait sur
+  // l'accueil élève, avec un message qui ne le concernait pas : « ton espace
+  // s'ouvrira quand un parent t'aura rattaché à son compte ».
+  if (profil?.role === "admin") redirect(chemin(langue, "/admin"))
+  if (profil?.role === "parent") redirect(chemin(langue, "/parent"))
+  if (profil?.role === "repetiteur") redirect(chemin(langue, "/repetiteur/profil"))
 
   const { data: tuteurs } = await supabase
     .from("tuteurs_ia")
