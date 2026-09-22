@@ -171,6 +171,20 @@ export const fr = {
     aucunRepetiteur:
       "Aucun répétiteur vérifié pour l'instant. L'annuaire ouvrira dès que les premiers profils auront passé la vérification.",
     annuaireEtape: "Annuaire — étape 3",
+    ajouterEnfant: "Ajouter un enfant",
+    prenomEnfant: "Prénom de l'enfant",
+    nomEnfant: "Nom (facultatif)",
+    motDePasseEnfant: "Mot de passe de l'enfant",
+    motDePasseAide:
+      "Six caractères au moins. Votre enfant devra le taper seul : choisissez-en un qu'il retiendra.",
+    creerLeCompte: "Créer le compte",
+    enfantCree:
+      "Compte créé. {prenom} se connecte avec l'identifiant {identifiant} et le mot de passe que vous venez de choisir.",
+    identifiantDe: "Identifiant",
+    aucunEnfant:
+      "Aucun enfant rattaché pour l'instant. Créez-lui un compte : il n'a pas besoin d'adresse mail, seulement d'un identifiant et d'un mot de passe.",
+    pasDEmail:
+      "Votre enfant n'a pas besoin d'adresse mail. Il se connectera sur ce téléphone avec son identifiant.",
     mesEnfants: "Mes enfants",
     mesEnfantsDetail:
       "Rattacher un enfant à votre compte vous donnera accès à son suivi : progression, comptes rendus de séance, enregistrements des cours.",

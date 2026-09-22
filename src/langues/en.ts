@@ -175,6 +175,20 @@ export const en: Dictionnaire = {
     aucunRepetiteur:
       "No verified tutor yet. The directory opens as soon as the first profiles pass the checks.",
     annuaireEtape: "Directory — step 3",
+    ajouterEnfant: "Add a child",
+    prenomEnfant: "Child's first name",
+    nomEnfant: "Last name (optional)",
+    motDePasseEnfant: "Child's password",
+    motDePasseAide:
+      "At least six characters. Your child will type it alone: pick one they will remember.",
+    creerLeCompte: "Create the account",
+    enfantCree:
+      "Account created. {prenom} signs in with the username {identifiant} and the password you just chose.",
+    identifiantDe: "Username",
+    aucunEnfant:
+      "No child linked yet. Create an account for them: no email address needed, only a username and a password.",
+    pasDEmail:
+      "Your child does not need an email address. They will sign in on this phone with their username.",
     mesEnfants: "My children",
     mesEnfantsDetail:
       "Adding a child to your account gives you access to their progress: reports, lesson summaries and lesson recordings.",

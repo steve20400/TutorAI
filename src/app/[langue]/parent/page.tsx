@@ -10,6 +10,7 @@ import {
   pluriel,
   remplir,
 } from "@/langues"
+import { Enfants, type Enfant } from "./enfants"
 import { supabaseServeur } from "@/lib/supabase/server"
 
 /**
@@ -51,6 +52,23 @@ export default async function AccueilParent({
 
   const verifies = count ?? 0
 
+  // Les enfants rattachés. La politique de `liens_familiaux` ne renvoie que
+  // ceux de l'appelant : pas de filtre à écrire ici, et surtout pas à oublier.
+  const { data: liens } = await supabase
+    .from("liens_familiaux")
+    .select("eleve_id")
+    .eq("parent_id", user.id)
+
+  const idsEnfants = (liens ?? []).map((l) => l.eleve_id as string)
+
+  const { data: fichesEnfants } = idsEnfants.length
+    ? await supabase
+        .from("profils")
+        .select("id, prenom, nom, identifiant")
+        .in("id", idsEnfants)
+        .order("prenom")
+    : { data: [] as Enfant[] }
+
   return (
     <Registre>
       <main className="mx-auto flex max-w-lg flex-col gap-6 p-6">
@@ -76,15 +94,11 @@ export default async function AccueilParent({
           </div>
         </section>
 
-        <section className="carte p-5">
-          <div className="font-medium">{d.parent.mesEnfants}</div>
-          <p className="doux mt-1 text-sm leading-relaxed">
-            {d.parent.mesEnfantsDetail}
-          </p>
-          <div className="doux mt-3 text-xs uppercase tracking-wide">
-            {d.parent.suiviEtape}
-          </div>
-        </section>
+        <Enfants
+          langue={langue}
+          d={d}
+          enfants={(fichesEnfants ?? []) as Enfant[]}
+        />
       </main>
     </Registre>
   )

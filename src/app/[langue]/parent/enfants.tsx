@@ -1,0 +1,119 @@
+"use client"
+
+import { useActionState } from "react"
+
+import { creerEnfant, type EtatEnfant } from "@/actions/famille"
+import { remplir, type Dictionnaire, type Langue } from "@/langues"
+
+const ETAT_INITIAL: EtatEnfant = {}
+
+export type Enfant = {
+  id: string
+  prenom: string | null
+  nom: string | null
+  identifiant: string | null
+}
+
+/**
+ * Les enfants rattachés, et le formulaire qui en ajoute un.
+ *
+ * L'identifiant est affiché en gros après la création, une seule fois : c'est
+ * la seule chose que le parent doit retenir, et il n'y a pas d'adresse mail
+ * pour le lui rappeler plus tard. Il reste visible dans la liste, ce qui rend
+ * l'oubli sans conséquence.
+ */
+export function Enfants({
+  langue,
+  d,
+  enfants,
+}: {
+  langue: Langue
+  d: Dictionnaire
+  enfants: Enfant[]
+}) {
+  const [etat, action, enCours] = useActionState(creerEnfant, ETAT_INITIAL)
+  const t = d.parent
+
+  return (
+    <section className="carte p-5">
+      <div className="font-medium">{t.mesEnfants}</div>
+
+      {enfants.length === 0 ? (
+        <p className="doux mt-1 text-sm leading-relaxed">{t.aucunEnfant}</p>
+      ) : (
+        <ul className="mt-3 flex flex-col gap-2">
+          {enfants.map((e) => (
+            <li
+              key={e.id}
+              className="flex flex-wrap items-baseline justify-between gap-2 border-t pt-2 text-sm"
+              style={{ borderColor: "var(--bordure)" }}
+            >
+              <span className="font-medium">
+                {[e.prenom, e.nom].filter(Boolean).join(" ")}
+              </span>
+              <span className="doux font-mono text-xs">
+                {t.identifiantDe} : {e.identifiant}
+              </span>
+            </li>
+          ))}
+        </ul>
+      )}
+
+      {etat.cree ? (
+        <p
+          className="mt-4 rounded-[9px] p-3 text-sm leading-relaxed"
+          style={{
+            background: "color-mix(in srgb, var(--accent) 8%, transparent)",
+            border: "1px solid var(--bordure)",
+          }}
+        >
+          {remplir(t.enfantCree, {
+            prenom: etat.cree.prenom,
+            identifiant: etat.cree.identifiant,
+          })}
+        </p>
+      ) : null}
+
+      <form action={action} className="mt-4 flex flex-col gap-2.5">
+        <input type="hidden" name="langue" value={langue} />
+
+        <div className="flex flex-wrap gap-2.5">
+          <input
+            name="prenom"
+            required
+            placeholder={t.prenomEnfant}
+            className="champ min-w-[140px] flex-1 px-3 py-2 text-sm"
+          />
+          <input
+            name="nom"
+            placeholder={t.nomEnfant}
+            className="champ min-w-[140px] flex-1 px-3 py-2 text-sm"
+          />
+        </div>
+
+        <input
+          name="motDePasse"
+          type="password"
+          required
+          minLength={6}
+          autoComplete="new-password"
+          placeholder={t.motDePasseEnfant}
+          className="champ px-3 py-2 text-sm"
+        />
+        <p className="doux text-xs leading-relaxed">{t.motDePasseAide}</p>
+
+        {etat.erreur ? (
+          <p className="text-sm" style={{ color: "var(--erreur-texte)" }}>
+            {etat.erreur}
+          </p>
+        ) : null}
+
+        <button type="submit" className="bt1 mt-1" disabled={enCours}>
+          {t.creerLeCompte}
+        </button>
+
+        <p className="doux text-xs leading-relaxed">{t.pasDEmail}</p>
+      </form>
+    </section>
+  )
+}

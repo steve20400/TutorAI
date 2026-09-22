@@ -512,4 +512,59 @@ select verifier('un eleve PEUT signaler',
 reset role;
 set local "request.jwt.claims" = '';
 
+-- ---------------------------------------------------------------------------
+-- Un enfant n'a pas d'adresse mail.
+--
+-- Supabase impose une adresse unique par compte. Dans une maison où l'on
+-- partage un téléphone et une boîte mail, le premier inscrit prenait l'adresse
+-- et fermait la porte aux autres : un enfant inscrit le matin empêchait sa
+-- mère de chercher un répétiteur le soir.
+--
+-- Effet de bord voulu, et le plus important : un mineur ne peut plus ouvrir un
+-- compte seul. Il naît rattaché à un adulte identifié.
+set local role authenticated;
+set local "request.jwt.claims" = '{"sub":"11111111-1111-1111-1111-111111111111","role":"authenticated"}';
+
+do $$
+begin
+  perform creer_compte_eleve('Pirate', 'Sansparent', 'motdepasse');
+exception when insufficient_privilege then
+  null;
+end $$;
+
+select verifier('un eleve ne cree PAS de compte enfant',
+                (select count(*)::int from profils where prenom = 'Pirate'), 0);
+
+reset role;
+set local "request.jwt.claims" = '';
+
+-- Le parent, lui, le peut — et l'enfant lui est rattaché dans la même
+-- transaction. Un enfant a moitie cree, sans lien vers son parent, serait pire
+-- que pas d'enfant du tout.
+set local role authenticated;
+set local "request.jwt.claims" = '{"sub":"33333333-3333-3333-3333-333333333333","role":"authenticated"}';
+
+do $$
+declare ident text;
+begin
+  select identifiant into ident from creer_compte_eleve('Essai', 'Rattache', 'motdepasse');
+exception when others then
+  null;
+end $$;
+
+reset role;
+set local "request.jwt.claims" = '';
+
+select verifier('un parent cree un enfant, rattache du meme coup',
+                (select count(*)::int
+                   from profils p join liens_familiaux l on l.eleve_id = p.id
+                  where p.prenom = 'Essai'
+                    and l.parent_id = '33333333-3333-3333-3333-333333333333'), 1);
+
+select verifier('l''enfant n''a aucune adresse mail reelle',
+                (select count(*)::int from auth.users u
+                   join profils p on p.id = u.id
+                  where p.prenom = 'Essai'
+                    and u.email not like '%@eleves.tutela.cm'), 0);
+
 rollback;
