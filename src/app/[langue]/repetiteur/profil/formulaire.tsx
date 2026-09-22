@@ -4,12 +4,8 @@ import { useActionState } from "react"
 
 import { useLangue } from "@/langues/contexte"
 import { Message } from "../../(auth)/champs"
-import {
-  enregistrerProfil,
-  MATIERES,
-  NIVEAUX,
-  type EtatProfil,
-} from "@/actions/repetiteur"
+import { enregistrerProfil, type EtatProfil } from "@/actions/repetiteur"
+import { MATIERES, NIVEAUX } from "@/lib/referentiel"
 
 const ETAT_INITIAL: EtatProfil = {}
 

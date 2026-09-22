@@ -3,32 +3,10 @@
 import { redirect } from "next/navigation"
 import { revalidatePath } from "next/cache"
 import { chemin, langueDeFormulaire } from "@/langues"
+import { MATIERES, NIVEAUX } from "@/lib/referentiel"
 import { supabaseServeur } from "@/lib/supabase/server"
 
 export type EtatProfil = { erreur?: string; info?: string }
-
-/** Listes fermées : ce qui arrive du navigateur est filtré contre elles. */
-export const MATIERES = [
-  "Mathématiques",
-  "Physique-Chimie",
-  "SVT",
-  "Français",
-  "Anglais",
-  "Philosophie",
-  "Histoire-Géographie",
-  "Informatique",
-  "Économie",
-] as const
-
-export const NIVEAUX = [
-  "6e",
-  "5e",
-  "4e",
-  "3e",
-  "2nde",
-  "1ère",
-  "Terminale",
-] as const
 
 export async function enregistrerProfil(
   _precedent: EtatProfil,
