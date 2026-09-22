@@ -27,6 +27,14 @@ export const fr = {
     changerLangue: "Changer de langue",
   },
 
+  introuvable: {
+    titre: "Cette page n'existe pas.",
+    detail:
+      "L'adresse est peut-être mal recopiée, ou la page a changé de nom depuis qu'on vous a partagé le lien.",
+    retour: "Revenir à l'accueil",
+    code: "Erreur 404",
+  },
+
   chargement: {
     aria: "Chargement de TUTELA",
     sloganLigne1: "Un répétiteur vérifié.",

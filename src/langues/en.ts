@@ -31,6 +31,14 @@ export const en: Dictionnaire = {
     changerLangue: "Change language",
   },
 
+  introuvable: {
+    titre: "This page does not exist.",
+    detail:
+      "The address may have been mistyped, or the page has been renamed since the link was shared with you.",
+    retour: "Back to home",
+    code: "Error 404",
+  },
+
   chargement: {
     aria: "Loading TUTELA",
     sloganLigne1: "A verified tutor.",
