@@ -1,70 +1,143 @@
 @import "tailwindcss";
 
 /* =============================================================================
-   Deux registres visuels dans un seul produit.
+   Deux thèmes, chacun en clair et en sombre — quatre combinaisons.
 
-   Ce ne sont ni les mêmes personnes ni le même moment : un adolescent qui
-   révise a besoin de chaleur, un parent qui confie son enfant à un inconnu a
-   besoin de preuves. Plutôt que de chercher un compromis tiède, chaque espace
-   porte son propre registre.
+   Le thème (« indigo » ou « foret ») se choisit dans les réglages et se pose
+   sur <html data-theme>. Le mode suit le système par défaut, et se force avec
+   data-mode="clair" ou "sombre".
 
-   Le registre se choisit par l'attribut data-registre sur <body> (voir les
-   layouts). Tout le reste — couleurs, arrondis, ombres — en découle.
+   Ce sont les mêmes noms de variables que l'ancien système à deux registres :
+   les pages déjà écrites continuent de fonctionner sans modification. Ce qui
+   change, c'est qui décide de la couleur — l'utilisateur, plus l'espace.
    ============================================================================= */
 
 :root,
-[data-registre="eleve"] {
-  --fond: #faf6ee;
-  --texte: #2a2118;
-  --texte-doux: #8a7a5f;
-  --surface: #ffffff;
-  --bordure: #e8dfce;
-  --accent: #b45309;
-  --accent-texte: #ffffff;
-  --accent-doux: #f3e4c8;
-  --accent-doux-texte: #7a5a16;
-  --rayon: 14px;
-  --rayon-petit: 10px;
-  --ombre: 0 1px 3px rgb(80 60 20 / 0.1);
+[data-theme="indigo"] {
+  color-scheme: light;
+
+  --fond: #f4f1ea;
+  --texte: #1b2a4a;
+  --texte-doux: #5d6a82;
+  --surface: #fbf9f4;
+  --bordure: #dfd9cc;
+
+  --accent: #1b2a4a;
+  --accent-texte: #f4f1ea;
+
+  /* Le couple « vérifié ». Vert dans les quatre thèmes : c'est le seul signal
+     qui ne doit jamais changer de sens d'un écran à l'autre. */
+  --accent-doux: #dfeae1;
+  --accent-doux-texte: #1f6b45;
+
+  /* Voyant d'enregistrement. Rouge franc, jamais ambré : un voyant qu'on ne
+     voit pas ne rassure personne. */
+  --voyant: #e8692f;
+  --erreur-texte: #a52a1e;
+
+  --rayon: 12px;
+  --rayon-petit: 8px;
+  --ombre: 0 1px 2px rgb(27 42 74 / 0.06);
+  --motif-opacite: 0.11;
 }
 
-[data-registre="adulte"] {
-  --fond: #f4f6f9;
-  --texte: #14243a;
-  --texte-doux: #5b6b7f;
-  --surface: #ffffff;
-  --bordure: #d4dce6;
-  --accent: #14314f;
-  --accent-texte: #ffffff;
-  --accent-doux: #e3f2ec;
-  --accent-doux-texte: #136647;
-  --rayon: 8px;
-  --rayon-petit: 5px;
-  --ombre: none;
+[data-theme="foret"] {
+  color-scheme: light;
+
+  --fond: #f1f3ee;
+  --texte: #1e3a2f;
+  --texte-doux: #5a6e62;
+  --surface: #f8f9f6;
+  --bordure: #d8dfd4;
+
+  --accent: #1e3a2f;
+  --accent-texte: #f1f3ee;
+  --accent-doux: #dfebe1;
+  --accent-doux-texte: #1f6b45;
+  --voyant: #e0632c;
+  --erreur-texte: #a52a1e;
+
+  --rayon: 12px;
+  --rayon-petit: 8px;
+  --ombre: 0 1px 2px rgb(30 58 47 / 0.06);
+  --motif-opacite: 0.11;
 }
+
+/* --- Modes sombres ---------------------------------------------------------
+   `:not([data-mode="clair"])` laisse la préférence explicite de l'utilisateur
+   l'emporter sur celle du système. L'ordre compte : « foret » vient en
+   dernier, à spécificité égale.                                             */
 
 @media (prefers-color-scheme: dark) {
-  :root,
-  [data-registre="eleve"] {
-    --fond: #17150f;
-    --texte: #f5f2ea;
-    --texte-doux: #a2957c;
-    --surface: #221f17;
-    --bordure: #38321f;
-    --accent-doux: #3a2f14;
-    --accent-doux-texte: #e8c88a;
-  }
-
-  [data-registre="adulte"] {
-    --fond: #0f1a26;
-    --texte: #e8eef5;
-    --texte-doux: #8fa3ba;
-    --surface: #17232f;
-    --bordure: #2a3a4c;
-    --accent: #2f6ea8;
+  :root:not([data-mode="clair"]),
+  [data-theme="indigo"]:not([data-mode="clair"]) {
+    color-scheme: dark;
+    --fond: #0e1626;
+    --texte: #e9e3d6;
+    --texte-doux: #93a0b5;
+    --surface: #16223a;
+    --bordure: #263452;
+    --accent: #e9e3d6;
+    --accent-texte: #0e1626;
     --accent-doux: #16302a;
     --accent-doux-texte: #6fd3ab;
+    --voyant: #d9453a;
+    --erreur-texte: #f4a196;
+    --ombre: none;
+    --motif-opacite: 0.1;
   }
+
+  [data-theme="foret"]:not([data-mode="clair"]) {
+    color-scheme: dark;
+    --fond: #14171a;
+    --texte: #e7e5e0;
+    --texte-doux: #9a9b97;
+    --surface: #1d2125;
+    --bordure: #2e3338;
+    --accent: #e7e5e0;
+    --accent-texte: #14171a;
+    --accent-doux: #1c2c24;
+    --accent-doux-texte: #74cca4;
+    --voyant: #d1483a;
+    --erreur-texte: #f2a096;
+    --ombre: none;
+    --motif-opacite: 0.1;
+  }
+}
+
+:root[data-mode="sombre"],
+[data-theme="indigo"][data-mode="sombre"] {
+  color-scheme: dark;
+  --fond: #0e1626;
+  --texte: #e9e3d6;
+  --texte-doux: #93a0b5;
+  --surface: #16223a;
+  --bordure: #263452;
+  --accent: #e9e3d6;
+  --accent-texte: #0e1626;
+  --accent-doux: #16302a;
+  --accent-doux-texte: #6fd3ab;
+  --voyant: #d9453a;
+  --erreur-texte: #f4a196;
+  --ombre: none;
+  --motif-opacite: 0.1;
+}
+
+[data-theme="foret"][data-mode="sombre"] {
+  color-scheme: dark;
+  --fond: #14171a;
+  --texte: #e7e5e0;
+  --texte-doux: #9a9b97;
+  --surface: #1d2125;
+  --bordure: #2e3338;
+  --accent: #e7e5e0;
+  --accent-texte: #14171a;
+  --accent-doux: #1c2c24;
+  --accent-doux-texte: #74cca4;
+  --voyant: #d1483a;
+  --erreur-texte: #f2a096;
+  --ombre: none;
+  --motif-opacite: 0.1;
 }
 
 body {
@@ -73,7 +146,30 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-/* --- Éléments partagés, rendus différemment selon le registre -------------- */
+/* --- Le motif ---------------------------------------------------------------
+   Le SVG sert de masque, pas d'image : la couleur vient de background-color,
+   donc le motif suit les quatre thèmes sans qu'on le redessine quatre fois.  */
+
+.motif-fond {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-color: var(--texte);
+  opacity: var(--motif-opacite);
+  -webkit-mask: url("/motif-education.svg") 0 0 / 160px 160px repeat;
+  mask: url("/motif-education.svg") 0 0 / 160px 160px repeat;
+}
+
+/* Sur un téléphone, 160 px de tuile donne des motifs trop gros : deux et demi
+   en travers de l'écran. On resserre. */
+@media (max-width: 640px) {
+  .motif-fond {
+    -webkit-mask-size: 118px 118px;
+    mask-size: 118px 118px;
+  }
+}
+
+/* --- Éléments partagés ----------------------------------------------------- */
 
 .carte {
   background: var(--surface);
@@ -105,8 +201,6 @@ body {
   border-color: var(--accent);
 }
 
-/* Badge de vérification : vert dans les deux registres. C'est le seul signal
-   qui ne doit jamais changer de sens d'un écran à l'autre. */
 .badge-verifie {
   background: var(--accent-doux);
   color: var(--accent-doux-texte);
@@ -117,10 +211,18 @@ body {
   white-space: nowrap;
 }
 
+.badge-eteint {
+  background: color-mix(in srgb, var(--texte-doux) 12%, transparent);
+  color: var(--texte-doux);
+  border-radius: var(--rayon-petit);
+  font-size: 11px;
+  font-weight: 500;
+  padding: 3px 8px;
+  white-space: nowrap;
+}
+
 .doux { color: var(--texte-doux); }
 
-/* Pastille de sélection. L'état coché doit se lire d'un coup d'œil sur un
-   petit écran : couleur pleine, pas seulement une bordure plus sombre. */
 .pastille {
   display: block;
   border: 1px solid var(--bordure);
@@ -138,4 +240,132 @@ body {
 .peer:focus-visible + .pastille {
   outline: 2px solid var(--accent);
   outline-offset: 2px;
+}
+
+/* --- Écran de chargement ----------------------------------------------------
+   L'écran s'allume, le répétiteur entre, la vignette de l'élève s'ouvre, le
+   voyant clignote puis se fixe. Quatre temps en 1,3 s : assez pour raconter,
+   assez court pour ne pas agacer au dixième lancement.                       */
+
+@keyframes chargement-apparait {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: none; }
+}
+
+@keyframes chargement-vignette {
+  from { opacity: 0; transform: scale(0.35); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+@keyframes chargement-voyant {
+  0%   { opacity: 0; }
+  12%  { opacity: 1; }
+  34%  { opacity: 0.25; }
+  56%  { opacity: 1; }
+  78%  { opacity: 0.25; }
+  100% { opacity: 1; }
+}
+
+/* Barre indéterminée : on ne connaît pas l'avancement réel, autant ne pas le
+   feindre. Elle montre seulement que quelque chose travaille encore. */
+@keyframes chargement-navette {
+  from { transform: translateX(-100%); }
+  to   { transform: translateX(260%); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .chargement-anime {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}
+
+.chargement {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: var(--fond);
+  color: var(--texte);
+  transition: opacity 0.42s ease-in;
+}
+
+.chargement-bloc {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transition:
+    transform 0.55s cubic-bezier(0.55, 0, 0.2, 1),
+    opacity 0.45s ease-in;
+}
+
+.chargement-barre {
+  position: relative;
+  width: 104px;
+  height: 2.5px;
+  margin-top: 20px;
+  border-radius: 2px;
+  overflow: hidden;
+  background: color-mix(in srgb, var(--texte) 14%, transparent);
+}
+.chargement-barre i {
+  position: absolute;
+  inset-block: 0;
+  width: 42%;
+  border-radius: 2px;
+  background: var(--accent);
+  animation: chargement-navette 1.15s ease-in-out infinite;
+}
+
+.chargement-slogan {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 34px;
+  padding: 0 24px;
+  text-align: center;
+  font-size: 11.5px;
+  line-height: 1.75;
+  color: var(--texte-doux);
+}
+
+.chargement-lenteur {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 12px;
+  text-align: center;
+  font-size: 11px;
+  color: var(--texte-doux);
+  opacity: 0.75;
+}
+
+.chargement-sortie {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Sur grand écran, la marque ne disparaît pas : elle rejoint sa place en tête
+   de page pendant que le contenu se découvre. Le chargement devient le début
+   de la page, pas un écran de plus. */
+@media (min-width: 768px) {
+  .chargement-sortie .chargement-bloc {
+    transform: translate(calc(-50vw + 7.5rem), calc(-50vh + 3.5rem)) scale(0.3);
+    opacity: 0;
+  }
+  .chargement-sortie .chargement-slogan {
+    opacity: 0;
+    transition: opacity 0.25s ease-in;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .chargement-barre i { animation-duration: 2.4s; }
+  .chargement-bloc { transition: opacity 0.3s ease-in; transform: none !important; }
 }

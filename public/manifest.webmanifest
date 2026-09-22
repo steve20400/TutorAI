@@ -1,16 +1,18 @@
 {
-  "name": "Mon tuteur",
-  "short_name": "Tuteur",
-  "description": "Soutien scolaire ancré sur le programme officiel. Ton tuteur ne donne pas les réponses — il t'aide à les trouver.",
+  "name": "TUTELA",
+  "short_name": "TUTELA",
+  "description": "Un répétiteur vérifié. Une séance qui laisse une trace.",
   "lang": "fr",
   "dir": "ltr",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
   "orientation": "portrait",
-  "background_color": "#ffffff",
-  "theme_color": "#b45309",
-  "categories": ["education"],
+  "background_color": "#f4f1ea",
+  "theme_color": "#f4f1ea",
+  "categories": [
+    "education"
+  ],
   "icons": [
     {
       "src": "/icones/icone-192.png",

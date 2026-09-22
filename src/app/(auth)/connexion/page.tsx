@@ -27,10 +27,10 @@ function Formulaire() {
         <input type="hidden" name="suite" value={suite} />
 
         <Champ
-          label="Email"
+          label="Email ou identifiant"
           name="email"
-          type="email"
-          autoComplete="email"
+          type="text"
+          autoComplete="username"
           required
         />
         <Champ

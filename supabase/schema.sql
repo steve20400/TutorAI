@@ -32,6 +32,9 @@ create table profils (
   prenom      text not null,
   nom         text,
   telephone   text,
+  -- Nom d'utilisateur. Sert à l'administration, qui se connecte par
+  -- identifiant plutôt que par email.
+  identifiant text unique,
   pays        text not null default 'CM',
   cree_le     timestamptz not null default now()
 );
@@ -210,6 +213,32 @@ create table journal_admin (
 );
 
 -- =============================================================================
+-- 5 bis. PARAMÈTRES DE L'APPLICATION
+--
+-- Ce que l'administrateur règle sans toucher au code ni redéployer.
+--
+-- Les modules coûteux (IA, paiement, enregistrement vidéo) naissent ÉTEINTS.
+-- Tant qu'un interrupteur est à false, l'écran correspondant n'apparaît pas et
+-- l'action côté serveur est refusée — les deux, pas seulement le premier :
+-- masquer un bouton n'a jamais empêché personne d'appeler la route derrière.
+-- =============================================================================
+
+create table parametres (
+  cle      text primary key,
+  valeur   jsonb not null,
+  libelle  text not null,
+  maj_le   timestamptz not null default now(),
+  maj_par  uuid references profils(id) on delete set null
+);
+
+insert into parametres (cle, valeur, libelle) values
+  ('ia_active',       'false'::jsonb,   'Tuteur IA proposé aux élèves'),
+  ('paiement_actif',  'false'::jsonb,   'Paiement mobile money activé'),
+  ('enregistrement_actif', 'false'::jsonb, 'Enregistrement des séances de cours'),
+  ('resolution_video', '"480p"'::jsonb, 'Résolution des séances enregistrées'),
+  ('inscriptions_ouvertes', 'true'::jsonb, 'Nouvelles inscriptions autorisées');
+
+-- =============================================================================
 -- 6. FONCTIONS D'AIDE POUR LA RLS
 -- =============================================================================
 
@@ -254,6 +283,7 @@ alter table contrats          enable row level security;
 alter table seances_humaines  enable row level security;
 alter table signalements      enable row level security;
 alter table journal_admin     enable row level security;
+alter table parametres        enable row level security;
 
 -- --- profils ---
 create policy "lire son profil" on profils
@@ -340,6 +370,15 @@ create policy "ecrire ses messages" on messages
 create policy "admin lit les incidents" on incidents_tuteur
   for select using (est_admin());
 
+-- --- paramètres ---
+-- Tout le monde lit : l'application doit savoir quels modules sont allumés.
+-- Seule l'administration écrit.
+create policy "tout le monde lit les parametres" on parametres
+  for select using (true);
+
+create policy "seule l'administration modifie les parametres" on parametres
+  for update using (est_admin()) with check (est_admin());
+
 -- --- journal d'administration : lecture admin, écriture serveur uniquement ---
 create policy "admin lit le journal" on journal_admin
   for select using (est_admin());
@@ -372,21 +411,34 @@ create policy "les familles voient les repetiteurs verifies" on repetiteurs
 
 create or replace function gerer_nouvel_utilisateur()
 returns trigger language plpgsql security definer set search_path = public as $$
+declare
+  role_demande text := coalesce(new.raw_user_meta_data ->> 'role', 'eleve');
 begin
-  insert into profils (id, role, prenom, nom, telephone, pays)
+  -- `raw_user_meta_data` vient du client. N'importe qui peut appeler
+  -- supabase.auth.signUp({options: {data: {role: 'admin'}}}) depuis un
+  -- navigateur avec la clé publique — elle est publique, c'est son rôle.
+  -- Faire confiance à ce champ donnerait les pleins pouvoirs à qui le demande.
+  -- Tout rôle non prevu retombe sur 'eleve'. Un administrateur ne se cree
+  -- qu'en SQL, jamais par inscription.
+  if role_demande not in ('eleve', 'parent', 'repetiteur') then
+    role_demande := 'eleve';
+  end if;
+
+  insert into profils (id, role, prenom, nom, telephone, identifiant, pays)
   values (
     new.id,
-    coalesce((new.raw_user_meta_data ->> 'role')::role_utilisateur, 'eleve'),
+    role_demande::role_utilisateur,
     coalesce(new.raw_user_meta_data ->> 'prenom', 'Élève'),
     nullif(new.raw_user_meta_data ->> 'nom', ''),
     nullif(new.raw_user_meta_data ->> 'telephone', ''),
+    nullif(new.raw_user_meta_data ->> 'identifiant', ''),
     coalesce(new.raw_user_meta_data ->> 'pays', 'CM')
   );
 
   -- Un répétiteur a besoin d'une fiche dès l'inscription, même vide : sans
   -- elle, sa première visite au formulaire de profil n'aurait rien à modifier.
   -- Elle naît en 'brouillon', donc invisible des familles.
-  if coalesce(new.raw_user_meta_data ->> 'role', '') = 'repetiteur' then
+  if role_demande = 'repetiteur' then
     insert into repetiteurs (id) values (new.id);
   end if;
   return new;
@@ -396,3 +448,27 @@ $$;
 create trigger sur_nouvel_utilisateur
   after insert on auth.users
   for each row execute function gerer_nouvel_utilisateur();
+
+
+-- =============================================================================
+-- 9. CONNEXION PAR IDENTIFIANT
+--
+-- L'administration se connecte avec « GALILEE », pas avec une adresse email.
+-- Supabase Auth ne connaît que les emails : cette fonction fait le pont.
+--
+-- security definer, car un visiteur non connecté ne peut pas lire `profils` —
+-- et c'est justement avant d'être connecté qu'il a besoin de cette résolution.
+-- Elle ne révèle rien : sans le mot de passe, connaître l'email ne sert à rien.
+-- =============================================================================
+
+create or replace function email_par_identifiant(saisie text)
+returns text language sql stable security definer set search_path = public, auth as $$
+  select u.email
+  from profils p
+  join auth.users u on u.id = p.id
+  where upper(p.identifiant) = upper(trim(saisie))
+  limit 1;
+$$;
+
+revoke all on function email_par_identifiant(text) from public;
+grant execute on function email_par_identifiant(text) to anon, authenticated;

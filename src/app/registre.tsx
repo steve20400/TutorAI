@@ -1,17 +1,22 @@
 /**
- * Applique un registre visuel à tout un espace de l'application.
+ * Conteneur pleine hauteur qui peint le fond du thème.
  *
- * Les variables CSS sont redéfinies sur ce conteneur, donc tout ce qu'il
- * contient en hérite. Il peint aussi le fond par-dessus celui du <body>, sans
- * quoi l'espace adulte garderait le fond crème de l'espace élève.
+ * Historiquement, ce composant portait deux palettes — une pour l'espace
+ * élève, une pour l'espace adulte. Ce n'est plus le cas : depuis les quatre
+ * thèmes, c'est l'utilisateur qui choisit son registre visuel dans les
+ * réglages, et il s'applique à toute l'application.
  *
- * Voir src/app/globals.css pour les deux palettes.
+ * La propriété `type` ne change donc plus aucune couleur. Elle est conservée
+ * le temps que les pages d'authentification soient refaites, pour ne pas
+ * modifier quatre fichiers avant de les réécrire — mais elle est à retirer à
+ * ce moment-là. Voir src/lib/theme.ts et src/app/globals.css.
  */
 export function Registre({
   type,
   children,
 }: {
-  type: "eleve" | "adulte"
+  /** @deprecated Sans effet. Le registre visuel vient du thème choisi. */
+  type?: "eleve" | "adulte"
   children: React.ReactNode
 }) {
   return (

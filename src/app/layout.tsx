@@ -1,19 +1,22 @@
 import type { Metadata, Viewport } from "next"
+
+import { SCRIPT_THEME } from "@/lib/theme"
+import { EcranChargement } from "./chargement"
 import "./globals.css"
 
 export const metadata: Metadata = {
-  title: "Mon tuteur",
+  title: "TUTELA",
   description:
-    "Soutien scolaire ancré sur le programme officiel. Ton tuteur ne donne pas les réponses — il t'aide à les trouver.",
+    "Un répétiteur vérifié. Une séance qui laisse une trace. Le soutien scolaire où un enfant n'est jamais seul avec un adulte.",
   manifest: "/manifest.webmanifest",
-  applicationName: "Mon tuteur",
+  applicationName: "TUTELA",
   icons: {
     icon: "/favicon.png",
     apple: "/icones/apple-touch-icon.png",
   },
   appleWebApp: {
     capable: true,
-    title: "Mon tuteur",
+    title: "TUTELA",
     statusBarStyle: "default",
   },
   // Produit destiné à des mineurs : pas d'indexation, pas d'aperçu partageable.
@@ -30,9 +33,11 @@ export const viewport: Viewport = {
   initialScale: 1,
   maximumScale: 1,
   viewportFit: "cover",
+  // Le fond du thème Indigo, clair et sombre : c'est celui qui s'applique
+  // tant que l'utilisateur n'a rien choisi.
   themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#b45309" },
-    { media: "(prefers-color-scheme: dark)", color: "#17150f" },
+    { media: "(prefers-color-scheme: light)", color: "#f4f1ea" },
+    { media: "(prefers-color-scheme: dark)", color: "#0e1626" },
   ],
 }
 
@@ -42,8 +47,15 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="fr">
-      <body className="min-h-dvh antialiased">{children}</body>
+    <html lang="fr" data-theme="indigo">
+      <head>
+        {/* Avant tout rendu, sinon la page clignote dans le mauvais thème. */}
+        <script dangerouslySetInnerHTML={{ __html: SCRIPT_THEME }} />
+      </head>
+      <body className="min-h-dvh antialiased">
+        <EcranChargement />
+        {children}
+      </body>
     </html>
   )
 }

@@ -29,15 +29,29 @@ export async function seConnecter(
   _precedent: EtatFormulaire,
   donnees: FormData,
 ): Promise<EtatFormulaire> {
-  const email = String(donnees.get("email") ?? "").trim()
+  const saisie = String(donnees.get("email") ?? "").trim()
   const motDePasse = String(donnees.get("motDePasse") ?? "")
   const suite = String(donnees.get("suite") ?? "/")
 
-  if (!email || !motDePasse) {
+  if (!saisie || !motDePasse) {
     return { erreur: "Remplis les deux champs." }
   }
 
   const supabase = await supabaseServeur()
+
+  // L'administration se connecte par identifiant (« GALILEE »), les autres par
+  // email. Une saisie sans arobase est donc traitée comme un identifiant et
+  // résolue en base. Échec silencieux volontaire : si l'identifiant n'existe
+  // pas, on laisse l'authentification répondre « identifiants incorrects »
+  // plutôt que de révéler quels comptes existent.
+  let email = saisie
+  if (!saisie.includes("@")) {
+    const { data } = await supabase.rpc("email_par_identifiant", {
+      saisie,
+    })
+    email = (data as string | null) ?? saisie
+  }
+
   const { error } = await supabase.auth.signInWithPassword({
     email,
     password: motDePasse,
@@ -86,6 +100,7 @@ async function accueilDeLUtilisateur(
     .single()
 
   const role = data?.role as RoleInscription | "admin" | undefined
+  if (role === "admin") return "/admin"
   if (role === "parent") return "/parent"
   if (role === "repetiteur") return "/repetiteur/profil"
   return "/"
