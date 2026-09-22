@@ -508,14 +508,24 @@ body {
 }
 
 /* Barre repliée : plus de libellé, l'entrée redevient un carré. */
-.admin-repliee .admin-lien {
-  margin: 0 auto 5px;
-  padding: 9px;
-  width: 34px;
-  justify-content: center;
+/* Le repli n'existe qu'à partir de `lg`. Sur téléphone la barre s'ouvre en
+   surimpression et reste toujours dépliée — or `repliee` est mémorisé dans le
+   navigateur et vaut donc souvent `true` en arrivant. Sans cette borne, une
+   barre ouverte au doigt s'affichait repliée, libellés en moins.
+
+   La borne est ici et non dans la classe : `lg:admin-repliee` ne produit
+   aucun style, Tailwind ne sachant pas préfixer une classe maison. Écrite
+   ainsi, elle ne faisait rien du tout — le bouton de repli semblait mort. */
+@media (min-width: 1024px) {
+  .admin-repliee .admin-lien {
+    margin: 0 auto 5px;
+    padding: 9px;
+    width: 34px;
+    justify-content: center;
+  }
+  .admin-repliee .admin-libelle,
+  .admin-repliee .admin-compteur { display: none; }
 }
-.admin-repliee .admin-libelle,
-.admin-repliee .admin-compteur { display: none; }
 
 /* Voile qui dit qu'il reste des entrées sous le pli. */
 .admin-voile {
@@ -704,30 +714,26 @@ body {
   --carte-commande: invert(1);
 }
 
-/* ── Barre repliée ─────────────────────────────────────────────────────────
-   `.admin-repliee` n'est posée qu'à partir de `lg` (voir barre.tsx). Tout le
-   repli passe donc par le CSS et jamais par un ternaire en JavaScript : un
-   ternaire s'appliquerait à toutes les tailles d'écran, et sur téléphone —
-   où la barre s'ouvre en surimpression, toujours dépliée — le markup se
-   croyait replié pendant que le CSS se croyait déplié. Logo et avatar
-   partaient alors se centrer en colonne, libellés en moins. */
-.admin-repliee .admin-tete {
-  flex-direction: column;
-  justify-content: center;
-  gap: 0.75rem;
-  padding-left: 0;
-  padding-right: 0;
-}
+/* ── Barre repliée (grand écran seulement) ───────────────────────────────── */
+@media (min-width: 1024px) {
+  .admin-repliee .admin-tete {
+    flex-direction: column;
+    justify-content: center;
+    gap: 0.75rem;
+    padding-left: 0;
+    padding-right: 0;
+  }
 
-.admin-repliee .admin-pied {
-  padding-left: 0.375rem;
-  padding-right: 0.375rem;
-}
+  .admin-repliee .admin-pied {
+    padding-left: 0.375rem;
+    padding-right: 0.375rem;
+  }
 
-.admin-repliee .admin-rangee {
-  flex-direction: column;
-  justify-content: center;
-  gap: 0.5rem;
+  .admin-repliee .admin-rangee {
+    flex-direction: column;
+    justify-content: center;
+    gap: 0.5rem;
+  }
 }
 
 /* Le rouet d'attente. Il ne dit pas combien de temps il reste — il dit que la

@@ -321,9 +321,9 @@ export function BarreAdmin({
       ) : null}
 
       <nav
-        className={`admin-encre fixed inset-y-0 left-0 z-50 flex w-[236px] flex-col overflow-hidden transition-transform duration-200 lg:static lg:z-auto lg:w-auto lg:shrink-0 lg:translate-x-0 lg:transition-none ${
+        className={`admin-encre fixed inset-y-0 left-0 z-50 flex w-[236px] flex-col overflow-hidden transition-transform duration-200 lg:static lg:z-auto lg:shrink-0 lg:translate-x-0 lg:transition-none ${
           ouverte ? "translate-x-0" : "-translate-x-full"
-        } ${repliee ? "lg:admin-repliee lg:w-[58px]" : "lg:w-[188px]"}`}
+        } ${repliee ? "admin-repliee lg:w-[58px]" : "lg:w-[188px]"}`}
         aria-label={d.admin.titre}
         aria-hidden={undefined}
       >
