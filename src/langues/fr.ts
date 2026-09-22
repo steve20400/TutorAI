@@ -151,6 +151,9 @@ export const fr = {
   accueil: {
     bonjour: "Bonjour {prenom}",
     question: "Qu'est-ce qu'on fait aujourd'hui ?",
+    enAttente: "Rien à faire pour l'instant.",
+    enAttenteDetail:
+      "Ton espace s'ouvrira quand un parent t'aura rattaché à son compte, ou quand la plateforme activera le tuteur.",
     discuter: "Discuter",
     discuterDetail: "Poser une question libre",
     monTuteur: "Mon tuteur",

@@ -9,6 +9,7 @@ import {
   LANGUE_PAR_DEFAUT,
   remplir,
 } from "@/langues"
+import { lireParametres } from "@/lib/parametres"
 import { supabaseServeur } from "@/lib/supabase/server"
 
 /**
@@ -55,6 +56,13 @@ export default async function Accueil({
 
   const premier = tuteurs?.[0]
 
+  // Les entrées du tuteur IA ne s'affichent que si le module est allumé. Les
+  // routes derrière refusent déjà, mais proposer un lien qui renvoie à la page
+  // qu'on vient de quitter donne l'impression d'une application cassée — et
+  // c'est bien ainsi qu'un élève l'a lu : « ça me met un écran pour créer le
+  // tuteur », alors qu'il n'aurait jamais dû voir l'entrée.
+  const { ia_active } = await lireParametres()
+
   return (
     <main className="mx-auto flex min-h-dvh max-w-md flex-col gap-4 p-6">
       <header className="flex items-baseline justify-between pt-8">
@@ -69,24 +77,26 @@ export default async function Accueil({
       </header>
 
       <div className="mt-4 flex flex-col gap-3">
-        <Link href={chemin(langue, "/discuter")} className="choix-role">
-          <span className="font-medium">{d.accueil.discuter}</span>
-          <span className="doux mt-0.5 block text-sm">
-            {d.accueil.discuterDetail}
-          </span>
-        </Link>
-
-        <Link
-          href={chemin(langue, premier ? "/tuteur" : "/tuteur/nouveau")}
-          className="choix-role"
-        >
-          <span className="font-medium">{d.accueil.monTuteur}</span>
-          <span className="doux mt-0.5 block text-sm">
-            {premier
-              ? `${premier.matiere} — ${premier.niveau}`
-              : d.accueil.creerTuteur}
-          </span>
-        </Link>
+        {ia_active ? (
+          <Link
+            href={chemin(langue, premier ? "/tuteur" : "/tuteur/nouveau")}
+            className="choix-role"
+          >
+            <span className="font-medium">{d.accueil.monTuteur}</span>
+            <span className="doux mt-0.5 block text-sm">
+              {premier
+                ? `${premier.matiere} — ${premier.niveau}`
+                : d.accueil.creerTuteur}
+            </span>
+          </Link>
+        ) : (
+          <div className="carte p-5">
+            <p className="font-medium">{d.accueil.enAttente}</p>
+            <p className="doux mt-1 text-sm leading-relaxed">
+              {d.accueil.enAttenteDetail}
+            </p>
+          </div>
+        )}
       </div>
     </main>
   )

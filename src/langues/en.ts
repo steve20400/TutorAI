@@ -155,6 +155,9 @@ export const en: Dictionnaire = {
   accueil: {
     bonjour: "Hello {prenom}",
     question: "What are we doing today?",
+    enAttente: "Nothing to do yet.",
+    enAttenteDetail:
+      "Your space opens once a parent links you to their account, or once the platform switches the tutor on.",
     discuter: "Chat",
     discuterDetail: "Ask anything",
     monTuteur: "My AI tutor",
