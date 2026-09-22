@@ -164,4 +164,102 @@ select verifier('un visiteur non connecte ne voit pas les repetiteurs non verifi
                 (select count(*)::int from repetiteurs
                  where id = '55555555-5555-5555-5555-555555555555'), 0);
 
+-- =============================================================================
+-- Pièces justificatives, redevances, porte-monnaie
+--
+-- Ces règles-là protègent des choses différentes : l'identité d'un adulte qui
+-- veut approcher des enfants, l'argent, et le droit de figurer dans l'annuaire.
+-- =============================================================================
+
+-- Repasse en superutilisateur pour monter la scène.
+reset role;
+set local "request.jwt.claims" = '';
+
+-- Le répétiteur vérifié dépose une pièce.
+insert into pieces_justificatives (repetiteur_id, type_cle, chemin)
+values ('44444444-4444-4444-4444-444444444444', 'cni', 'pieces/44/cni.jpg');
+
+-- --- Une pièce déposée ne se relit pas, même par celui qui l'a déposée -------
+-- Une pièce relisible est une pièce qu'on peut échanger après examen.
+
+set local role authenticated;
+set local "request.jwt.claims" = '{"sub":"44444444-4444-4444-4444-444444444444","role":"authenticated"}';
+
+select verifier('un repetiteur ne relit PAS sa propre piece deposee',
+                (select count(*)::int from pieces_justificatives), 0);
+
+set local "request.jwt.claims" = '{"sub":"33333333-3333-3333-3333-333333333333","role":"authenticated"}';
+
+select verifier('un parent ne voit AUCUNE piece justificative',
+                (select count(*)::int from pieces_justificatives), 0);
+
+-- --- Le porte-monnaie est éteint : personne n'y écrit ------------------------
+
+set local "request.jwt.claims" = '{"sub":"44444444-4444-4444-4444-444444444444","role":"authenticated"}';
+
+select verifier('creation de portefeuille refusee, module eteint',
+                (select case when exists (
+                   select 1 from portefeuilles where id = '44444444-4444-4444-4444-444444444444'
+                 ) then 1 else 0 end), 0);
+
+-- --- Un impayé échu sort de l'annuaire --------------------------------------
+-- C'est le seul levier de recouvrement de la plateforme, puisqu'elle ne
+-- détient pas l'argent.
+
+reset role;
+set local "request.jwt.claims" = '';
+
+insert into redevances
+  (repetiteur_id, periode, mode, montant_unitaire, eleves_actifs, montant_total, echeance)
+values
+  ('44444444-4444-4444-4444-444444444444', date_trunc('month', current_date)::date,
+   'par_eleve_actif', 2000, 1, 2000, current_date - 1);
+
+set local role authenticated;
+set local "request.jwt.claims" = '{"sub":"33333333-3333-3333-3333-333333333333","role":"authenticated"}';
+
+select verifier('un repetiteur verifie mais impaye sort de l''annuaire',
+                (select count(*)::int from repetiteurs
+                 where id = '44444444-4444-4444-4444-444444444444'), 0);
+
+-- Une fois réglée, la fiche revient.
+reset role;
+set local "request.jwt.claims" = '';
+update redevances set statut = 'payee', payee_le = now()
+where repetiteur_id = '44444444-4444-4444-4444-444444444444';
+
+set local role authenticated;
+set local "request.jwt.claims" = '{"sub":"33333333-3333-3333-3333-333333333333","role":"authenticated"}';
+
+select verifier('la fiche revient dans l''annuaire une fois la redevance payee',
+                (select count(*)::int from repetiteurs
+                 where id = '44444444-4444-4444-4444-444444444444'), 1);
+
+-- --- Une redevance ne se lit que par son destinataire ------------------------
+
+set local "request.jwt.claims" = '{"sub":"55555555-5555-5555-5555-555555555555","role":"authenticated"}';
+
+select verifier('un repetiteur ne voit PAS la redevance d''un autre',
+                (select count(*)::int from redevances), 0);
+
+set local "request.jwt.claims" = '{"sub":"44444444-4444-4444-4444-444444444444","role":"authenticated"}';
+
+select verifier('un repetiteur voit sa propre redevance',
+                (select count(*)::int from redevances), 1);
+
+-- --- Un contrat non réaccepté sort aussi de l'annuaire -----------------------
+-- Changer la facturation change le contrat : on ne prélève pas sur une base
+-- que le répétiteur n'a jamais signée.
+
+reset role;
+set local "request.jwt.claims" = '';
+update facturation set version_contrat = version_contrat + 1 where id = 1;
+
+set local role authenticated;
+set local "request.jwt.claims" = '{"sub":"33333333-3333-3333-3333-333333333333","role":"authenticated"}';
+
+select verifier('un repetiteur qui n''a pas reaccepte le contrat sort de l''annuaire',
+                (select count(*)::int from repetiteurs
+                 where id = '44444444-4444-4444-4444-444444444444'), 0);
+
 rollback;
