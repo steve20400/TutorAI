@@ -1,6 +1,7 @@
 import Link from "next/link"
 
 import { EnteteAdmin, RienEncore } from "@/composants/admin/entete"
+import { Filtres } from "@/composants/admin/filtres"
 import {
   chemin,
   dictionnaire,
@@ -98,33 +99,19 @@ export default async function PageRepetiteurs({
           <input type="hidden" name="filtre" value={filtre} />
         </form>
 
-        <div className="mt-3 flex flex-wrap gap-2">
-          {FILTRES.map((f) => (
-            <Link
-              key={f}
-              href={`${chemin(langue, "/admin/repetiteurs")}?filtre=${f}${q ? `&q=${encodeURIComponent(q)}` : ""}`}
-              className="pastille"
-              style={
-                filtre === f
-                  ? {
-                      background: "var(--accent)",
-                      borderColor: "var(--accent)",
-                      color: "var(--accent-texte)",
-                      fontWeight: 500,
-                    }
-                  : undefined
-              }
-            >
-              {f === "tous"
-                ? t.tous
-                : f === "en_attente"
-                  ? t.attente
-                  : f === "verifie"
-                    ? t.verifies
-                    : t.refuses}
-            </Link>
-          ))}
-        </div>
+        <Filtres
+          base={chemin(langue, "/admin/repetiteurs")}
+          parametre="filtre"
+          actuel={filtre}
+          autres={q ? { q } : {}}
+          etiquette={t.etiquette}
+          options={[
+            { valeur: "tous", libelle: t.tous },
+            { valeur: "en_attente", libelle: t.attente },
+            { valeur: "verifie", libelle: t.verifies },
+            { valeur: "refuse", libelle: t.refuses },
+          ]}
+        />
 
         {visibles.length === 0 ? (
           <div className="mt-6">

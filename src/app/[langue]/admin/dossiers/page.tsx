@@ -147,8 +147,13 @@ export default async function PageDossiers({
             <div className="doux text-[10px] font-semibold uppercase tracking-[0.14em]">
               {t.sousLaPile}
             </div>
-            <div className="mt-2">
-              {restants.slice(0, 6).map((r) => (
+            {/* Toute la pile, et non les six premiers. Le plafond précédent
+                n'était pas seulement une troncature d'affichage : les dossiers
+                au-delà du sixième n'étaient accessibles par aucun chemin, et
+                « et 14 autres » ne menait nulle part. Un dossier qu'on ne peut
+                pas ouvrir est un répétiteur qui attend indéfiniment. */}
+            <div className="mt-2 max-h-[46vh] overflow-y-auto">
+              {restants.map((r) => (
                 <Link
                   key={r.id}
                   href={chemin(langue, `/admin/dossiers/${r.id}`)}
@@ -162,11 +167,7 @@ export default async function PageDossiers({
                 </Link>
               ))}
             </div>
-            {restants.length > 6 ? (
-              <p className="doux mt-3 text-center text-[12px]">
-                {remplir(t.autres, { n: restants.length - 6 })}
-              </p>
-            ) : null}
+
           </section>
         ) : null}
       </div>

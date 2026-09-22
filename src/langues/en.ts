@@ -442,6 +442,7 @@ export const en: Dictionnaire = {
   },
 
   adminNav: {
+    theme: "Theme",
     ouvrir: "Expand the bar",
     replier: "Collapse the bar",
     administrateur: "administrator",

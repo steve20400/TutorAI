@@ -1,6 +1,5 @@
 "use server"
 
-import { cookies } from "next/headers"
 import { redirect } from "next/navigation"
 import { revalidatePath } from "next/cache"
 
@@ -20,36 +19,6 @@ export type EtatFormulaire = {
   info?: string
 }
 
-/**
- * Marqueur « cette personne a déjà un compte ».
- *
- * Il décide de la porte qu'on ouvre à un visiteur sans session : inscription
- * pour un nouveau venu, connexion pour quelqu'un qui revient. Un cookie et non
- * `localStorage`, parce que la décision est prise sur le serveur, avant le
- * rendu : lue dans le navigateur, elle afficherait d'abord la mauvaise page
- * puis sauterait à l'autre.
- *
- * Il ne contient rien — ni identité, ni jeton, ni adresse. Seulement le fait
- * qu'une inscription ou une connexion a déjà réussi sur cet appareil. Il n'est
- * donc pas `httpOnly` : rien à y voler.
- */
-const COOKIE_CONNU = "tutela-connu"
-
-async function marquerConnu() {
-  const boite = await cookies()
-  boite.set(COOKIE_CONNU, "1", {
-    maxAge: 60 * 60 * 24 * 365,
-    sameSite: "lax",
-    path: "/",
-    secure: process.env.NODE_ENV === "production",
-  })
-}
-
-/** Quelle porte ouvrir à un visiteur sans session. */
-export async function porteDEntree(): Promise<"/connexion" | "/inscription"> {
-  const boite = await cookies()
-  return boite.get(COOKIE_CONNU)?.value === "1" ? "/connexion" : "/inscription"
-}
 
 /**
  * Langue transmise par le formulaire.
@@ -110,7 +79,6 @@ export async function seConnecter(
 
   if (error) return { erreur: traduire(error.message, d) }
 
-  await marquerConnu()
   revalidatePath("/", "layout")
 
   // On ne redirige que vers un chemin interne : une URL fournie par
@@ -208,11 +176,6 @@ export async function sInscrire(
   })
 
   if (error) return { erreur: traduire(error.message, d) }
-
-  // Même si la session n'est pas ouverte (confirmation par email en attente),
-  // le compte existe : la prochaine visite doit mener à la connexion, pas
-  // redemander une inscription.
-  await marquerConnu()
 
   // Si la confirmation par email est active dans Supabase, aucune session
   // n'est ouverte tout de suite.

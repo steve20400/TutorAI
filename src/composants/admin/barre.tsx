@@ -330,22 +330,14 @@ export function BarreAdmin({
       <div className="motif-fond" />
 
       <div
-        className={`admin-encre relative z-10 flex shrink-0 border-b pb-3.5 pt-4 ${
-          repliee ? "flex-col items-center gap-3 px-0" : "items-center gap-2.5 pl-4 pr-2.5"
-        }`}
+        className="admin-tete admin-encre relative z-10 flex shrink-0 items-center gap-2.5 border-b pb-3.5 pl-4 pr-2.5 pt-4"
         style={bordure}
       >
         <Marque taille={19} />
-        {repliee ? null : (
-          <>
-            <span className="text-[13px] font-bold tracking-[0.13em]">
-              TUTELA
-            </span>
-            {/* Pousse le repli contre le bord : collé au logo, on croirait
-                qu'il en fait partie. */}
-            <span className="flex-1" />
-          </>
-        )}
+        <span className="admin-libelle text-[13px] font-bold tracking-[0.13em]">
+          TUTELA
+        </span>
+        <span className="admin-libelle flex-1" />
         <BoutonRepli repliee={repliee} basculer={basculer} d={d} />
       </div>
 
@@ -377,72 +369,59 @@ export function BarreAdmin({
       </div>
 
       <div
-        className={`admin-encre relative z-10 flex shrink-0 flex-col border-t py-2.5 ${
-          repliee ? "items-center gap-2 px-1.5" : "gap-2 px-3"
-        }`}
+        className="admin-pied admin-encre relative z-10 flex shrink-0 flex-col gap-2 border-t px-3 py-2.5"
         style={bordure}
       >
-        <div
-          className={`flex w-full items-center ${
-            repliee ? "justify-center" : "gap-2.5 pl-1"
-          }`}
-        >
-          <Avatar nom={nom ?? identifiant} photoUrl={photoUrl} taille={26} />
-          {repliee ? null : (
-            <span className="min-w-0 flex-1 leading-tight">
-              <span className="block truncate text-[11.5px] font-medium">
-                {identifiant}
-              </span>
-              <span
-                className="block truncate text-[10px]"
-                style={{ color: "#93a0bb" }}
-              >
-                {d.adminNav.administrateur}
-              </span>
-            </span>
-          )}
-        </div>
-
         {/* Le thème et la sortie. Sans eux, un administrateur entré en
             affichage clair n'avait aucun moyen d'en changer ni de se
             déconnecter : il fallait vider les cookies. */}
-        <div
-          className={`flex w-full items-center ${
-            repliee ? "flex-col gap-1.5" : "gap-1.5 pl-0.5"
-          }`}
-        >
+        <div className="admin-rangee flex items-center gap-2">
+          <span
+            className="admin-libelle text-[11.5px]"
+            style={{ color: "#c3cde0" }}
+          >
+            {d.adminNav.theme}
+          </span>
+          <span className="admin-libelle flex-1" />
           <BasculeMode couleur="#c3cde0" taille={30} />
-          <form action={seDeconnecter} className={repliee ? "" : "flex-1"}>
+        </div>
+
+        <div className="admin-rangee flex items-center gap-2.5">
+          <Avatar nom={nom ?? identifiant} photoUrl={photoUrl} taille={26} />
+          <span className="admin-libelle min-w-0 flex-1 leading-tight">
+            <span className="block truncate text-[11.5px] font-medium">
+              {identifiant}
+            </span>
+            <span
+              className="block truncate text-[10px]"
+              style={{ color: "#93a0bb" }}
+            >
+              {d.adminNav.administrateur}
+            </span>
+          </span>
+          <form action={seDeconnecter} className="shrink-0">
             <input type="hidden" name="langue" value={langue} />
             <button
               type="submit"
-              title={repliee ? d.commun.seDeconnecter : undefined}
-              aria-label={repliee ? d.commun.seDeconnecter : undefined}
-              className={`flex h-[30px] items-center gap-2 rounded-[8px] transition hover:bg-white/10 ${
-                repliee ? "w-[30px] justify-center" : "w-full px-2.5"
-              }`}
+              title={d.commun.seDeconnecter}
+              aria-label={d.commun.seDeconnecter}
+              className="grid h-[30px] w-[30px] place-items-center rounded-[8px] transition hover:bg-white/10"
               style={{ color: "#c3cde0" }}
             >
               <svg
-                width="15"
-                height="15"
+                width="16"
+                height="16"
                 viewBox="0 0 20 20"
                 fill="none"
                 stroke="currentColor"
                 strokeWidth="1.6"
                 strokeLinecap="round"
                 strokeLinejoin="round"
-                className="shrink-0"
                 aria-hidden
               >
                 <path d="M12.5 14.2v1.6a1.8 1.8 0 0 1-1.8 1.8H4.6a1.8 1.8 0 0 1-1.8-1.8V4.2a1.8 1.8 0 0 1 1.8-1.8h6.1a1.8 1.8 0 0 1 1.8 1.8v1.6" />
                 <path d="M8.4 10h9M14.6 7l3 3-3 3" />
               </svg>
-              {repliee ? null : (
-                <span className="truncate text-[11.5px]">
-                  {d.commun.seDeconnecter}
-                </span>
-              )}
             </button>
           </form>
         </div>

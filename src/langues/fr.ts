@@ -447,6 +447,7 @@ export const fr = {
   },
 
   adminNav: {
+    theme: "Thème",
     ouvrir: "Déplier la barre",
     replier: "Replier la barre",
     administrateur: "administrateur",
