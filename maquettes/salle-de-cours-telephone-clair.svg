@@ -1,0 +1,135 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="380" height="780" viewBox="0 0 380 780" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif">
+  <!--
+    TUTELA — salle de cours adaptative, rendu téléphone.
+    Maquette de référence, thème clair. Mathématiques, Terminale D, feuille « traceur ».
+  -->
+  <defs>
+    <clipPath id="ecran"><rect x="12" y="12" width="356" height="756" rx="28"/></clipPath>
+    <clipPath id="plan"><rect x="12" y="56" width="356" height="540"/></clipPath>
+  </defs>
+
+  <rect width="380" height="780" rx="38" fill="#2a2a2c"/>
+  <rect x="12" y="12" width="356" height="756" rx="28" fill="#ffffff"/>
+
+  <g clip-path="url(#ecran)">
+
+    <!-- ══ barre du haut ══ -->
+    <rect x="12" y="12" width="356" height="44" fill="#fbfaf7"/>
+    <line x1="12" y1="56" x2="368" y2="56" stroke="#eceae4" stroke-width="1"/>
+    <g transform="translate(26 25) scale(.375)">
+      <rect x="3" y="5" width="42" height="31" rx="7" fill="#14203a"/>
+      <rect x="20" y="36" width="8" height="4" fill="#14203a"/>
+      <rect x="13" y="39.5" width="22" height="4.6" rx="2.3" fill="#14203a"/>
+      <circle cx="16.5" cy="15" r="4.7" fill="#fbfaf7"/>
+      <path d="M8.2 28.8a8.3 8.8 0 0 1 16.6 0z" fill="#fbfaf7"/>
+      <rect x="26.5" y="20.5" width="15.5" height="12.5" rx="3.5" fill="#fbfaf7" stroke="#14203a" stroke-width="1.7"/>
+      <circle cx="34.25" cy="25.4" r="2.4" fill="#14203a"/>
+      <path d="M30.6 33a3.65 3.9 0 0 1 7.3 0z" fill="#14203a"/>
+      <circle cx="39.5" cy="11" r="3" fill="#c2402c"/>
+    </g>
+    <text x="52" y="32" font-size="12" font-weight="600" fill="#14203a">Limites et continuité</text>
+    <text x="52" y="46" font-size="9" fill="#14203a" opacity=".5">Feuille 1 · traceur</text>
+    <circle cx="308" cy="34" r="4" fill="#c2402c"/>
+    <text x="318" y="38" font-size="10.5" fill="#14203a" opacity=".65" font-family="ui-monospace, Menlo, monospace">14:37</text>
+
+    <!-- ══ plan de travail : le traceur ══ -->
+    <rect x="12" y="56" width="356" height="540" fill="#fdfcfa"/>
+    <g clip-path="url(#plan)">
+      <g stroke="#f1ede4" stroke-width="1">
+        <path d="M12 100h356M12 148h356M12 196h356M12 244h356M12 292h356M12 388h356M12 436h356M12 484h356M12 532h356M12 580h356"/>
+        <path d="M46 56v540M94 56v540M142 56v540M238 56v540M286 56v540M334 56v540"/>
+      </g>
+      <g stroke="#bdb6a6" stroke-width="1.4">
+        <path d="M12 340h356"/><path d="M190 56v540"/>
+      </g>
+      <g stroke="#a8761a" stroke-width="1.4" stroke-dasharray="6 5">
+        <path d="M220 56v540"/><path d="M12 280h356"/>
+      </g>
+      <path d="M12 292 C 60 297, 140 310, 185 355 C 198 400, 208 500, 212 596"
+            fill="none" stroke="#1b6b45" stroke-width="2.6"/>
+      <path d="M224 58 C 232 150, 250 195, 280 235 C 305 252, 340 260, 366 264"
+            fill="none" stroke="#1b6b45" stroke-width="2.6"/>
+      <text x="228" y="76" font-size="10" fill="#a8761a" font-family="ui-monospace, Menlo, monospace">x = 1</text>
+      <text x="316" y="274" font-size="10" fill="#a8761a" font-family="ui-monospace, Menlo, monospace">y = 2</text>
+      <text x="26" y="522" font-size="11.5" fill="#8a90a0" font-family="ui-monospace, Menlo, monospace">f(x) = (2x+1)/(x−1)</text>
+    </g>
+
+    <!-- vidéos en pastilles flottantes -->
+    <g>
+      <rect x="298" y="68" width="58" height="44" rx="8" fill="#edeae1" stroke="#d5cfc2"/>
+      <circle cx="348" cy="76" r="3.4" fill="#c2402c"/>
+      <text x="303" y="106" font-size="7" fill="#6a7386">Ngu E.</text>
+      <rect x="298" y="118" width="58" height="44" rx="8" fill="#edeae1" stroke="#d5cfc2"/>
+      <text x="303" y="156" font-size="7" fill="#6a7386">Nfor A.</text>
+    </g>
+
+    <!-- rappel : le répétiteur est ailleurs -->
+    <g>
+      <rect x="24" y="544" width="332" height="38" rx="9" fill="#fdf6e9" fill-opacity=".94" stroke="#ecdcb8"/>
+      <text x="38" y="568" font-size="9.5" fill="#a8761a">Le répétiteur est sur la feuille 3</text>
+      <rect x="265" y="552" width="78" height="22" rx="6" fill="none" stroke="#a8761a" stroke-width="1.5"/>
+      <text x="304" y="567" font-size="9.5" font-weight="600" fill="#a8761a" text-anchor="middle">Rejoindre</text>
+    </g>
+
+    <!-- ══ bandeau des feuilles ══ -->
+    <rect x="12" y="596" width="356" height="72" fill="#0a1220"/>
+    <line x1="12" y1="596" x2="368" y2="596" stroke="#eceae4"/>
+
+    <g>
+      <rect x="26" y="610" width="54" height="38" rx="6" fill="#ffffff" stroke="#14203a" stroke-width="1.6"/>
+      <path d="M31 640 C 43 640, 52 634, 57 624 C 60 618, 61 612, 61 610" fill="none" stroke="#1b6b45" stroke-width="1.4"/>
+      <path d="M63 647 C 66 628, 72 620, 79 619" fill="none" stroke="#1b6b45" stroke-width="1.4"/>
+      <circle cx="74" cy="642" r="3" fill="#1b6b45"/>
+      <text x="26" y="661" font-size="8" font-weight="600" fill="#14203a">1 · traceur</text>
+    </g>
+    <g>
+      <rect x="92" y="610" width="54" height="38" rx="6" fill="#ffffff" stroke="#d9d3c7"/>
+      <path d="M100 620h38M100 628h26M100 636h18" stroke="#b4b8c2" stroke-width="1.6" stroke-linecap="round"/>
+      <text x="92" y="661" font-size="8" fill="#14203a" opacity=".55">2 · énoncé</text>
+    </g>
+    <g>
+      <rect x="158" y="610" width="54" height="38" rx="6" fill="#ffffff" stroke="#a8761a" stroke-width="1.6"/>
+      <text x="165" y="626" font-size="8.5" fill="#8a90a0" font-family="ui-monospace, Menlo, monospace">lim = 2</text>
+      <text x="165" y="638" font-size="8.5" fill="#8a90a0" font-family="ui-monospace, Menlo, monospace">x→+∞</text>
+      <circle cx="206" cy="642" r="3" fill="#a8761a"/>
+      <text x="158" y="661" font-size="8" fill="#a8761a">3 · calcul</text>
+    </g>
+    <g>
+      <rect x="224" y="610" width="54" height="38" rx="6" fill="#ffffff" stroke="#d9d3c7"/>
+      <path d="M231 640 C 238 620, 245 644, 252 626 C 256 616, 264 638, 272 624"
+            fill="none" stroke="#b4b8c2" stroke-width="1.5" stroke-linecap="round"/>
+      <text x="224" y="661" font-size="8" fill="#14203a" opacity=".55">4 · main levée</text>
+    </g>
+    <g>
+      <rect x="290" y="610" width="38" height="38" rx="6" fill="none" stroke="#ddd8cc" stroke-dasharray="4 3"/>
+      <path d="M309 620v18M300 629h18" stroke="#a9ada0" stroke-width="1.6" stroke-linecap="round"/>
+    </g>
+
+    <!-- ══ barre d'outils ══ -->
+    <rect x="12" y="668" width="356" height="100" fill="#f4f2ec"/>
+    <line x1="12" y1="668" x2="368" y2="668" stroke="#eceae4"/>
+
+    <rect x="26" y="684" width="62" height="32" rx="8" fill="#14203a"/>
+    <text x="57" y="704" font-size="10" font-weight="600" fill="#ffffff" text-anchor="middle">Traceur</text>
+
+    <g fill="#14203a" font-size="14" text-anchor="middle">
+      <rect x="96"  y="684" width="32" height="32" rx="8" fill="#ffffff" stroke="#d9d3c7"/><text x="112" y="705">∫</text>
+      <rect x="134" y="684" width="32" height="32" rx="8" fill="#ffffff" stroke="#d9d3c7"/><text x="150" y="705">∑</text>
+      <rect x="172" y="684" width="32" height="32" rx="8" fill="#ffffff" stroke="#d9d3c7"/><text x="188" y="705">√</text>
+      <rect x="210" y="684" width="38" height="32" rx="8" fill="#ffffff" stroke="#d9d3c7"/><text x="229" y="704" font-size="11">lim</text>
+      <rect x="254" y="684" width="32" height="32" rx="8" fill="#ffffff" stroke="#d9d3c7"/><text x="270" y="705">∈</text>
+      <rect x="292" y="684" width="32" height="32" rx="8" fill="#ffffff" stroke="#d9d3c7"/><text x="308" y="705">π</text>
+      <rect x="330" y="684" width="26" height="32" rx="8" fill="#ffffff" stroke="#d9d3c7" opacity=".5"/>
+    </g>
+
+    <!-- commandes de séance -->
+    <rect x="26" y="726" width="94" height="30" rx="8" fill="#ffffff" stroke="#d9d3c7"/>
+    <text x="73" y="745" font-size="9.5" fill="#14203a" text-anchor="middle">Photo du cahier</text>
+    <rect x="128" y="726" width="86" height="30" rx="8" fill="#ffffff" stroke="#d9d3c7"/>
+    <text x="171" y="745" font-size="9.5" fill="#14203a" text-anchor="middle">Passer la main</text>
+    <rect x="288" y="726" width="34" height="30" rx="8" fill="#ffffff" stroke="#d9d3c7"/>
+    <path d="M298 736h14M298 741h14M298 746h9" stroke="#14203a" stroke-width="1.5" stroke-linecap="round"/>
+    <rect x="328" y="726" width="34" height="30" rx="8" fill="#c2402c"/>
+    <path d="M345 734v8M339.5 737.5a7 7 0 1 0 11 0" stroke="#fff" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+  </g>
+</svg>
