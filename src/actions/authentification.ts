@@ -36,6 +36,9 @@ function langueDe(donnees: FormData): Langue {
 /** Messages d'erreur Supabase traduits. Personne ne doit lire de l'anglais brut. */
 function traduire(message: string, d: Dictionnaire): string {
   const m = message.toLowerCase()
+  // Un compte désactivé doit le savoir. « Identifiants incorrects » ferait
+  // ressaisir indéfiniment un mot de passe pourtant juste.
+  if (m.includes("banned")) return d.erreurs.compteDesactive
   if (m.includes("invalid login credentials"))
     return d.erreurs.identifiantsIncorrects
   if (m.includes("email not confirmed")) return d.erreurs.emailNonConfirme

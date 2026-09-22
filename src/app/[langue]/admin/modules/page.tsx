@@ -28,7 +28,7 @@ export default async function PageModules({
     <>
       <EnteteAdmin etiquette={t.etiquette} titre={d.admin.modules} />
 
-      <div className="px-7 pb-7">
+      <div className="px-5 sm:px-7 pb-7">
         {MODULES.map((cle) => {
           const actif = parametres[cle]
           const textes = d.admin.interrupteurs[cle]

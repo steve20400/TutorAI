@@ -80,7 +80,7 @@ export default async function PageDossiers({
         }
       />
 
-      <div className="px-7 pb-7">
+      <div className="px-5 sm:px-7 pb-7">
         {/* La pile : cinq épaisseurs derrière, jamais plus. */}
         <div className="relative" style={{ height: 156 }}>
           {EPAISSEURS.slice(0, Math.min(5, restants.length)).map((e, i) => (

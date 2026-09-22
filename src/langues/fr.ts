@@ -122,6 +122,8 @@ export const fr = {
   },
 
   erreurs: {
+    compteDesactive:
+      "Ce compte a été désactivé par l'administration. Écrivez-nous si vous pensez qu'il s'agit d'une erreur.",
     identifiantsIncorrects: "Email ou mot de passe incorrect.",
     emailNonConfirme:
       "Ton email n'est pas encore confirmé. Vérifie ta boîte de réception.",
@@ -331,6 +333,12 @@ export const fr = {
       demanderPiece: "Demander une pièce",
       refuser: "Refuser",
       motifRefus: "Motif du refus",
+      desactiver: "Désactiver le compte",
+      reactiver: "Réactiver le compte",
+      motifDesactivation: "Motif de la désactivation",
+      desactiveDepuis: "Compte désactivé le {date}.",
+      desactivationDetail:
+        "Le compte sort de l'annuaire et ne peut plus ouvrir de session ; les sessions en cours sont fermées immédiatement. Rien n'est supprimé : les séances, les comptes rendus et le registre subsistent, et la désactivation se défait.",
       motifObligatoire: "Un refus sans motif est incompréhensible pour celui qui le reçoit.",
       consigne: "Chaque décision est inscrite au registre, avec votre nom et l'heure.",
       tarif: "{n} FCFA / mois",

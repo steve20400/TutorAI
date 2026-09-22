@@ -10,7 +10,12 @@ import {
   remplir,
 } from "@/langues"
 import { exigerAdmin } from "@/lib/admin"
-import { apposerCachet, refuserDossier } from "@/actions/admin"
+import {
+  apposerCachet,
+  desactiverCompte,
+  reactiverCompte,
+  refuserDossier,
+} from "@/actions/admin"
 
 export default async function PageDossier({
   params,
@@ -53,7 +58,7 @@ export default async function PageDossier({
 
   const { data: profil } = await supabase
     .from("profils")
-    .select("prenom, nom")
+    .select("prenom, nom, desactive_le")
     .eq("id", id)
     .maybeSingle()
 
@@ -62,7 +67,7 @@ export default async function PageDossier({
 
   return (
     <>
-      <div className="px-7 pt-7">
+      <div className="px-5 sm:px-7 pt-7">
         <Link
           href={chemin(langue, "/admin/dossiers")}
           className="doux text-[12px] hover:underline"
@@ -73,7 +78,7 @@ export default async function PageDossier({
 
       <EnteteAdmin etiquette={fiche.ville ?? "—"} titre={nom} />
 
-      <div className="max-w-3xl px-7 pb-7">
+      <div className="max-w-3xl px-5 sm:px-7 pb-7">
         <p className="doux text-[13px] leading-relaxed">
           {(fiche.niveaux ?? []).map((n: string) => d.niveaux[n] ?? n).join(", ")}
           {" · "}
@@ -171,6 +176,62 @@ export default async function PageDossier({
               {t.refuser}
             </button>
           </form>
+        </div>
+
+        {/* La désactivation, à part et sous les décisions de vérification :
+            elle ne juge pas un dossier, elle ferme un compte. Jamais de
+            suppression — effacer l'auteur d'une séance effacerait la séance. */}
+        <div
+          className="mt-7 border-t pt-5"
+          style={{ borderColor: "var(--bordure)" }}
+        >
+          {profil?.desactive_le ? (
+            <div className="flex flex-wrap items-center gap-3">
+              <span className="badge-eteint">
+                {remplir(t.desactiveDepuis, {
+                  date: new Date(profil.desactive_le).toLocaleDateString(
+                    d.meta.htmlLang,
+                  ),
+                })}
+              </span>
+              <form action={reactiverCompte}>
+                <input type="hidden" name="langue" value={langue} />
+                <input type="hidden" name="compteId" value={fiche.id} />
+                <button type="submit" className="bt2">
+                  {t.reactiver}
+                </button>
+              </form>
+            </div>
+          ) : (
+            <form
+              action={desactiverCompte}
+              className="flex flex-wrap items-start gap-2"
+            >
+              <input type="hidden" name="langue" value={langue} />
+              <input type="hidden" name="compteId" value={fiche.id} />
+              <label className="flex flex-col">
+                <input
+                  name="motif"
+                  required
+                  placeholder={t.motifDesactivation}
+                  className="champ min-w-[220px] px-3 py-2 text-[13px]"
+                />
+                <span className="doux mt-1 max-w-[380px] text-[11px] leading-snug">
+                  {t.desactivationDetail}
+                </span>
+              </label>
+              <button
+                type="submit"
+                className="bt2"
+                style={{
+                  color: "var(--erreur-texte)",
+                  borderColor: "var(--erreur-texte)",
+                }}
+              >
+                {t.desactiver}
+              </button>
+            </form>
+          )}
         </div>
 
         <p className="doux mt-5 text-[12px] leading-relaxed">{t.consigne}</p>

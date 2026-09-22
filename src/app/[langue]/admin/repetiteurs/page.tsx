@@ -82,7 +82,7 @@ export default async function PageRepetiteurs({
         titre={remplir(pluriel(langue, visibles.length, t.fiches), {})}
       />
 
-      <div className="px-7 pb-7">
+      <div className="px-5 sm:px-7 pb-7">
         <form className="flex flex-wrap items-center gap-3" action="">
           <label className="champ flex min-w-[240px] flex-1 items-center gap-2.5 px-3 py-2">
             <svg width="14" height="14" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" className="doux shrink-0" aria-hidden>
@@ -141,7 +141,17 @@ export default async function PageRepetiteurs({
                   className="border-t"
                   style={{ borderColor: "var(--bordure)" }}
                 >
-                  <td className="truncate py-2.5 font-medium">{nomDe(r.id)}</td>
+                  <td className="truncate py-2.5 font-medium">
+                    {/* La fiche est le seul endroit d'où l'on peut désactiver
+                        un compte : sans ce lien, la liste était un cul-de-sac
+                        pour tout répétiteur déjà vérifié. */}
+                    <Link
+                      href={chemin(langue, `/admin/dossiers/${r.id}`)}
+                      className="transition hover:opacity-70"
+                    >
+                      {nomDe(r.id)}
+                    </Link>
+                  </td>
                   <td className="doux truncate py-2.5">{r.ville ?? "—"}</td>
                   <td className="doux truncate py-2.5">
                     {(r.matieres ?? [])

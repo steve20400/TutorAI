@@ -51,7 +51,7 @@ export default async function PageModule({
 
   return (
     <>
-      <div className="px-7 pt-7">
+      <div className="px-5 sm:px-7 pt-7">
         <Link
           href={chemin(langue, "/admin/modules")}
           className="doux text-[12px] hover:underline"
@@ -66,7 +66,7 @@ export default async function PageModule({
         </span>
       </EnteteAdmin>
 
-      <div className="flex max-w-2xl flex-col gap-5 px-7 pb-7">
+      <div className="flex max-w-2xl flex-col gap-5 px-5 sm:px-7 pb-7">
         <p className="doux text-[13px] leading-relaxed">{textes.detail}</p>
 
         {cle === "enregistrement_actif" ? (

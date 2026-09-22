@@ -293,3 +293,42 @@ export async function poserCle(donnees: FormData): Promise<void> {
 
   revalidatePath("/", "layout")
 }
+
+/**
+ * Désactive un compte. Jamais de suppression.
+ *
+ * Supprimer effacerait aussi ce qui permet de comprendre plus tard : qui a
+ * vérifié ce répétiteur, quelles séances il a données, ce qu'un parent avait
+ * signalé. Sur un produit dont la promesse est qu'une trace subsiste, effacer
+ * l'auteur d'une séance reviendrait à effacer la séance.
+ *
+ * Le travail réel est en base : sortir la fiche de l'annuaire, interdire à
+ * GoTrue de rouvrir une session, et fermer les sessions déjà ouvertes. Ce
+ * dernier point n'est pas un détail — c'est lui qui met dehors tout de suite
+ * un répétiteur écarté en urgence, au lieu d'attendre l'expiration du jeton
+ * pendant qu'il rejoint la séance de l'après-midi.
+ */
+export async function desactiverCompte(donnees: FormData): Promise<void> {
+  const langue = langueDeFormulaire(donnees)
+  const cible = String(donnees.get("compteId") ?? "")
+  const motif = String(donnees.get("motif") ?? "").trim()
+  if (!cible) return
+
+  const { supabase } = await exigerAdmin(langue)
+  // `desactiver_compte` journalise elle-même : elle seule connaît le moment
+  // exact où la bascule a eu lieu.
+  await supabase.rpc("desactiver_compte", { cible, motif })
+
+  revalidatePath("/", "layout")
+}
+
+export async function reactiverCompte(donnees: FormData): Promise<void> {
+  const langue = langueDeFormulaire(donnees)
+  const cible = String(donnees.get("compteId") ?? "")
+  if (!cible) return
+
+  const { supabase } = await exigerAdmin(langue)
+  await supabase.rpc("reactiver_compte", { cible })
+
+  revalidatePath("/", "layout")
+}

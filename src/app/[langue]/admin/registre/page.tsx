@@ -50,7 +50,7 @@ export default async function PageRegistre({
     <>
       <EnteteAdmin etiquette={t.etiquette} titre={d.adminNav.registre} />
 
-      <div className="relative px-7 pb-7 pl-12">
+      <div className="relative px-5 sm:px-7 pb-7 pl-9 sm:pl-12">
         <span
           className="absolute bottom-8 left-[34px] top-1 w-px"
           style={{ background: "var(--bordure)" }}

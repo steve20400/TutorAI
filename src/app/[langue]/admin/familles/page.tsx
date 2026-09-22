@@ -52,7 +52,7 @@ export default async function PageFamilles({
         titre={`${liste.length} ${pluriel(langue, liste.length, t.compte).replace(`${liste.length} `, "")}`}
       />
 
-      <div className="px-7 pb-7">
+      <div className="px-5 sm:px-7 pb-7">
         {liste.map((p) => {
           const n = enfantsPar.get(p.id) ?? 0
           return (

@@ -17,7 +17,7 @@ export function EnteteAdmin({
   children?: React.ReactNode
 }) {
   return (
-    <header className="flex flex-wrap items-end justify-between gap-4 px-7 pb-5 pt-7">
+    <header className="flex flex-wrap items-end justify-between gap-4 px-5 sm:px-7 pb-5 pt-7">
       <div className="min-w-0">
         <div className="doux text-[11px] font-semibold uppercase tracking-[0.16em]">
           {etiquette}

@@ -27,7 +27,7 @@ export default async function PageFacturation({
     <>
       <EnteteAdmin etiquette={t.etiquette} titre={t.titre} />
 
-      <div className="max-w-2xl px-7 pb-7">
+      <div className="max-w-2xl px-5 sm:px-7 pb-7">
         <FormulaireFacturation
           langue={langue}
           d={d}

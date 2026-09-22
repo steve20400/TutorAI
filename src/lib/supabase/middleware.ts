@@ -54,10 +54,30 @@ export async function actualiserSession(
 
   if (!user && !estPublique) {
     const url = requete.nextUrl.clone()
-    url.pathname = `/${langue}/connexion`
-    // `suite` garde la langue : on doit pouvoir y revenir tel quel après
-    // la connexion.
-    url.searchParams.set("suite", chemin)
+
+    // Deux situations, deux portes.
+    //
+    // À la racine, personne ne « revient » : on ouvre l'application, ou on
+    // suit un lien partagé dans un groupe. La quasi-totalité de ces gens n'ont
+    // pas de compte, et la connexion est une porte fermée en guise d'accueil.
+    // Celui qui en a un traverse l'inscription d'un clic.
+    //
+    // Sur une adresse précise — une séance, un dossier — c'est l'inverse : on
+    // ne tombe pas dessus par hasard, on y revient. La connexion garde alors
+    // `suite`, pour y ramener tel quel une fois la session ouverte.
+    //
+    // C'est ici que la décision se prend, et nulle part ailleurs : le
+    // middleware s'exécute AVANT la page, donc une redirection posée dans
+    // `[langue]/page.tsx` n'était jamais atteinte.
+    if (sansLangue === "/") {
+      url.pathname = `/${langue}/inscription`
+      url.search = ""
+    } else {
+      url.pathname = `/${langue}/connexion`
+      // `suite` garde la langue : on doit pouvoir y revenir tel quel après
+      // la connexion.
+      url.searchParams.set("suite", chemin)
+    }
     return NextResponse.redirect(url)
   }
 

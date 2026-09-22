@@ -428,4 +428,46 @@ select verifier('lister_cles ne renvoie aucune colonne de valeur',
                   where r.routine_name = 'lister_cles'
                     and p.parameter_name = 'valeur'), 0);
 
+-- ---------------------------------------------------------------------------
+-- La désactivation d'un compte.
+--
+-- On ne supprime pas : effacer l'auteur d'une séance effacerait la séance, sur
+-- un produit dont la promesse est qu'une trace subsiste. Mais une
+-- désactivation qui laisse la fiche dans l'annuaire ne désactive rien — et
+-- c'est exactement ce qui arrivait, parce qu'une politique permissive de plus
+-- ÉLARGIT l'accès au lieu de le restreindre.
+update profils set desactive_le = now()
+where id = '55555555-5555-5555-5555-555555555555';
+
+set local role authenticated;
+set local "request.jwt.claims" = '{"sub":"33333333-3333-3333-3333-333333333333","role":"authenticated"}';
+
+select verifier('un parent ne voit PAS un repetiteur desactive',
+                (select count(*)::int from repetiteurs
+                  where id = '55555555-5555-5555-5555-555555555555'), 0);
+
+reset role;
+set local "request.jwt.claims" = '';
+
+-- Lui doit pouvoir relire sa fiche : sans cela il ne saurait pas ce qu'on lui
+-- reproche, et ne pourrait rien corriger.
+set local role authenticated;
+set local "request.jwt.claims" = '{"sub":"55555555-5555-5555-5555-555555555555","role":"authenticated"}';
+
+select verifier('un repetiteur desactive relit SA fiche',
+                (select count(*)::int from repetiteurs
+                  where id = '55555555-5555-5555-5555-555555555555'), 1);
+
+reset role;
+set local "request.jwt.claims" = '';
+
+update profils set desactive_le = null
+where id = '55555555-5555-5555-5555-555555555555';
+
+-- Une seule politique de lecture sur les fiches. Trois portes vers la même
+-- pièce, c'est deux qu'on oubliera de mettre à jour la prochaine fois.
+select verifier('une seule politique de lecture sur repetiteurs',
+                (select count(*)::int from pg_policies
+                  where tablename = 'repetiteurs' and cmd = 'SELECT'), 1);
+
 rollback;

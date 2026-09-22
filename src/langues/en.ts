@@ -126,6 +126,8 @@ export const en: Dictionnaire = {
   },
 
   erreurs: {
+    compteDesactive:
+      "This account has been deactivated by the administration. Contact us if you believe this is a mistake.",
     identifiantsIncorrects: "Wrong email or password.",
     emailNonConfirme:
       "Your email is not confirmed yet. Check your inbox.",
@@ -326,6 +328,12 @@ export const en: Dictionnaire = {
       demanderPiece: "Ask for a document",
       refuser: "Reject",
       motifRefus: "Reason for rejection",
+      desactiver: "Deactivate account",
+      reactiver: "Reactivate account",
+      motifDesactivation: "Reason for deactivation",
+      desactiveDepuis: "Account deactivated on {date}.",
+      desactivationDetail:
+        "The account leaves the directory and can no longer open a session; sessions already open are closed immediately. Nothing is deleted: sessions, reports and the register remain, and deactivation can be undone.",
       motifObligatoire: "A rejection without a reason means nothing to whoever receives it.",
       consigne: "Every decision is written to the log, with your name and the time.",
       tarif: "{n} FCFA / month",

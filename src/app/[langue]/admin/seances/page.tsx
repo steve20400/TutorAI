@@ -42,7 +42,7 @@ export default async function PageSeances({
         etiquette={t.etiquette}
         titre={`${enCours.length} ${pluriel(langue, enCours.length, t.enCours)}`}
       />
-      <div className="grid gap-3 px-7 pb-7 sm:grid-cols-3 lg:grid-cols-4">
+      <div className="grid gap-3 px-5 sm:px-7 pb-7 sm:grid-cols-3 lg:grid-cols-4">
         {enCours.map((s) => (
           <div
             key={s.id}
