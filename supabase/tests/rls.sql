@@ -262,4 +262,36 @@ select verifier('un repetiteur qui n''a pas reaccepte le contrat sort de l''annu
                 (select count(*)::int from repetiteurs
                  where id = '44444444-4444-4444-4444-444444444444'), 0);
 
+-- =============================================================================
+-- Basculer de mode de facturation n'efface rien
+--
+-- L'administrateur doit pouvoir passer du montant fixe au pourcentage, puis
+-- revenir, sans avoir à ressaisir ce qu'il avait réglé. C'est toute la
+-- promesse de l'espace d'administration : des réglages qui survivent aux
+-- changements d'avis.
+-- =============================================================================
+
+reset role;
+set local "request.jwt.claims" = '';
+
+update facturation
+   set mode = 'par_eleve_actif', montant_par_eleve = 2500, pourcentage = 12.5
+ where id = 1;
+
+-- On bascule vers le pourcentage : le montant fixe doit rester en mémoire.
+update facturation set mode = 'pourcentage_gains' where id = 1;
+
+select verifier('le montant fixe survit au passage en pourcentage',
+                (select montant_par_eleve from facturation where id = 1), 2500);
+
+-- Et on revient : le pourcentage doit être resté lui aussi.
+update facturation set mode = 'par_eleve_actif' where id = 1;
+
+select verifier('le pourcentage survit au retour au montant fixe',
+                (select (pourcentage * 10)::int from facturation where id = 1), 125);
+
+select verifier('le mode est bien revenu au montant fixe',
+                (select case when mode = 'par_eleve_actif' then 1 else 0 end
+                   from facturation where id = 1), 1);
+
 rollback;
