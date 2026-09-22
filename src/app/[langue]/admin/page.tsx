@@ -1,36 +1,18 @@
-import { redirect } from "next/navigation"
+import Link from "next/link"
 
-import { BoutonDeconnexion } from "@/composants/deconnexion"
-import { Registre } from "@/composants/registre"
+import { EnteteAdmin } from "@/composants/admin/entete"
 import {
   chemin,
   dictionnaire,
   estLangue,
   LANGUE_PAR_DEFAUT,
+  pluriel,
   remplir,
-  type Dictionnaire,
-  type Langue,
 } from "@/langues"
-import { supabaseServeur } from "@/lib/supabase/server"
+import { exigerAdmin } from "@/lib/admin"
 import { lireParametres } from "@/lib/parametres"
-import { basculerParametre, changerResolution } from "@/actions/admin"
 
-/** Modules pilotables, dans l'ordre d'affichage. */
-const MODULES = [
-  "ia_active",
-  "enregistrement_actif",
-  "paiement_actif",
-  "inscriptions_ouvertes",
-] as const
-
-/** Poids approximatif d'une heure de cours, par résolution. */
-const COUT_PAR_HEURE = {
-  "360p": "200 Mo",
-  "480p": "350 Mo",
-  "720p": "700 Mo",
-} as const
-
-export default async function EspaceAdmin({
+export default async function TableauDeBord({
   params,
 }: {
   params: Promise<{ langue: string }>
@@ -38,193 +20,135 @@ export default async function EspaceAdmin({
   const { langue: brut } = await params
   const langue = estLangue(brut) ? brut : LANGUE_PAR_DEFAUT
   const d = dictionnaire(langue)
+  const t = d.adminPages.tableauDeBord
 
-  const supabase = await supabaseServeur()
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-
-  if (!user) redirect(chemin(langue, "/connexion"))
-
-  const { data: profil } = await supabase
-    .from("profils")
-    .select("role, identifiant")
-    .eq("id", user.id)
-    .single()
-
-  if (profil?.role !== "admin") redirect(chemin(langue, "/"))
-
+  const { supabase } = await exigerAdmin(langue)
   const parametres = await lireParametres()
 
-  const [comptes, repetiteursAttente] = await Promise.all([
-    supabase.from("profils").select("role"),
+  const [attente, verifies, familles, enCours] = await Promise.all([
     supabase
       .from("repetiteurs")
       .select("id", { count: "exact", head: true })
       .eq("statut", "en_attente"),
+    supabase.from("repetiteurs").select("ville").eq("statut", "verifie"),
+    supabase
+      .from("profils")
+      .select("id", { count: "exact", head: true })
+      .eq("role", "parent"),
+    supabase
+      .from("seances_humaines")
+      .select("id", { count: "exact", head: true })
+      .not("demarree_le", "is", null)
+      .is("terminee_le", null),
   ])
 
-  const parRole = (r: string) =>
-    comptes.data?.filter((c) => c.role === r).length ?? 0
+  const aVerifier = attente.count ?? 0
+  const nbFamilles = familles.count ?? 0
+  const nbEnCours = enCours.count ?? 0
 
-  const aVerifier = repetiteursAttente.count ?? 0
-  const resolution = parametres.resolution_video as keyof typeof COUT_PAR_HEURE
+  // Répartition par ville, calculée ici : la base ne sait pas regrouper sans
+  // vue dédiée, et le volume reste minuscule pendant des années.
+  const parVille = new Map<string, number>()
+  for (const r of verifies.data ?? []) {
+    const ville = (r.ville ?? "").trim()
+    if (ville) parVille.set(ville, (parVille.get(ville) ?? 0) + 1)
+  }
+  const villes = [...parVille.entries()].sort((a, b) => b[1] - a[1])
+  const maximum = villes[0]?.[1] ?? 1
+
+  // Le titre dit ce que la page raconte aujourd'hui, pas le nom de la rubrique.
+  const titre =
+    villes.length === 0
+      ? t.titreVide
+      : aVerifier === 0
+        ? t.titreCalme
+        : remplir(t.titreCouverture, { ville: villes[villes.length - 1]![0] })
 
   return (
-    <Registre>
-      <main className="mx-auto flex max-w-2xl flex-col gap-6 p-6">
-        <header className="flex items-baseline justify-between pt-6">
-          <div>
-            <h1 className="text-2xl font-medium">{d.admin.titre}</h1>
-            <p className="doux mt-0.5 text-sm">{profil.identifiant}</p>
+    <>
+      <EnteteAdmin etiquette={t.etiquette} titre={titre} />
+
+      <div className="grid gap-4 px-7 pb-7 lg:grid-cols-[1.4fr_1fr]">
+        <section className="carte flex flex-col gap-4 p-5">
+          <div className="doux text-[11px] font-semibold uppercase tracking-[0.16em]">
+            {t.couverture}
           </div>
-          <BoutonDeconnexion langue={langue} />
-        </header>
 
-        <section className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-          <Chiffre valeur={parRole("eleve")} libelle={d.admin.eleves} />
-          <Chiffre valeur={parRole("parent")} libelle={d.admin.parents} />
-          <Chiffre
-            valeur={parRole("repetiteur")}
-            libelle={d.admin.repetiteurs}
-          />
-          <Chiffre
-            valeur={aVerifier}
-            libelle={d.admin.aVerifier}
-            alerte={aVerifier > 0}
-          />
-        </section>
+          {villes.length === 0 ? (
+            <p className="doux py-6 text-center text-[13px]">{t.aucuneVille}</p>
+          ) : (
+            <div className="flex flex-col gap-3">
+              {villes.map(([ville, n]) => (
+                <div key={ville}>
+                  <div className="flex items-baseline justify-between text-[13px]">
+                    <span className="font-medium">{ville}</span>
+                    <span className="doux font-mono text-[12px]">{n}</span>
+                  </div>
+                  <div
+                    className="mt-1.5 h-[4px] overflow-hidden rounded-full"
+                    style={{ background: "var(--bordure)" }}
+                  >
+                    <i
+                      className="block h-full rounded-full"
+                      style={{
+                        width: `${Math.round((n / maximum) * 100)}%`,
+                        background: "var(--accent)",
+                      }}
+                    />
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
 
-        <section className="flex flex-col gap-3">
-          <h2 className="doux text-sm font-medium uppercase tracking-wide">
-            {d.admin.modules}
-          </h2>
-
-          {MODULES.map((cle) => (
-            <Interrupteur
-              key={cle}
-              cle={cle}
-              d={d}
-              langue={langue}
-              actif={parametres[cle]}
-              // Un enregistrement éteint est le seul réglage qui mérite un
-              // avertissement : c'est la promesse faite aux parents qui tombe.
-              avertissement={
-                cle === "enregistrement_actif" && !parametres[cle]
-              }
-            />
-          ))}
-        </section>
-
-        <section className="carte p-4">
-          <div className="font-medium">{d.admin.resolutionTitre}</div>
-          <p className="doux mt-1 text-sm leading-relaxed">
-            {d.admin.resolutionDetail}
-          </p>
-          <form action={changerResolution} className="mt-3 flex gap-2">
-            <input type="hidden" name="langue" value={langue} />
-            {(Object.keys(COUT_PAR_HEURE) as (keyof typeof COUT_PAR_HEURE)[]).map(
-              (r) => (
-                <button
-                  key={r}
-                  type="submit"
-                  name="resolution"
-                  value={r}
-                  className={
-                    parametres.resolution_video === r
-                      ? "bouton px-4 py-2 text-sm"
-                      : "champ px-4 py-2 text-sm"
-                  }
-                >
-                  {r}
-                </button>
-              ),
-            )}
-          </form>
-          <p className="doux mt-2 text-xs">
-            {remplir(d.admin.resolutionCout, {
-              taille: COUT_PAR_HEURE[resolution] ?? "350 Mo",
-            })}
+          <p className="doux mt-auto pt-2 text-[12px] leading-relaxed">
+            {nbFamilles} {pluriel(langue, nbFamilles, t.familles)}
           </p>
         </section>
 
-        <p className="doux text-center text-xs leading-relaxed">
-          {d.admin.journal}
-        </p>
-      </main>
-    </Registre>
-  )
-}
+        <div className="flex flex-col gap-4">
+          <section className="carte p-5">
+            <div className="flex items-baseline gap-3">
+              <span className="text-[38px] font-light leading-none tracking-[-0.04em]">
+                {aVerifier}
+              </span>
+              <span className="text-[14px] leading-snug">
+                {pluriel(langue, aVerifier, t.dossiersAttendent)}
+              </span>
+            </div>
+            {aVerifier > 0 ? (
+              <Link
+                href={chemin(langue, "/admin/dossiers")}
+                className="bt1 mt-4 w-full"
+              >
+                {t.ouvrirLePremier}
+              </Link>
+            ) : null}
+          </section>
 
-function Chiffre({
-  valeur,
-  libelle,
-  alerte,
-}: {
-  valeur: number
-  libelle: string
-  alerte?: boolean
-}) {
-  return (
-    <div className="carte p-3">
-      <div
-        className="text-2xl font-medium"
-        style={alerte ? { color: "var(--voyant)" } : undefined}
-      >
-        {valeur}
-      </div>
-      <div className="doux text-xs">{libelle}</div>
-    </div>
-  )
-}
-
-function Interrupteur({
-  cle,
-  d,
-  langue,
-  actif,
-  avertissement,
-}: {
-  cle: (typeof MODULES)[number]
-  d: Dictionnaire
-  langue: Langue
-  actif: boolean
-  avertissement?: boolean
-}) {
-  const textes = d.admin.interrupteurs[cle]
-
-  return (
-    <form action={basculerParametre} className="carte flex gap-4 p-4">
-      <input type="hidden" name="langue" value={langue} />
-      <input type="hidden" name="cle" value={cle} />
-      <input type="hidden" name="valeur" value={String(!actif)} />
-
-      <div className="flex-1">
-        <div className="flex items-center gap-2">
-          <span className="font-medium">{textes.titre}</span>
-          <span className={actif ? "badge-verifie" : "badge-eteint"}>
-            {actif ? d.admin.actif : d.admin.eteint}
-          </span>
+          <section className="carte p-5">
+            <div className="flex items-center gap-2.5">
+              <span
+                className="h-[7px] w-[7px] shrink-0 rounded-full"
+                style={{
+                  background: nbEnCours > 0 ? "var(--voyant)" : "var(--bordure)",
+                }}
+              />
+              <span className="text-[14px]">
+                <b>{nbEnCours}</b>{" "}
+                {pluriel(langue, nbEnCours, t.seancesEnDirect)}
+              </span>
+            </div>
+            <p className="doux mt-1.5 text-[12px]">
+              {parametres.enregistrement_actif
+                ? remplir(t.enregistrementActif, {
+                    resolution: parametres.resolution_video,
+                  })
+                : t.enregistrementEteint}
+            </p>
+          </section>
         </div>
-        <p className="doux mt-1 text-sm leading-relaxed">{textes.detail}</p>
-        {avertissement ? (
-          <p className="mt-2 text-xs" style={{ color: "var(--voyant)" }}>
-            {d.admin.avertissementEnregistrement}
-          </p>
-        ) : null}
       </div>
-
-      <button
-        type="submit"
-        className={
-          actif
-            ? "champ self-start px-3 py-1.5 text-sm"
-            : "bouton self-start px-3 py-1.5 text-sm"
-        }
-      >
-        {actif ? d.admin.eteindre : d.admin.activer}
-      </button>
-    </form>
+    </>
   )
 }
