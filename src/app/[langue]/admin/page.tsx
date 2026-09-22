@@ -1,5 +1,6 @@
 import Link from "next/link"
 
+import { CarteCouverture } from "@/composants/admin/carte"
 import { EnteteAdmin } from "@/composants/admin/entete"
 import {
   chemin,
@@ -25,7 +26,7 @@ export default async function TableauDeBord({
   const { supabase } = await exigerAdmin(langue)
   const parametres = await lireParametres()
 
-  const [attente, verifies, familles, enCours] = await Promise.all([
+  const [attente, verifies, familles, enCours, villes] = await Promise.all([
     supabase
       .from("repetiteurs")
       .select("id", { count: "exact", head: true })
@@ -40,11 +41,18 @@ export default async function TableauDeBord({
       .select("id", { count: "exact", head: true })
       .not("demarree_le", "is", null)
       .is("terminee_le", null),
+    supabase
+      .from("villes")
+      .select("nom, x, y")
+      .eq("visible", true)
+      .order("nom"),
   ])
 
   const aVerifier = attente.count ?? 0
   const nbFamilles = familles.count ?? 0
   const nbEnCours = enCours.count ?? 0
+
+  const ouvertes = (villes.data ?? []) as { nom: string; x: number; y: number }[]
 
   // Répartition par ville, calculée ici : la base ne sait pas regrouper sans
   // vue dédiée, et le volume reste minuscule pendant des années.
@@ -53,55 +61,42 @@ export default async function TableauDeBord({
     const ville = (r.ville ?? "").trim()
     if (ville) parVille.set(ville, (parVille.get(ville) ?? 0) + 1)
   }
-  const villes = [...parVille.entries()].sort((a, b) => b[1] - a[1])
-  const maximum = villes[0]?.[1] ?? 1
 
   // Le titre dit ce que la page raconte aujourd'hui, pas le nom de la rubrique.
+  //
+  // La ville nommée est une ville RÉELLEMENT ouverte et réellement vide. Tant
+  // qu'aucune ville n'est ouverte, annoncer qu'il en manque dans l'une d'elles
+  // serait une phrase inventée : la carte n'aurait rien à montrer.
+  const vides = ouvertes.filter((v) => !parVille.get(v.nom))
   const titre =
-    villes.length === 0
+    ouvertes.length === 0 || parVille.size === 0
       ? t.titreVide
-      : aVerifier === 0
-        ? t.titreCalme
-        : remplir(t.titreCouverture, { ville: villes[villes.length - 1]![0] })
+      : vides.length > 0
+        ? remplir(t.titreCouverture, { ville: vides[0]!.nom })
+        : t.titreCalme
 
   return (
     <>
       <EnteteAdmin etiquette={t.etiquette} titre={titre} />
 
-      <div className="grid gap-4 px-7 pb-7 lg:grid-cols-[1.4fr_1fr]">
-        <section className="carte flex flex-col gap-4 p-5">
+      {/* Sous le point de rupture la carte passe en dernier : elle a besoin de
+          toute la largeur, et les chiffres qui appellent une action doivent
+          rester au-dessus de la ligne de flottaison. */}
+      <div className="flex flex-col gap-4 px-5 pb-7 sm:px-7 lg:grid lg:grid-cols-[1.45fr_1fr] lg:items-start">
+        <section className="carte order-last flex flex-col gap-3 p-4 sm:p-5 lg:order-first">
           <div className="doux text-[11px] font-semibold uppercase tracking-[0.16em]">
             {t.couverture}
           </div>
 
-          {villes.length === 0 ? (
-            <p className="doux py-6 text-center text-[13px]">{t.aucuneVille}</p>
-          ) : (
-            <div className="flex flex-col gap-3">
-              {villes.map(([ville, n]) => (
-                <div key={ville}>
-                  <div className="flex items-baseline justify-between text-[13px]">
-                    <span className="font-medium">{ville}</span>
-                    <span className="doux font-mono text-[12px]">{n}</span>
-                  </div>
-                  <div
-                    className="mt-1.5 h-[4px] overflow-hidden rounded-full"
-                    style={{ background: "var(--bordure)" }}
-                  >
-                    <i
-                      className="block h-full rounded-full"
-                      style={{
-                        width: `${Math.round((n / maximum) * 100)}%`,
-                        background: "var(--accent)",
-                      }}
-                    />
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
+          <div className="min-h-[230px] flex-1 sm:min-h-[300px]">
+            <CarteCouverture
+              villes={ouvertes}
+              parVille={parVille}
+              legendeVide={t.aucuneVille}
+            />
+          </div>
 
-          <p className="doux mt-auto pt-2 text-[12px] leading-relaxed">
+          <p className="doux text-[12px] leading-relaxed">
             {nbFamilles} {pluriel(langue, nbFamilles, t.familles)}
           </p>
         </section>
@@ -149,6 +144,7 @@ export default async function TableauDeBord({
           </section>
         </div>
       </div>
+
     </>
   )
 }

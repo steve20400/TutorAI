@@ -1,0 +1,375 @@
+<div style="font-family:inherit">
+
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <defs>
+      <!-- ICÔNES — trait 1.6, viewBox 20 -->
+      <g id="i-tb"><rect x="2.5" y="2.5" width="6.5" height="6.5" rx="1.5"/><rect x="11" y="2.5" width="6.5" height="6.5" rx="1.5"/><rect x="2.5" y="11" width="6.5" height="6.5" rx="1.5"/><rect x="11" y="11" width="6.5" height="6.5" rx="1.5"/></g>
+      <g id="i-do"><path d="M2.5 5.5a2 2 0 0 1 2-2h3.3l1.8 2.2h6a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2h-11a2 2 0 0 1-2-2z"/></g>
+      <g id="i-re"><circle cx="10" cy="6.6" r="3.3"/><path d="M3.8 17c0-3.4 2.8-5.4 6.2-5.4s6.2 2 6.2 5.4"/></g>
+      <g id="i-fa"><circle cx="7.2" cy="7" r="2.8"/><circle cx="14.2" cy="8.4" r="2.2"/><path d="M2.2 16.6c0-2.9 2.2-4.6 5-4.6s5 1.7 5 4.6"/><path d="M12.6 16.6c0-2.3 1.3-3.8 3.2-3.8 1.4 0 2.4.8 2.9 2"/></g>
+      <g id="i-se"><rect x="2.2" y="3.6" width="15.6" height="10.6" rx="2"/><path d="M7.6 17.4h4.8M10 14.2v3.2"/><circle cx="14.4" cy="6.4" r="1.1" fill="currentColor" stroke="none"/></g>
+      <g id="i-mo"><path d="M3 6h5M12 6h5M3 14h9M16 14h1"/><circle cx="10" cy="6" r="2.1"/><circle cx="14" cy="14" r="2.1"/></g>
+      <g id="i-cl"><circle cx="6.6" cy="7.2" r="3.4"/><path d="M9 9.6 17 17.6M14.2 14.8l1.6-1.6M11.8 12.4l1.6-1.6"/></g>
+      <g id="i-rg"><path d="M3.4 4.2a1.8 1.8 0 0 1 1.8-1.8H16a.8.8 0 0 1 .8.8v13.6a.8.8 0 0 1-.8.8H5.2a1.8 1.8 0 0 1-1.8-1.8z"/><path d="M3.4 14.2h13.4M6.8 6.4h6.4M6.8 9.4h4.4"/></g>
+      <g id="i-pl"><rect x="2.2" y="3.2" width="15.6" height="13.6" rx="2"/><path d="M8 3.2v13.6"/></g>
+
+      <pattern id="mv" width="180" height="180" patternUnits="userSpaceOnUse">
+        <g fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round">
+          <g transform="translate(30 32)"><rect x="-15" y="-12" width="30" height="21" rx="3"/><path d="M-3 12h6M-8 15h16" stroke-width="1.3"/><circle cx="-4" cy="-5" r="3" fill="currentColor" stroke="none"/><path d="M-9 4a5 5.3 0 0 1 10 0z" fill="currentColor" stroke="none"/><rect x="4" y="-2" width="9" height="8" rx="1.5"/></g>
+          <g transform="translate(104 24)"><path d="M0 0h34M0 5h34M0 10h24M0 15h30"/><circle cx="-5" cy="7" r="2" fill="currentColor" stroke="none"/></g>
+          <g transform="translate(150 78) rotate(6)"><rect x="-10" y="-8" width="20" height="16" rx="2"/><path d="M-6 -2h12M-6 2.5h7" stroke-width="1.2"/></g>
+          <g transform="translate(66 86)"><circle r="12" stroke-dasharray="3.2 3"/><circle r="7.5"/><path d="M-3.4 0l2.6 2.6l5-5.6" stroke-width="1.8"/></g>
+          <g transform="translate(16 118)"><rect x="0" y="0" width="13" height="10" rx="1.5"/><rect x="16" y="0" width="13" height="10" rx="1.5"/><rect x="0" y="13" width="13" height="10" rx="1.5"/><rect x="16" y="13" width="13" height="10" rx="1.5" fill="currentColor" opacity=".35" stroke="none"/></g>
+          <g transform="translate(110 132) rotate(-5)"><path d="M0 -4q-6-3.4-11-1.8v11q5-1.6 11 1.8q6-3.4 11-1.8v-11q-5-1.6-11 1.8z"/></g>
+          <g transform="translate(180 60)"><rect x="-13" y="-10" width="26" height="19" rx="3"/></g>
+          <g transform="translate(0 60)"><rect x="-13" y="-10" width="26" height="19" rx="3"/></g>
+          <g transform="translate(68 0)"><path d="M0 0h28M0 5h28M0 10h19"/></g>
+          <g transform="translate(68 180)"><path d="M0 0h28M0 5h28M0 10h19"/></g>
+        </g>
+      </pattern>
+    </defs>
+  </svg>
+
+  <style>
+    .ic{width:15px;height:15px;flex:none}
+    .ic svg{display:block}
+    .iw{fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+
+    .gal{display:flex;flex-wrap:wrap;gap:20px}
+    .pan{width:396px}
+    .box{border-radius:10px;overflow:hidden;border:1px solid rgb(0 0 0/.12);box-shadow:0 5px 16px rgb(0 0 0/.14);height:252px;display:flex;font-size:10px}
+    .nm{margin-top:9px;font-size:13.5px;font-weight:500;color:var(--text-primary)}
+    .ds{margin:3px 0 0;font-size:12px;line-height:1.55;color:var(--text-secondary)}
+    .nb{display:inline-block;font-size:10px;font-weight:700;color:var(--text-accent);background:var(--bg-accent);border-radius:4px;padding:1px 6px;margin-right:6px}
+
+    /* barre latérale commune, étroite */
+    .sb{width:38px;flex:none;display:flex;flex-direction:column;align-items:center;padding:9px 0;gap:7px}
+    .sb .lg{margin-bottom:4px}
+    .sb .it{width:24px;height:24px;border-radius:6px;display:flex;align-items:center;justify-content:center;opacity:.55}
+    .sb .it.on{opacity:1}
+    .sb .pl{margin-top:auto;width:24px;height:24px;border-radius:6px;display:flex;align-items:center;justify-content:center;border:1px solid currentColor;opacity:.45}
+
+    .mono{font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+  </style>
+
+  <!-- ══ la rangée d'icônes ══ -->
+  <div style="display:flex;flex-wrap:wrap;gap:20px;align-items:center;padding:14px 18px;background:var(--surface-1);border-radius:11px;margin-bottom:24px;color:var(--text-primary)">
+    <div style="font-size:13px;font-weight:500;width:100%;margin-bottom:2px">Les vraies icônes de la barre latérale</div>
+    <span style="display:flex;align-items:center;gap:7px;font-size:12px;color:var(--text-secondary)"><span class="ic"><svg viewBox="0 0 20 20" class="iw"><use href="#i-tb"/></svg></span>Tableau de bord</span>
+    <span style="display:flex;align-items:center;gap:7px;font-size:12px;color:var(--text-secondary)"><span class="ic"><svg viewBox="0 0 20 20" class="iw"><use href="#i-do"/></svg></span>Dossiers</span>
+    <span style="display:flex;align-items:center;gap:7px;font-size:12px;color:var(--text-secondary)"><span class="ic"><svg viewBox="0 0 20 20" class="iw"><use href="#i-re"/></svg></span>Répétiteurs</span>
+    <span style="display:flex;align-items:center;gap:7px;font-size:12px;color:var(--text-secondary)"><span class="ic"><svg viewBox="0 0 20 20" class="iw"><use href="#i-fa"/></svg></span>Familles</span>
+    <span style="display:flex;align-items:center;gap:7px;font-size:12px;color:var(--text-secondary)"><span class="ic"><svg viewBox="0 0 20 20" class="iw"><use href="#i-se"/></svg></span>Séances</span>
+    <span style="display:flex;align-items:center;gap:7px;font-size:12px;color:var(--text-secondary)"><span class="ic"><svg viewBox="0 0 20 20" class="iw"><use href="#i-mo"/></svg></span>Modules</span>
+    <span style="display:flex;align-items:center;gap:7px;font-size:12px;color:var(--text-secondary)"><span class="ic"><svg viewBox="0 0 20 20" class="iw"><use href="#i-cl"/></svg></span>Clés</span>
+    <span style="display:flex;align-items:center;gap:7px;font-size:12px;color:var(--text-secondary)"><span class="ic"><svg viewBox="0 0 20 20" class="iw"><use href="#i-rg"/></svg></span>Registre</span>
+    <p style="margin:2px 0 0;font-size:12px;color:var(--text-muted);width:100%">Le bouton de repli reste en bas, comme tu l'as retenu — il n'aspire plus la visibilité du logo.</p>
+  </div>
+
+  <div class="gal">
+
+    <!-- 1 — LE REGISTRE RELIÉ -->
+    <div class="pan">
+      <div class="box" style="background:#fff;color:#14203a">
+        <div class="sb" style="background:#fff;border-right:1px solid #e8e4dc">
+          <span class="lg"><svg width="17" height="17" viewBox="0 0 48 48"><rect x="3" y="5" width="42" height="31" rx="7" fill="#14203a"/><rect x="13" y="39.5" width="22" height="4.6" rx="2.3" fill="#14203a"/><rect x="20" y="36" width="8" height="4" fill="#14203a"/><circle cx="16.5" cy="15" r="4.7" fill="#fff"/><path d="M8.2 28.8a8.3 8.8 0 0 1 16.6 0z" fill="#fff"/><rect x="26.5" y="20.5" width="15.5" height="12.5" rx="3.5" fill="#fff" stroke="#14203a" stroke-width="1.7"/><circle cx="39.5" cy="11" r="3" fill="#c2402c"/></svg></span>
+          <span class="it"><span class="ic"><svg viewBox="0 0 20 20" class="iw"><use href="#i-tb"/></svg></span></span>
+          <span class="it on"><span class="ic"><svg viewBox="0 0 20 20" class="iw"><use href="#i-rg"/></svg></span></span>
+          <span class="it"><span class="ic"><svg viewBox="0 0 20 20" class="iw"><use href="#i-do"/></svg></span></span>
+          <span class="it"><span class="ic"><svg viewBox="0 0 20 20" class="iw"><use href="#i-re"/></svg></span></span>
+          <span class="pl"><span class="ic"><svg viewBox="0 0 20 20" class="iw"><use href="#i-pl"/></svg></span></span>
+        </div>
+        <div style="flex:1;padding:16px 20px">
+          <div style="font-size:8.5px;letter-spacing:.2em;text-transform:uppercase;color:#9aa1b0">Registre — septembre 2026</div>
+          <div style="margin-top:12px">
+            <div style="display:flex;gap:10px;padding:7px 0;border-bottom:1px solid #efece5"><span class="mono" style="color:#b2b8c4;width:30px">0043</span><span style="flex:1">Tabi Peter</span><span style="color:#9aa1b0">Buea</span><span style="color:#c2402c">refusé</span></div>
+            <div style="display:flex;gap:10px;padding:7px 0;border-bottom:1px solid #efece5"><span class="mono" style="color:#b2b8c4;width:30px">0042</span><span style="flex:1;font-weight:600">Mballa Christelle</span><span style="color:#9aa1b0">Yaoundé</span><span style="color:#1b6b45">cachet 22.09</span></div>
+            <div style="display:flex;gap:10px;padding:7px 0;border-bottom:1px solid #efece5"><span class="mono" style="color:#b2b8c4;width:30px">0041</span><span style="flex:1">Ngu Emmanuel</span><span style="color:#9aa1b0">Bamenda</span><span style="color:#8a5a12">en attente</span></div>
+            <div style="display:flex;gap:10px;padding:7px 0;border-bottom:1px solid #efece5;opacity:.45"><span class="mono" style="color:#b2b8c4;width:30px">0040</span><span style="flex:1">Fotso Alain</span><span>Douala</span><span>cachet 18.09</span></div>
+            <div style="display:flex;gap:10px;padding:7px 0;opacity:.25"><span class="mono" style="color:#b2b8c4;width:30px">0039</span><span style="flex:1">Atangana Rose</span><span>Yaoundé</span><span>cachet 15.09</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="nm"><span class="nb">1</span>Le registre relié</div>
+      <p class="ds">Blanc pur, aucune carte, aucune bordure. Une ligne par décision, numérotée dans la marge, les plus anciennes qui pâlissent. La typographie fait tout le travail.</p>
+    </div>
+
+    <!-- 2 — LE PLAN DE TRAVAIL -->
+    <div class="pan">
+      <div class="box" style="background:#f2efe7;color:#14203a">
+        <div class="sb" style="background:#e6e1d5;border-right:1px solid #d8d2c2">
+          <span class="lg"><svg width="17" height="17" viewBox="0 0 48 48"><rect x="3" y="5" width="42" height="31" rx="7" fill="#14203a"/><rect x="13" y="39.5" width="22" height="4.6" rx="2.3" fill="#14203a"/><rect x="20" y="36" width="8" height="4" fill="#14203a"/><circle cx="16.5" cy="15" r="4.7" fill="#f2efe7"/><path d="M8.2 28.8a8.3 8.8 0 0 1 16.6 0z" fill="#f2efe7"/><rect x="26.5" y="20.5" width="15.5" height="12.5" rx="3.5" fill="#f2efe7" stroke="#14203a" stroke-width="1.7"/><circle cx="39.5" cy="11" r="3" fill="#c2402c"/></svg></span>
+          <span class="it"><span class="ic"><svg viewBox="0 0 20 20" class="iw"><use href="#i-tb"/></svg></span></span>
+          <span class="it on"><span class="ic"><svg viewBox="0 0 20 20" class="iw"><use href="#i-do"/></svg></span></span>
+          <span class="it"><span class="ic"><svg viewBox="0 0 20 20" class="iw"><use href="#i-fa"/></svg></span></span>
+          <span class="pl"><span class="ic"><svg viewBox="0 0 20 20" class="iw"><use href="#i-pl"/></svg></span></span>
+        </div>
+        <div style="flex:1;padding:18px 16px;position:relative">
+          <div style="position:absolute;left:34px;top:54px;width:200px;height:110px;background:#fbf9f4;border-radius:2px 8px 8px 8px;transform:rotate(-2.5deg);box-shadow:0 4px 12px rgb(20 32 58/.14)"></div>
+          <div style="position:absolute;left:26px;top:44px;width:200px;height:110px;background:#fff;border-radius:2px 8px 8px 8px;transform:rotate(1.4deg);box-shadow:0 5px 14px rgb(20 32 58/.16);padding:12px 14px">
+            <div style="position:absolute;top:-8px;left:12px;height:9px;padding:0 9px;background:#c9a227;border-radius:3px 3px 0 0"></div>
+            <div style="font-size:8px;letter-spacing:.14em;text-transform:uppercase;color:#9aa1b0">Dossier 0041</div>
+            <div style="font-size:12.5px;font-weight:600;margin-top:5px">Ngu Emmanuel</div>
+            <div style="color:#7b8394;margin-top:3px">Bamenda · Form 4 → Upper Sixth</div>
+            <div style="display:flex;gap:4px;margin-top:9px"><span style="font-size:8.5px;background:#e3efe8;color:#1b6b45;padding:2px 6px;border-radius:4px">CNI</span><span style="font-size:8.5px;background:#e3efe8;color:#1b6b45;padding:2px 6px;border-radius:4px">Casier</span><span style="font-size:8.5px;background:#fbf1e0;color:#8a5a12;padding:2px 6px;border-radius:4px">Diplôme</span></div>
+          </div>
+          <div style="position:absolute;right:16px;bottom:16px;width:56px;height:56px;border-radius:50%;border:1.8px dashed #1b6b45;color:#1b6b45;display:flex;flex-direction:column;align-items:center;justify-content:center;transform:rotate(-12deg)"><b style="font-size:8px;letter-spacing:.08em">VÉRIFIÉ</b><span style="font-size:7px">22.09.26</span></div>
+        </div>
+      </div>
+      <div class="nm"><span class="nb">2</span>Le plan de travail</div>
+      <p class="ds">Les dossiers sont empilés et légèrement de travers, comme sur un bureau. On en prend un, on l'ouvre, le cachet attend dans le coin. Physique, immédiat.</p>
+    </div>
+
+    <!-- 3 — LA CONSOLE DE VEILLE -->
+    <div class="pan">
+      <div class="box" style="background:#080d18;color:#d8e2f2">
+        <div class="sb" style="background:#0d1424;border-right:1px solid #1c2740;position:relative;overflow:hidden">
+          <svg style="position:absolute;inset:0;opacity:.14;color:#d8e2f2" viewBox="0 0 38 252" preserveAspectRatio="xMidYMid slice"><rect width="38" height="252" fill="url(#mv)"/></svg>
+          <span class="lg" style="position:relative"><svg width="17" height="17" viewBox="0 0 48 48"><rect x="3" y="5" width="42" height="31" rx="7" fill="#d8e2f2"/><rect x="13" y="39.5" width="22" height="4.6" rx="2.3" fill="#d8e2f2"/><rect x="20" y="36" width="8" height="4" fill="#d8e2f2"/><circle cx="16.5" cy="15" r="4.7" fill="#0d1424"/><path d="M8.2 28.8a8.3 8.8 0 0 1 16.6 0z" fill="#0d1424"/><rect x="26.5" y="20.5" width="15.5" height="12.5" rx="3.5" fill="#0d1424" stroke="#d8e2f2" stroke-width="1.7"/><circle cx="39.5" cy="11" r="3" fill="#e04a32"/></svg></span>
+          <span class="it on" style="position:relative"><span class="ic"><svg viewBox="0 0 20 20" class="iw"><use href="#i-tb"/></svg></span></span>
+          <span class="it" style="position:relative"><span class="ic"><svg viewBox="0 0 20 20" class="iw"><use href="#i-se"/></svg></span></span>
+          <span class="it" style="position:relative"><span class="ic"><svg viewBox="0 0 20 20" class="iw"><use href="#i-do"/></svg></span></span>
+          <span class="pl" style="position:relative"><span class="ic"><svg viewBox="0 0 20 20" class="iw"><use href="#i-pl"/></svg></span></span>
+        </div>
+        <div style="flex:1;padding:15px 18px">
+          <div style="display:flex;align-items:center;gap:7px;font-size:8.5px;letter-spacing:.18em;text-transform:uppercase;color:#7f8ca5"><span style="width:6px;height:6px;border-radius:50%;background:#3ecf8e;display:block"></span>En direct</div>
+          <div class="mono" style="display:flex;gap:22px;margin-top:13px">
+            <div><div style="font-size:26px;font-weight:600;line-height:1">7</div><div style="font-size:8.5px;color:#7f8ca5;letter-spacing:.09em;margin-top:2px">SÉANCES</div></div>
+            <div><div style="font-size:26px;font-weight:600;line-height:1;color:#c9a227">3</div><div style="font-size:8.5px;color:#7f8ca5;letter-spacing:.09em;margin-top:2px">DOSSIERS</div></div>
+            <div><div style="font-size:26px;font-weight:600;line-height:1">12</div><div style="font-size:8.5px;color:#7f8ca5;letter-spacing:.09em;margin-top:2px">VÉRIFIÉS</div></div>
+          </div>
+          <div class="mono" style="margin-top:14px;font-size:9px;line-height:1.85;color:#8f9cb5">
+            <div><span style="color:#3ecf8e">14:02</span> séance 8821 démarrée · Ngu ↔ Nfor</div>
+            <div><span style="color:#3ecf8e">14:00</span> enregistrement 480p en cours</div>
+            <div><span style="color:#c9a227">13:47</span> dossier 0041 — diplôme illisible</div>
+            <div style="opacity:.5"><span>13:30</span> séance 8820 terminée · 52 min</div>
+          </div>
+        </div>
+      </div>
+      <div class="nm"><span class="nb">3</span>La console de veille</div>
+      <p class="ds">Sombre, chiffres en chasse fixe, flux d'événements en direct. Ce n'est plus un tableau de bord, c'est un poste de surveillance — ce que ton produit est vraiment.</p>
+    </div>
+
+    <!-- 4 — LE MUR D'ÉCRANS -->
+    <div class="pan">
+      <div class="box" style="background:#101828;color:#dbe3f0">
+        <div class="sb" style="background:#0b1120;border-right:1px solid #1e2940">
+          <span class="lg"><svg width="17" height="17" viewBox="0 0 48 48"><rect x="3" y="5" width="42" height="31" rx="7" fill="#dbe3f0"/><rect x="13" y="39.5" width="22" height="4.6" rx="2.3" fill="#dbe3f0"/><rect x="20" y="36" width="8" height="4" fill="#dbe3f0"/><circle cx="16.5" cy="15" r="4.7" fill="#0b1120"/><path d="M8.2 28.8a8.3 8.8 0 0 1 16.6 0z" fill="#0b1120"/><rect x="26.5" y="20.5" width="15.5" height="12.5" rx="3.5" fill="#0b1120" stroke="#dbe3f0" stroke-width="1.7"/><circle cx="39.5" cy="11" r="3" fill="#e04a32"/></svg></span>
+          <span class="it"><span class="ic"><svg viewBox="0 0 20 20" class="iw"><use href="#i-tb"/></svg></span></span>
+          <span class="it on"><span class="ic"><svg viewBox="0 0 20 20" class="iw"><use href="#i-se"/></svg></span></span>
+          <span class="it"><span class="ic"><svg viewBox="0 0 20 20" class="iw"><use href="#i-do"/></svg></span></span>
+          <span class="pl"><span class="ic"><svg viewBox="0 0 20 20" class="iw"><use href="#i-pl"/></svg></span></span>
+        </div>
+        <div style="flex:1;padding:14px">
+          <div style="font-size:8.5px;letter-spacing:.18em;text-transform:uppercase;color:#7f8ca5;margin-bottom:10px">Séances en cours · 6</div>
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:7px">
+            <div style="aspect-ratio:4/3;background:#182339;border-radius:5px;position:relative;display:flex;align-items:flex-end;padding:5px"><span style="position:absolute;top:5px;right:5px;width:5px;height:5px;border-radius:50%;background:#e04a32"></span><span style="font-size:7.5px;color:#a8b3c9">Ngu · Maths</span></div>
+            <div style="aspect-ratio:4/3;background:#182339;border-radius:5px;position:relative;display:flex;align-items:flex-end;padding:5px"><span style="position:absolute;top:5px;right:5px;width:5px;height:5px;border-radius:50%;background:#e04a32"></span><span style="font-size:7.5px;color:#a8b3c9">Mballa · Phi</span></div>
+            <div style="aspect-ratio:4/3;background:#182339;border-radius:5px;position:relative;display:flex;align-items:flex-end;padding:5px"><span style="position:absolute;top:5px;right:5px;width:5px;height:5px;border-radius:50%;background:#e04a32"></span><span style="font-size:7.5px;color:#a8b3c9">Fotso · SVT</span></div>
+            <div style="aspect-ratio:4/3;background:#182339;border-radius:5px;position:relative;display:flex;align-items:flex-end;padding:5px"><span style="font-size:7.5px;color:#a8b3c9">Atangana</span></div>
+            <div style="aspect-ratio:4/3;background:#182339;border-radius:5px;position:relative;display:flex;align-items:flex-end;padding:5px"><span style="font-size:7.5px;color:#a8b3c9">Tabi · Angl</span></div>
+            <div style="aspect-ratio:4/3;background:#131d30;border-radius:5px;border:1px dashed #263248;display:flex;align-items:center;justify-content:center"><span style="font-size:7.5px;color:#55607a">libre</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="nm"><span class="nb">4</span>Le mur d'écrans</div>
+      <p class="ds">Chaque séance en cours est une tuile, avec son voyant rouge. Tu vois d'un coup d'œil ce qui se passe maintenant. Pas de vidéo visible — seulement qu'elle a lieu et qu'elle est enregistrée.</p>
+    </div>
+
+    <!-- 5 — LA CHRONOLOGIE -->
+    <div class="pan">
+      <div class="box" style="background:#fff;color:#14203a">
+        <div class="sb" style="background:#fafaf8;border-right:1px solid #ebe8e1">
+          <span class="lg"><svg width="17" height="17" viewBox="0 0 48 48"><rect x="3" y="5" width="42" height="31" rx="7" fill="#14203a"/><rect x="13" y="39.5" width="22" height="4.6" rx="2.3" fill="#14203a"/><rect x="20" y="36" width="8" height="4" fill="#14203a"/><circle cx="16.5" cy="15" r="4.7" fill="#fff"/><path d="M8.2 28.8a8.3 8.8 0 0 1 16.6 0z" fill="#fff"/><rect x="26.5" y="20.5" width="15.5" height="12.5" rx="3.5" fill="#fff" stroke="#14203a" stroke-width="1.7"/><circle cx="39.5" cy="11" r="3" fill="#c2402c"/></svg></span>
+          <span class="it on"><span class="ic"><svg viewBox="0 0 20 20" class="iw"><use href="#i-tb"/></svg></span></span>
+          <span class="it"><span class="ic"><svg viewBox="0 0 20 20" class="iw"><use href="#i-do"/></svg></span></span>
+          <span class="it"><span class="ic"><svg viewBox="0 0 20 20" class="iw"><use href="#i-rg"/></svg></span></span>
+          <span class="pl"><span class="ic"><svg viewBox="0 0 20 20" class="iw"><use href="#i-pl"/></svg></span></span>
+        </div>
+        <div style="flex:1;padding:16px 20px">
+          <div style="font-size:15px;font-weight:500;margin-bottom:13px">Votre journée</div>
+          <div style="position:relative;padding-left:16px">
+            <span style="position:absolute;left:3.5px;top:4px;bottom:4px;width:1px;background:#e8e4dc"></span>
+            <div style="position:relative;padding-bottom:13px"><span style="position:absolute;left:-16px;top:3px;width:8px;height:8px;border-radius:50%;background:#c9a227"></span><div style="font-size:8.5px;color:#9aa1b0">il y a 20 min</div><div style="margin-top:2px"><b>Ngu Emmanuel</b> a redéposé son diplôme</div></div>
+            <div style="position:relative;padding-bottom:13px"><span style="position:absolute;left:-16px;top:3px;width:8px;height:8px;border-radius:50%;background:#1b6b45"></span><div style="font-size:8.5px;color:#9aa1b0">09:14</div><div style="margin-top:2px">Vous avez apposé le cachet sur <b>Mballa Christelle</b></div></div>
+            <div style="position:relative;padding-bottom:13px"><span style="position:absolute;left:-16px;top:3px;width:8px;height:8px;border-radius:50%;background:#d6d2c8"></span><div style="font-size:8.5px;color:#9aa1b0">08:02</div><div style="margin-top:2px">4 nouvelles familles inscrites cette nuit</div></div>
+            <div style="position:relative;opacity:.5"><span style="position:absolute;left:-16px;top:3px;width:8px;height:8px;border-radius:50%;background:#d6d2c8"></span><div style="font-size:8.5px;color:#9aa1b0">hier 22:40</div><div style="margin-top:2px">Séance 8819 terminée · 48 min · enregistrée</div></div>
+          </div>
+        </div>
+      </div>
+      <div class="nm"><span class="nb">5</span>La chronologie</div>
+      <p class="ds">Pas de chiffres : un récit. Tu ouvres et tu lis ce qui s'est passé depuis hier, dans l'ordre. C'est la forme qui convient à quelqu'un qui passe cinq minutes par jour.</p>
+    </div>
+
+    <!-- 6 — LE GRAND CHIFFRE -->
+    <div class="pan">
+      <div class="box" style="background:#fff;color:#14203a">
+        <div class="sb" style="background:#fff;border-right:1px solid #ebe8e1">
+          <span class="lg"><svg width="17" height="17" viewBox="0 0 48 48"><rect x="3" y="5" width="42" height="31" rx="7" fill="#14203a"/><rect x="13" y="39.5" width="22" height="4.6" rx="2.3" fill="#14203a"/><rect x="20" y="36" width="8" height="4" fill="#14203a"/><circle cx="16.5" cy="15" r="4.7" fill="#fff"/><path d="M8.2 28.8a8.3 8.8 0 0 1 16.6 0z" fill="#fff"/><rect x="26.5" y="20.5" width="15.5" height="12.5" rx="3.5" fill="#fff" stroke="#14203a" stroke-width="1.7"/><circle cx="39.5" cy="11" r="3" fill="#c2402c"/></svg></span>
+          <span class="it on"><span class="ic"><svg viewBox="0 0 20 20" class="iw"><use href="#i-tb"/></svg></span></span>
+          <span class="it"><span class="ic"><svg viewBox="0 0 20 20" class="iw"><use href="#i-do"/></svg></span></span>
+          <span class="it"><span class="ic"><svg viewBox="0 0 20 20" class="iw"><use href="#i-mo"/></svg></span></span>
+          <span class="pl"><span class="ic"><svg viewBox="0 0 20 20" class="iw"><use href="#i-pl"/></svg></span></span>
+        </div>
+        <div style="flex:1;padding:22px 24px;display:flex;flex-direction:column;justify-content:center">
+          <div style="display:flex;align-items:flex-start;gap:16px">
+            <div style="font-size:86px;font-weight:300;line-height:.82;letter-spacing:-.05em">3</div>
+            <div style="padding-top:8px">
+              <div style="font-size:16px;font-weight:500;line-height:1.25;letter-spacing:-.01em">dossiers<br/>attendent votre<br/>cachet.</div>
+            </div>
+          </div>
+          <div style="margin-top:20px;display:flex;gap:9px">
+            <button style="font-size:10px;font-weight:500;padding:8px 15px;border-radius:7px;border:none;background:#14203a;color:#fff">Ouvrir le premier</button>
+            <button style="font-size:10px;font-weight:500;padding:8px 15px;border-radius:7px;background:#fff;color:#14203a;border:1px solid #e0dcd3">Tout voir</button>
+          </div>
+          <div style="margin-top:18px;padding-top:13px;border-top:1px solid #efece5;display:flex;gap:20px;font-size:9.5px;color:#9aa1b0">
+            <span>12 vérifiés</span><span>48 familles</span><span>7 séances en cours</span>
+          </div>
+        </div>
+      </div>
+      <div class="nm"><span class="nb">6</span>Le grand chiffre</div>
+      <p class="ds">Un seul nombre, énorme, et une phrase. Le reste tient sur une ligne en bas. Éditorial plutôt que gestionnaire — et impossible d'ouvrir l'application sans voir ce qui attend.</p>
+    </div>
+
+    <!-- 7 — LES COLONNES -->
+    <div class="pan">
+      <div class="box" style="background:#f7f6f2;color:#14203a">
+        <div class="sb" style="background:#fff;border-right:1px solid #e8e4dc">
+          <span class="lg"><svg width="17" height="17" viewBox="0 0 48 48"><rect x="3" y="5" width="42" height="31" rx="7" fill="#14203a"/><rect x="13" y="39.5" width="22" height="4.6" rx="2.3" fill="#14203a"/><rect x="20" y="36" width="8" height="4" fill="#14203a"/><circle cx="16.5" cy="15" r="4.7" fill="#fff"/><path d="M8.2 28.8a8.3 8.8 0 0 1 16.6 0z" fill="#fff"/><rect x="26.5" y="20.5" width="15.5" height="12.5" rx="3.5" fill="#fff" stroke="#14203a" stroke-width="1.7"/><circle cx="39.5" cy="11" r="3" fill="#c2402c"/></svg></span>
+          <span class="it"><span class="ic"><svg viewBox="0 0 20 20" class="iw"><use href="#i-tb"/></svg></span></span>
+          <span class="it on"><span class="ic"><svg viewBox="0 0 20 20" class="iw"><use href="#i-do"/></svg></span></span>
+          <span class="it"><span class="ic"><svg viewBox="0 0 20 20" class="iw"><use href="#i-re"/></svg></span></span>
+          <span class="pl"><span class="ic"><svg viewBox="0 0 20 20" class="iw"><use href="#i-pl"/></svg></span></span>
+        </div>
+        <div style="flex:1;padding:14px;display:grid;grid-template-columns:repeat(3,1fr);gap:9px">
+          <div>
+            <div style="font-size:8.5px;letter-spacing:.13em;text-transform:uppercase;color:#9aa1b0;margin-bottom:7px">Déposés · 1</div>
+            <div style="background:#fff;border-radius:7px;padding:9px;box-shadow:0 1px 3px rgb(20 32 58/.08)"><div style="font-weight:600;font-size:10.5px">Tabi Peter</div><div style="color:#8a90a0;font-size:9px;margin-top:2px">Buea</div></div>
+          </div>
+          <div>
+            <div style="font-size:8.5px;letter-spacing:.13em;text-transform:uppercase;color:#9aa1b0;margin-bottom:7px">En examen · 1</div>
+            <div style="background:#fff;border-radius:7px;padding:9px;box-shadow:0 1px 3px rgb(20 32 58/.08);border-left:2.5px solid #c9a227"><div style="font-weight:600;font-size:10.5px">Ngu Emmanuel</div><div style="color:#8a90a0;font-size:9px;margin-top:2px">diplôme illisible</div></div>
+          </div>
+          <div>
+            <div style="font-size:8.5px;letter-spacing:.13em;text-transform:uppercase;color:#9aa1b0;margin-bottom:7px">Cachet apposé · 12</div>
+            <div style="background:#fff;border-radius:7px;padding:9px;box-shadow:0 1px 3px rgb(20 32 58/.08);border-left:2.5px solid #1b6b45"><div style="font-weight:600;font-size:10.5px">Mballa C.</div><div style="color:#1b6b45;font-size:9px;margin-top:2px">22.09.2026</div></div>
+            <div style="background:#fff;border-radius:7px;padding:9px;box-shadow:0 1px 3px rgb(20 32 58/.08);border-left:2.5px solid #1b6b45;margin-top:6px;opacity:.6"><div style="font-weight:600;font-size:10.5px">Fotso Alain</div><div style="color:#1b6b45;font-size:9px;margin-top:2px">18.09.2026</div></div>
+          </div>
+        </div>
+      </div>
+      <div class="nm"><span class="nb">7</span>Les trois colonnes</div>
+      <p class="ds">Déposé, en examen, cachet apposé. Le dossier traverse l'écran de gauche à droite. On voit le passage, pas seulement l'état — et rien ne peut rester coincé sans qu'on le remarque.</p>
+    </div>
+
+    <!-- 8 — LA FICHE PLEINE PAGE -->
+    <div class="pan">
+      <div class="box" style="background:#0e1626;color:#e6ecf7;position:relative">
+        <div class="sb" style="background:#0a1120;border-right:1px solid #1d2840">
+          <span class="lg"><svg width="17" height="17" viewBox="0 0 48 48"><rect x="3" y="5" width="42" height="31" rx="7" fill="#e6ecf7"/><rect x="13" y="39.5" width="22" height="4.6" rx="2.3" fill="#e6ecf7"/><rect x="20" y="36" width="8" height="4" fill="#e6ecf7"/><circle cx="16.5" cy="15" r="4.7" fill="#0a1120"/><path d="M8.2 28.8a8.3 8.8 0 0 1 16.6 0z" fill="#0a1120"/><rect x="26.5" y="20.5" width="15.5" height="12.5" rx="3.5" fill="#0a1120" stroke="#e6ecf7" stroke-width="1.7"/><circle cx="39.5" cy="11" r="3" fill="#e04a32"/></svg></span>
+          <span class="it"><span class="ic"><svg viewBox="0 0 20 20" class="iw"><use href="#i-tb"/></svg></span></span>
+          <span class="it on"><span class="ic"><svg viewBox="0 0 20 20" class="iw"><use href="#i-do"/></svg></span></span>
+          <span class="pl"><span class="ic"><svg viewBox="0 0 20 20" class="iw"><use href="#i-pl"/></svg></span></span>
+        </div>
+        <div style="flex:1;padding:16px 20px;position:relative;overflow:hidden">
+          <svg style="position:absolute;inset:0;opacity:.09;color:#e6ecf7" viewBox="0 0 356 252" preserveAspectRatio="xMidYMid slice"><rect width="356" height="252" fill="url(#mv)"/></svg>
+          <div style="position:relative;display:flex;justify-content:space-between;font-size:8.5px;letter-spacing:.14em;text-transform:uppercase;color:#7f8ca5"><span>Dossier 1 sur 3</span><span>← →</span></div>
+          <div style="position:relative;display:flex;gap:14px;margin-top:14px">
+            <div style="width:54px;height:66px;border-radius:5px;background:#1a2740;flex:none"></div>
+            <div>
+              <div style="font-size:16px;font-weight:500">Ngu Emmanuel</div>
+              <div style="color:#98a6c0;font-size:10px;margin-top:3px;line-height:1.55">Bamenda · Form 4 → Upper Sixth<br/>Mathematics, Physics · 7 ans</div>
+            </div>
+          </div>
+          <div style="position:relative;display:flex;gap:6px;margin-top:14px">
+            <div style="flex:1;background:#15223a;border-radius:6px;padding:7px 9px"><div style="font-size:8px;color:#7f8ca5">CARTE NATIONALE</div><div style="color:#6fd3ab;font-size:9.5px;margin-top:2px">lisible ✓</div></div>
+            <div style="flex:1;background:#15223a;border-radius:6px;padding:7px 9px"><div style="font-size:8px;color:#7f8ca5">CASIER</div><div style="color:#6fd3ab;font-size:9.5px;margin-top:2px">lisible ✓</div></div>
+            <div style="flex:1;background:#15223a;border-radius:6px;padding:7px 9px;border:1px solid #4a3a16"><div style="font-size:8px;color:#7f8ca5">DIPLÔME</div><div style="color:#e8b366;font-size:9.5px;margin-top:2px">illisible</div></div>
+          </div>
+          <div style="position:relative;display:flex;gap:8px;margin-top:16px">
+            <button style="font-size:10px;font-weight:500;padding:8px 16px;border-radius:7px;border:none;background:#e6ecf7;color:#0e1626">Apposer le cachet</button>
+            <button style="font-size:10px;font-weight:500;padding:8px 16px;border-radius:7px;background:transparent;color:#e6ecf7;border:1px solid #2a3852">Demander une pièce</button>
+          </div>
+        </div>
+      </div>
+      <div class="nm"><span class="nb">8</span>La fiche pleine page</div>
+      <p class="ds">Aucune liste. Un dossier à la fois, flèches pour passer au suivant. C'est le seul écran qui empêche de survoler — et survoler un dossier, ici, c'est laisser passer quelqu'un.</p>
+    </div>
+
+    <!-- 9 — LE TABLEAU DENSE -->
+    <div class="pan">
+      <div class="box" style="background:#fff;color:#14203a">
+        <div class="sb" style="background:#fff;border-right:1px solid #ebe8e1">
+          <span class="lg"><svg width="17" height="17" viewBox="0 0 48 48"><rect x="3" y="5" width="42" height="31" rx="7" fill="#14203a"/><rect x="13" y="39.5" width="22" height="4.6" rx="2.3" fill="#14203a"/><rect x="20" y="36" width="8" height="4" fill="#14203a"/><circle cx="16.5" cy="15" r="4.7" fill="#fff"/><path d="M8.2 28.8a8.3 8.8 0 0 1 16.6 0z" fill="#fff"/><rect x="26.5" y="20.5" width="15.5" height="12.5" rx="3.5" fill="#fff" stroke="#14203a" stroke-width="1.7"/><circle cx="39.5" cy="11" r="3" fill="#c2402c"/></svg></span>
+          <span class="it"><span class="ic"><svg viewBox="0 0 20 20" class="iw"><use href="#i-tb"/></svg></span></span>
+          <span class="it on"><span class="ic"><svg viewBox="0 0 20 20" class="iw"><use href="#i-re"/></svg></span></span>
+          <span class="it"><span class="ic"><svg viewBox="0 0 20 20" class="iw"><use href="#i-fa"/></svg></span></span>
+          <span class="pl"><span class="ic"><svg viewBox="0 0 20 20" class="iw"><use href="#i-pl"/></svg></span></span>
+        </div>
+        <div style="flex:1;padding:14px 16px">
+          <div style="display:flex;gap:7px;margin-bottom:11px">
+            <span style="font-size:9px;padding:3px 9px;border-radius:99px;background:#14203a;color:#fff">Tous · 15</span>
+            <span style="font-size:9px;padding:3px 9px;border-radius:99px;border:1px solid #e4e0d8;color:#7b8394">En attente · 3</span>
+            <span style="font-size:9px;padding:3px 9px;border-radius:99px;border:1px solid #e4e0d8;color:#7b8394">Vérifiés · 12</span>
+          </div>
+          <table style="width:100%;border-collapse:collapse;font-size:9.5px">
+            <tr style="color:#9aa1b0;font-size:8px;letter-spacing:.1em;text-transform:uppercase"><td style="padding:0 0 6px">Nom</td><td>Ville</td><td>Matières</td><td>Pièces</td><td style="text-align:right">État</td></tr>
+            <tr style="border-top:1px solid #f0ede6"><td style="padding:6px 0;font-weight:600">Ngu Emmanuel</td><td style="color:#7b8394">Bamenda</td><td style="color:#7b8394">Math, Phys</td><td class="mono" style="color:#8a5a12">2/3</td><td style="text-align:right;color:#8a5a12">attente</td></tr>
+            <tr style="border-top:1px solid #f0ede6"><td style="padding:6px 0;font-weight:600">Mballa C.</td><td style="color:#7b8394">Yaoundé</td><td style="color:#7b8394">Fr, Philo</td><td class="mono" style="color:#1b6b45">3/3</td><td style="text-align:right;color:#1b6b45">cachet</td></tr>
+            <tr style="border-top:1px solid #f0ede6"><td style="padding:6px 0;font-weight:600">Tabi Peter</td><td style="color:#7b8394">Buea</td><td style="color:#7b8394">English</td><td class="mono" style="color:#c2402c">1/3</td><td style="text-align:right;color:#c2402c">refusé</td></tr>
+            <tr style="border-top:1px solid #f0ede6"><td style="padding:6px 0;font-weight:600">Fotso Alain</td><td style="color:#7b8394">Douala</td><td style="color:#7b8394">SVT</td><td class="mono" style="color:#1b6b45">3/3</td><td style="text-align:right;color:#1b6b45">cachet</td></tr>
+            <tr style="border-top:1px solid #f0ede6"><td style="padding:6px 0;font-weight:600">Atangana R.</td><td style="color:#7b8394">Yaoundé</td><td style="color:#7b8394">Histoire</td><td class="mono" style="color:#1b6b45">3/3</td><td style="text-align:right;color:#1b6b45">cachet</td></tr>
+          </table>
+        </div>
+      </div>
+      <div class="nm"><span class="nb">9</span>Le tableau dense</div>
+      <p class="ds">Blanc pur, aucune ombre, quinze lignes visibles d'un coup. Le format de quelqu'un qui administre vite et connaît son outil. Moins beau, redoutablement efficace.</p>
+    </div>
+
+    <!-- 10 — LA CARTE -->
+    <div class="pan">
+      <div class="box" style="background:#fbfaf7;color:#14203a">
+        <div class="sb" style="background:#fff;border-right:1px solid #e8e4dc">
+          <span class="lg"><svg width="17" height="17" viewBox="0 0 48 48"><rect x="3" y="5" width="42" height="31" rx="7" fill="#14203a"/><rect x="13" y="39.5" width="22" height="4.6" rx="2.3" fill="#14203a"/><rect x="20" y="36" width="8" height="4" fill="#14203a"/><circle cx="16.5" cy="15" r="4.7" fill="#fff"/><path d="M8.2 28.8a8.3 8.8 0 0 1 16.6 0z" fill="#fff"/><rect x="26.5" y="20.5" width="15.5" height="12.5" rx="3.5" fill="#fff" stroke="#14203a" stroke-width="1.7"/><circle cx="39.5" cy="11" r="3" fill="#c2402c"/></svg></span>
+          <span class="it on"><span class="ic"><svg viewBox="0 0 20 20" class="iw"><use href="#i-tb"/></svg></span></span>
+          <span class="it"><span class="ic"><svg viewBox="0 0 20 20" class="iw"><use href="#i-re"/></svg></span></span>
+          <span class="it"><span class="ic"><svg viewBox="0 0 20 20" class="iw"><use href="#i-do"/></svg></span></span>
+          <span class="pl"><span class="ic"><svg viewBox="0 0 20 20" class="iw"><use href="#i-pl"/></svg></span></span>
+        </div>
+        <div style="flex:1;display:flex">
+          <div style="flex:1;padding:14px;display:flex;align-items:center;justify-content:center">
+            <svg width="118" height="150" viewBox="0 0 100 130">
+              <path d="M50 4 L61 20 L57 36 L69 44 L77 60 L73 78 L86 90 L83 112 L44 114 L38 99 L21 91 L15 73 L25 57 L23 39 L34 29 L38 13 Z" fill="#eeeae1" stroke="#ddd7ca" stroke-width="1.2" stroke-linejoin="round"/>
+              <circle cx="32" cy="52" r="7" fill="#14203a" opacity=".16"/><circle cx="32" cy="52" r="3" fill="#14203a"/>
+              <circle cx="58" cy="88" r="9" fill="#14203a" opacity=".16"/><circle cx="58" cy="88" r="3.6" fill="#14203a"/>
+              <circle cx="40" cy="95" r="6" fill="#14203a" opacity=".16"/><circle cx="40" cy="95" r="2.6" fill="#14203a"/>
+              <circle cx="27" cy="97" r="5" fill="#c9a227" opacity=".25"/><circle cx="27" cy="97" r="2.4" fill="#c9a227"/>
+            </svg>
+          </div>
+          <div style="width:126px;padding:14px 14px 14px 0;display:flex;flex-direction:column;justify-content:center;gap:9px">
+            <div style="font-size:8.5px;letter-spacing:.14em;text-transform:uppercase;color:#9aa1b0">Couverture</div>
+            <div><div style="display:flex;justify-content:space-between;font-size:10px"><b>Yaoundé</b><span class="mono" style="color:#7b8394">6</span></div><div style="height:3px;border-radius:2px;background:#e8e4dc;margin-top:3px"><i style="display:block;width:100%;height:3px;border-radius:2px;background:#14203a"></i></div></div>
+            <div><div style="display:flex;justify-content:space-between;font-size:10px"><b>Bamenda</b><span class="mono" style="color:#7b8394">4</span></div><div style="height:3px;border-radius:2px;background:#e8e4dc;margin-top:3px"><i style="display:block;width:66%;height:3px;border-radius:2px;background:#14203a"></i></div></div>
+            <div><div style="display:flex;justify-content:space-between;font-size:10px"><b>Douala</b><span class="mono" style="color:#7b8394">2</span></div><div style="height:3px;border-radius:2px;background:#e8e4dc;margin-top:3px"><i style="display:block;width:33%;height:3px;border-radius:2px;background:#14203a"></i></div></div>
+            <div><div style="display:flex;justify-content:space-between;font-size:10px"><b>Buea</b><span class="mono" style="color:#c9a227">0</span></div><div style="height:3px;border-radius:2px;background:#e8e4dc;margin-top:3px"><i style="display:block;width:8%;height:3px;border-radius:2px;background:#c9a227"></i></div></div>
+          </div>
+        </div>
+      </div>
+      <div class="nm"><span class="nb">10</span>La carte</div>
+      <p class="ds">Où sont tes répétiteurs vérifiés, ville par ville. Les points dorés marquent les villes sans couverture — c'est-à-dire les familles qui n'ont personne. Un tableau de bord qui dit où aller, pas où on en est.</p>
+    </div>
+
+  </div>
+
+  <div style="margin-top:8px;padding:16px 18px;background:var(--surface-1);border-radius:12px">
+    <div style="font-size:14px;font-weight:500;color:var(--text-primary);margin-bottom:9px">Mon avis, et ce que je combinerais</div>
+    <p style="margin:0 0 10px;font-size:14px;line-height:1.7;color:var(--text-secondary)">
+      <strong style="color:var(--text-primary);font-weight:500">6 comme tableau de bord, 8 comme écran de travail.</strong> Tu ouvres sur un chiffre énorme et une phrase — impossible d'ignorer ce qui attend. Tu cliques, et tu tombes dans la fiche pleine page, un dossier à la fois, sans liste à survoler. Deux écrans, deux gestes, aucune tuile de statistique.
+    </p>
+    <p style="margin:0 0 10px;font-size:14px;line-height:1.7;color:var(--text-secondary)">
+      <strong style="color:var(--text-primary);font-weight:500">3 et 4 sont les plus spectaculaires</strong> et les plus proches de ce que ton produit est vraiment — un poste de surveillance. Ce sont eux que je montrerais à un acheteur. Mais ils n'ont de sens qu'une fois les séances vidéo en service.
+    </p>
+    <p style="margin:0;font-size:14px;line-height:1.7;color:var(--text-secondary)">
+      <strong style="color:var(--text-primary);font-weight:500">10 est le seul qui te dise quelque chose que tu ne sais pas déjà :</strong> Buea n'a aucun répétiteur. Un tableau de bord qui répond « où aller » vaut mieux qu'un qui répond « où on en est ».
+    </p>
+  </div>
+</div>

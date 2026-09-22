@@ -4,9 +4,11 @@ import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { useEffect, useState } from "react"
 
+import { seDeconnecter } from "@/actions/authentification"
 import { chemin, type Dictionnaire, type Langue } from "@/langues"
 import { Avatar } from "@/composants/avatar"
 import { Marque } from "@/composants/marque"
+import { BasculeMode } from "@/composants/theme"
 
 /**
  * Les rubriques, dans l'ordre d'affichage.
@@ -115,6 +117,45 @@ function Icone({ cle }: { cle: CleRubrique }) {
   }
 }
 
+function BoutonRepli({
+  repliee,
+  basculer,
+  d,
+}: {
+  repliee: boolean
+  basculer: () => void
+  d: Dictionnaire
+}) {
+  return (
+    <button
+      type="button"
+      onClick={basculer}
+      aria-label={repliee ? d.adminNav.ouvrir : d.adminNav.replier}
+      title={repliee ? d.adminNav.ouvrir : d.adminNav.replier}
+      className="grid h-[26px] w-[26px] shrink-0 place-items-center rounded-[7px] transition hover:bg-white/10"
+      style={{ border: "1px solid rgb(255 255 255 / 0.22)", color: "#c3cde0" }}
+    >
+      <svg
+        width="13"
+        height="13"
+        viewBox="0 0 16 16"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        aria-hidden
+      >
+        <rect x="1.2" y="2.2" width="13.6" height="11.6" rx="2" />
+        <path d="M6 2.2v11.6" />
+        <path
+          d={repliee ? "M9.4 6.2 11.4 8l-2 1.8" : "M11.4 6.2 9.4 8l2 1.8"}
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+      </svg>
+    </button>
+  )
+}
+
 /**
  * Barre latérale de l'administration.
  *
@@ -143,6 +184,9 @@ export function BarreAdmin({
   aVerifier: number
 }) {
   const [repliee, poserRepliee] = useState(false)
+  // Téléphone uniquement. Sur grand écran la barre est toujours là ; c'est
+  // `repliee` qui décide si elle montre ses libellés ou seulement ses icônes.
+  const [ouverte, poserOuverte] = useState(false)
   const cheminActuel = usePathname()
 
   useEffect(() => {
@@ -152,6 +196,64 @@ export function BarreAdmin({
       // Navigation privée : la barre reste dépliée. Sans gravité.
     }
   }, [])
+
+  // Changer de page referme la barre : sur téléphone elle couvre l'écran, et
+  // la laisser ouverte cacherait la page qu'on vient de demander.
+  useEffect(() => {
+    poserOuverte(false)
+  }, [cheminActuel])
+
+  // Échap referme, comme tout ce qui se pose par-dessus une page.
+  useEffect(() => {
+    if (!ouverte) return
+    const surTouche = (e: KeyboardEvent) => {
+      if (e.key === "Escape") poserOuverte(false)
+    }
+    window.addEventListener("keydown", surTouche)
+    return () => window.removeEventListener("keydown", surTouche)
+  }, [ouverte])
+
+  /**
+   * Glisser pour ouvrir et fermer.
+   *
+   * L'ouverture ne part que du bord gauche — sinon le geste volerait tous les
+   * défilements horizontaux de la page, à commencer par le tableau des
+   * répétiteurs. La fermeture, elle, part de n'importe où : la barre couvre
+   * déjà l'écran, il n'y a rien d'autre à faire glisser.
+   */
+  useEffect(() => {
+    let x0 = 0
+    let y0 = 0
+    let candidat = false
+
+    const debut = (e: TouchEvent) => {
+      const t = e.touches[0]
+      if (!t) return
+      x0 = t.clientX
+      y0 = t.clientY
+      candidat = ouverte || x0 <= 28
+    }
+
+    const fin = (e: TouchEvent) => {
+      if (!candidat) return
+      candidat = false
+      const t = e.changedTouches[0]
+      if (!t) return
+      const dx = t.clientX - x0
+      const dy = t.clientY - y0
+      // Un geste franc et horizontal : sinon c'est un défilement vertical.
+      if (Math.abs(dx) < 55 || Math.abs(dy) > Math.abs(dx)) return
+      if (dx > 0 && !ouverte) poserOuverte(true)
+      if (dx < 0 && ouverte) poserOuverte(false)
+    }
+
+    window.addEventListener("touchstart", debut, { passive: true })
+    window.addEventListener("touchend", fin, { passive: true })
+    return () => {
+      window.removeEventListener("touchstart", debut)
+      window.removeEventListener("touchend", fin)
+    }
+  }, [ouverte])
 
   function basculer() {
     const suivant = !repliee
@@ -166,24 +268,85 @@ export function BarreAdmin({
   const bordure = { borderColor: "rgb(255 255 255 / 0.12)" }
 
   return (
-    <nav
-      className={`admin-encre relative flex shrink-0 flex-col overflow-hidden ${
-        repliee ? "admin-repliee w-[58px]" : "w-[188px]"
-      }`}
-      aria-label={d.admin.titre}
-    >
+    <>
+      {/* Téléphone : la barre n'occupe plus aucune largeur, elle revient par
+          ce bouton. Garder une bande d'icônes ici amputerait un écran déjà
+          étroit, et les pages larges — le tableau des répétiteurs — n'ont pas
+          de place à donner. */}
+      <header
+        className="admin-encre relative z-30 flex shrink-0 items-center gap-2.5 px-3 py-2.5 lg:hidden"
+        style={{ borderBottom: "1px solid rgb(255 255 255 / 0.12)" }}
+      >
+        <div className="motif-fond" />
+        <button
+          type="button"
+          onClick={() => poserOuverte(true)}
+          aria-label={d.adminNav.ouvrir}
+          aria-expanded={ouverte}
+          className="relative z-10 grid h-8 w-8 shrink-0 place-items-center rounded-[8px] transition hover:bg-white/10"
+          style={{ color: "#c3cde0" }}
+        >
+          <svg
+            width="18"
+            height="18"
+            viewBox="0 0 20 20"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.7"
+            strokeLinecap="round"
+            aria-hidden
+          >
+            <path d="M3 5.5h14M3 10h14M3 14.5h14" />
+          </svg>
+        </button>
+        <span className="relative z-10 flex items-center gap-2">
+          <Marque taille={17} />
+          <span className="text-[12px] font-bold tracking-[0.13em]">TUTELA</span>
+        </span>
+        <span className="relative z-10 ml-auto">
+          <BasculeMode couleur="#c3cde0" taille={32} />
+        </span>
+      </header>
+
+      {/* Le voile. Il ne ferme pas seulement au clic : il dit aussi que la
+          page est encore là, dessous. */}
+      {ouverte ? (
+        <button
+          type="button"
+          aria-label={d.adminNav.replier}
+          onClick={() => poserOuverte(false)}
+          className="fixed inset-0 z-40 lg:hidden"
+          style={{ background: "rgb(10 16 28 / 0.55)" }}
+        />
+      ) : null}
+
+      <nav
+        className={`admin-encre fixed inset-y-0 left-0 z-50 flex w-[236px] flex-col overflow-hidden transition-transform duration-200 lg:static lg:z-auto lg:w-auto lg:shrink-0 lg:translate-x-0 lg:transition-none ${
+          ouverte ? "translate-x-0" : "-translate-x-full"
+        } ${repliee ? "lg:admin-repliee lg:w-[58px]" : "lg:w-[188px]"}`}
+        aria-label={d.admin.titre}
+        aria-hidden={undefined}
+      >
       <div className="motif-fond" />
 
       <div
-        className={`admin-encre relative z-10 flex shrink-0 items-center gap-2.5 border-b pb-3.5 pt-4 ${
-          repliee ? "justify-center px-0" : "px-4"
+        className={`admin-encre relative z-10 flex shrink-0 border-b pb-3.5 pt-4 ${
+          repliee ? "flex-col items-center gap-3 px-0" : "items-center gap-2.5 pl-4 pr-2.5"
         }`}
         style={bordure}
       >
         <Marque taille={19} />
         {repliee ? null : (
-          <span className="text-[13px] font-bold tracking-[0.13em]">TUTELA</span>
+          <>
+            <span className="text-[13px] font-bold tracking-[0.13em]">
+              TUTELA
+            </span>
+            {/* Pousse le repli contre le bord : collé au logo, on croirait
+                qu'il en fait partie. */}
+            <span className="flex-1" />
+          </>
         )}
+        <BoutonRepli repliee={repliee} basculer={basculer} d={d} />
       </div>
 
       <div className="relative flex-1 overflow-y-auto py-2.5">
@@ -214,53 +377,77 @@ export function BarreAdmin({
       </div>
 
       <div
-        className={`admin-encre relative z-10 flex shrink-0 border-t py-2.5 ${
-          repliee
-            ? "flex-col items-center gap-2 px-0"
-            : "items-center gap-2.5 pl-4 pr-3"
+        className={`admin-encre relative z-10 flex shrink-0 flex-col border-t py-2.5 ${
+          repliee ? "items-center gap-2 px-1.5" : "gap-2 px-3"
         }`}
         style={bordure}
       >
-        <Avatar nom={nom ?? identifiant} photoUrl={photoUrl} taille={26} />
-        {repliee ? null : (
-          <span className="min-w-0 flex-1 leading-tight">
-            <span className="block truncate text-[11.5px] font-medium">
-              {identifiant}
-            </span>
-            <span
-              className="block truncate text-[10px]"
-              style={{ color: "#93a0bb" }}
-            >
-              {d.adminNav.administrateur}
-            </span>
-          </span>
-        )}
-        <button
-          type="button"
-          onClick={basculer}
-          aria-label={repliee ? d.adminNav.ouvrir : d.adminNav.replier}
-          className="grid h-[26px] w-[26px] shrink-0 place-items-center rounded-[7px] transition hover:bg-white/10"
-          style={{ border: "1px solid rgb(255 255 255 / 0.22)", color: "#c3cde0" }}
+        <div
+          className={`flex w-full items-center ${
+            repliee ? "justify-center" : "gap-2.5 pl-1"
+          }`}
         >
-          <svg
-            width="13"
-            height="13"
-            viewBox="0 0 16 16"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="1.5"
-            aria-hidden
-          >
-            <rect x="1.2" y="2.2" width="13.6" height="11.6" rx="2" />
-            <path d="M6 2.2v11.6" />
-            <path
-              d={repliee ? "M9.4 6.2 11.4 8l-2 1.8" : "M11.4 6.2 9.4 8l2 1.8"}
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          </svg>
-        </button>
+          <Avatar nom={nom ?? identifiant} photoUrl={photoUrl} taille={26} />
+          {repliee ? null : (
+            <span className="min-w-0 flex-1 leading-tight">
+              <span className="block truncate text-[11.5px] font-medium">
+                {identifiant}
+              </span>
+              <span
+                className="block truncate text-[10px]"
+                style={{ color: "#93a0bb" }}
+              >
+                {d.adminNav.administrateur}
+              </span>
+            </span>
+          )}
+        </div>
+
+        {/* Le thème et la sortie. Sans eux, un administrateur entré en
+            affichage clair n'avait aucun moyen d'en changer ni de se
+            déconnecter : il fallait vider les cookies. */}
+        <div
+          className={`flex w-full items-center ${
+            repliee ? "flex-col gap-1.5" : "gap-1.5 pl-0.5"
+          }`}
+        >
+          <BasculeMode couleur="#c3cde0" taille={30} />
+          <form action={seDeconnecter} className={repliee ? "" : "flex-1"}>
+            <input type="hidden" name="langue" value={langue} />
+            <button
+              type="submit"
+              title={repliee ? d.commun.seDeconnecter : undefined}
+              aria-label={repliee ? d.commun.seDeconnecter : undefined}
+              className={`flex h-[30px] items-center gap-2 rounded-[8px] transition hover:bg-white/10 ${
+                repliee ? "w-[30px] justify-center" : "w-full px-2.5"
+              }`}
+              style={{ color: "#c3cde0" }}
+            >
+              <svg
+                width="15"
+                height="15"
+                viewBox="0 0 20 20"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.6"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="shrink-0"
+                aria-hidden
+              >
+                <path d="M12.5 14.2v1.6a1.8 1.8 0 0 1-1.8 1.8H4.6a1.8 1.8 0 0 1-1.8-1.8V4.2a1.8 1.8 0 0 1 1.8-1.8h6.1a1.8 1.8 0 0 1 1.8 1.8v1.6" />
+                <path d="M8.4 10h9M14.6 7l3 3-3 3" />
+              </svg>
+              {repliee ? null : (
+                <span className="truncate text-[11.5px]">
+                  {d.commun.seDeconnecter}
+                </span>
+              )}
+            </button>
+          </form>
+        </div>
       </div>
-    </nav>
+      </nav>
+    </>
   )
 }

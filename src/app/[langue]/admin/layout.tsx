@@ -31,7 +31,9 @@ export default async function LayoutAdmin({
 
   return (
     <div
-      className="flex h-dvh overflow-hidden"
+      // Colonne sur téléphone : l'en-tête de la barre se pose au-dessus de la
+      // page. Ligne à partir de `lg`, où la barre reprend sa place à gauche.
+      className="flex h-dvh flex-col overflow-hidden lg:flex-row"
       style={{ background: "var(--fond)", color: "var(--texte)" }}
     >
       <BarreAdmin

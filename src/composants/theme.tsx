@@ -124,7 +124,16 @@ export function SelecteurTheme() {
  * Le pictogramme est un cercle à moitié plein, et non un soleil : un cercle
  * entouré de rayons fait partie des signes qu'on s'interdit dans ce produit.
  */
-export function BasculeMode() {
+export function BasculeMode({
+  couleur = "var(--texte)",
+  taille = 36,
+}: {
+  /** À préciser sur un aplat qui ne suit pas le thème — la barre latérale de
+   *  l'administration reste à l'encre en clair comme en sombre, et var(--texte)
+   *  y serait de l'encre sur de l'encre. */
+  couleur?: string
+  taille?: number
+} = {}) {
   const { d } = useLangue()
   const [mode, poserMode] = useState<"clair" | "sombre" | null>(null)
 
@@ -162,10 +171,15 @@ export function BasculeMode() {
             ? d.commun.affichageClair
             : d.commun.affichageSombre
       }
-      className="grid h-9 w-9 place-items-center rounded-full transition hover:opacity-70"
-      style={{ color: "var(--texte)" }}
+      className="grid shrink-0 place-items-center rounded-full transition hover:opacity-70"
+      style={{ color: couleur, width: taille, height: taille }}
     >
-      <svg width="19" height="19" viewBox="0 0 24 24" aria-hidden="true">
+      <svg
+        width={Math.round(taille * 0.53)}
+        height={Math.round(taille * 0.53)}
+        viewBox="0 0 24 24"
+        aria-hidden="true"
+      >
         <circle
           cx="12"
           cy="12"

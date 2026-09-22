@@ -462,6 +462,10 @@ body {
    ============================================================================= */
 
 .admin-encre {
+  /* La marque se pose sur cet aplat, pas sur le fond de page : sans cette
+     ligne, ses réserves prennent la couleur du thème et les silhouettes
+     disparaissent en thème clair. */
+  --marque-reserve: #16223a;
   --motif-opacite: 0.17;
   background: #14203a;
   color: #eef1f7;
@@ -574,3 +578,48 @@ body {
 .bt3 { background: transparent; color: var(--texte-doux); border-color: transparent; }
 .bt3:hover:not(:disabled) { color: var(--texte); border-color: var(--bordure); }
 .bt1:disabled, .bt2:disabled, .bt3:disabled { opacity: 0.45; cursor: not-allowed; }
+
+/* ── La carte de couverture du tableau de bord ─────────────────────────────
+   Elle a sa propre palette parce qu'elle doit rester lisible dans les quatre
+   thèmes sans virer au décor : de la terre, de l'eau, des routes, et des
+   pastilles qui portent un chiffre. Les mêmes variables dans les deux modes,
+   des valeurs différentes — la carte n'est jamais un aplat inversé. */
+[data-theme] {
+  --carte-fond: #f2efe6;
+  --carte-terre: #e8efe0;
+  --carte-eau: #cfe0ef;
+  --carte-route: #ffffff;
+  --carte-grille: #e2d9c6;
+  --carte-pastille: #1b2a4a;
+  --carte-chiffre: #ffffff;
+  --carte-nom: #6f7486;
+}
+
+[data-theme="foret"] {
+  --carte-terre: #e3ece0;
+  --carte-pastille: #1e3a2f;
+}
+
+@media (prefers-color-scheme: dark) {
+  [data-theme]:not([data-mode="clair"]) {
+    --carte-fond: #101a2c;
+    --carte-terre: #16233a;
+    --carte-eau: #1b3550;
+    --carte-route: #243453;
+    --carte-grille: #1a2a44;
+    --carte-pastille: #cddbe0;
+    --carte-chiffre: #14203a;
+    --carte-nom: #93a0bb;
+  }
+}
+
+[data-theme][data-mode="sombre"] {
+  --carte-fond: #101a2c;
+  --carte-terre: #16233a;
+  --carte-eau: #1b3550;
+  --carte-route: #243453;
+  --carte-grille: #1a2a44;
+  --carte-pastille: #cddbe0;
+  --carte-chiffre: #14203a;
+  --carte-nom: #93a0bb;
+}

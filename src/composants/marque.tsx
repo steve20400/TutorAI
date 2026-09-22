@@ -13,8 +13,14 @@
  * — Le voyant en rouge franc dans les quatre thèmes. C'est le seul élément qui
  *   annonce la surveillance ; ambré sur fond crème, il disparaissait.
  *
- * La réserve utilise var(--fond) : la marque se pose donc sur le fond de la
- * page, jamais sur une carte d'une autre couleur.
+ * La réserve utilise `--marque-reserve`, qui retombe sur var(--fond). Les deux
+ * silhouettes sont des trous dans l'écran, pas des formes peintes : elles ne
+ * se voient que si la réserve a la couleur de ce qu'il y a DERRIÈRE la marque.
+ * Sur le fond de page, var(--fond) suffit. Sur un aplat d'une autre couleur —
+ * la barre latérale de l'administration, qui reste à l'encre dans les deux
+ * thèmes — il faut le dire, sinon la marque se retrouve en thème clair avec
+ * des silhouettes crème sur un écran crème : le logo devient un rectangle vide
+ * avec un point orange, et les deux personnes disparaissent.
  */
 export function Marque({
   taille = 40,
@@ -55,8 +61,8 @@ export function Marque({
       <rect x="13" y="39.5" width="22" height="4.6" rx="2.3" fill="currentColor" />
 
       <g style={adulte} className={anime ? "chargement-anime" : undefined}>
-        <circle cx="16.5" cy="15" r="4.7" fill="var(--fond)" />
-        <path d="M8.2 28.8 a8.3 8.8 0 0 1 16.6 0 z" fill="var(--fond)" />
+        <circle cx="16.5" cy="15" r="4.7" fill="var(--marque-reserve, var(--fond))" />
+        <path d="M8.2 28.8 a8.3 8.8 0 0 1 16.6 0 z" fill="var(--marque-reserve, var(--fond))" />
       </g>
 
       <g style={vignette} className={anime ? "chargement-anime" : undefined}>
@@ -66,7 +72,7 @@ export function Marque({
           width="15.5"
           height="12.5"
           rx="3.5"
-          fill="var(--fond)"
+          fill="var(--marque-reserve, var(--fond))"
           stroke="currentColor"
           strokeWidth="1.7"
         />

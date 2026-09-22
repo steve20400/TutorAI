@@ -131,7 +131,14 @@ export default async function PageRepetiteurs({
             <RienEncore titre={terme ? t.videRecherche : t.vide} />
           </div>
         ) : (
-          <table className="mt-5 w-full table-fixed border-collapse text-[13px]">
+          // `table-fixed` répartissait les colonnes en pourcentages de la
+          // largeur disponible : sur un téléphone, « État » se retrouvait
+          // écrasé à quelques pixels et tronqué. Le tableau garde donc une
+          // largeur plancher et c'est le conteneur qui défile — les marges
+          // négatives laissent le défilement aller jusqu'au bord de l'écran,
+          // sinon la dernière colonne reste coincée sous le rembourrage.
+          <div className="-mx-5 mt-5 overflow-x-auto px-5 sm:-mx-7 sm:px-7">
+            <table className="w-full min-w-[560px] table-fixed border-collapse text-[13px]">
             <thead>
               <tr className="doux text-[10px] font-semibold uppercase tracking-[0.12em]">
                 <td className="w-[36%] pb-2">{t.colNom}</td>
@@ -165,7 +172,8 @@ export default async function PageRepetiteurs({
                 </tr>
               ))}
             </tbody>
-          </table>
+            </table>
+          </div>
         )}
       </div>
     </>

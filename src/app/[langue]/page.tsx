@@ -9,6 +9,7 @@ import {
   LANGUE_PAR_DEFAUT,
   remplir,
 } from "@/langues"
+import { porteDEntree } from "@/actions/authentification"
 import { supabaseServeur } from "@/lib/supabase/server"
 
 /**
@@ -34,7 +35,11 @@ export default async function Accueil({
     data: { user },
   } = await supabase.auth.getUser()
 
-  if (!user) redirect(chemin(langue, "/connexion"))
+  // Un visiteur sans session n'a pas forcément de compte. L'envoyer sur la
+  // connexion suppose qu'il en a un ; pour quelqu'un qui découvre TUTELA, c'est
+  // une porte fermée en guise d'accueil. On ouvre donc l'inscription, sauf si
+  // cet appareil s'est déjà inscrit ou connecté une fois.
+  if (!user) redirect(chemin(langue, await porteDEntree()))
 
   const { data: profil } = await supabase
     .from("profils")
