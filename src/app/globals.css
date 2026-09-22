@@ -754,3 +754,9 @@ body {
 @media (prefers-reduced-motion: reduce) {
   .rouet { animation-duration: 2s; }
 }
+
+/* L'écran d'ouverture ne se joue qu'une fois par onglet. L'attribut est posé
+   par un script de <head>, donc avant le premier rendu : changer de langue
+   remonte le layout, et sans cette règle l'écran réapparaissait le temps
+   d'une image — ce qui se lit comme un rechargement complet. */
+[data-chargement="joue"] .chargement { display: none !important; }

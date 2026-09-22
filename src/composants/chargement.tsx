@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
+import { CLE_CHARGEMENT } from "@/lib/theme"
 import { useLangue } from "@/langues/contexte"
 import { Marque } from "./marque"
 
@@ -44,7 +45,7 @@ const DUREE_SORTIE = 560
  * `sessionStorage` et non `localStorage` : l'animation doit revenir à la
  * prochaine ouverture de l'application, pas disparaître pour toujours.
  */
-const CLE_DEJA_JOUE = "tutela-chargement-joue"
+const CLE_DEJA_JOUE = CLE_CHARGEMENT
 
 function dejaJoue(): boolean {
   try {
@@ -100,6 +101,9 @@ export function EcranChargement() {
       clearTimeout(avertissement)
       try {
         sessionStorage.setItem(CLE_DEJA_JOUE, "1")
+        // Pour les remontages qui suivront dans cet onglet : c'est cet
+        // attribut que lit le script de <head>, avant le premier rendu.
+        document.documentElement.setAttribute("data-chargement", "joue")
       } catch {
         // idem
       }

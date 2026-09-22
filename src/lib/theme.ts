@@ -32,3 +32,28 @@ export const SCRIPT_THEME = `(function(){try{var d=document.documentElement,t=lo
 )}),m=localStorage.getItem(${JSON.stringify(
   CLE_MODE,
 )});if(t==="indigo"||t==="foret")d.setAttribute("data-theme",t);if(m==="clair"||m==="sombre")d.setAttribute("data-mode",m);}catch(e){}})()`
+
+/**
+ * Clé de l'écran de chargement, partagée avec le composant.
+ *
+ * `sessionStorage` et non `localStorage` : l'animation doit revenir à la
+ * prochaine ouverture de l'application, pas disparaître pour toujours.
+ */
+export const CLE_CHARGEMENT = "tutela-chargement-joue"
+
+/**
+ * Posé dans <head>, avant tout rendu, juste après le script du thème.
+ *
+ * Le composant `EcranChargement` sait déjà qu'il ne doit pas se rejouer, mais
+ * il l'apprend dans un `useEffect` — c'est-à-dire APRÈS un premier rendu. Or
+ * changer de langue démonte le layout de `[langue]` et le remonte : l'écran
+ * réapparaissait donc le temps d'une image, animation comprise, ce qui se lit
+ * comme un rechargement complet de l'application alors qu'on voulait
+ * seulement relire la même page dans l'autre langue.
+ *
+ * Décider ici, avant que le corps de la page ne soit peint, supprime cette
+ * image. Même mécanisme que pour le thème, et pour la même raison.
+ */
+export const SCRIPT_CHARGEMENT = `(function(){try{if(sessionStorage.getItem(${JSON.stringify(
+  CLE_CHARGEMENT,
+)})==="1")document.documentElement.setAttribute("data-chargement","joue")}catch(e){}})()`

@@ -3,7 +3,7 @@ import type { Metadata, Viewport } from "next"
 import { EcranChargement } from "@/composants/chargement"
 import { FournisseurLangue } from "@/langues/contexte"
 import { dictionnaire, estLangue, LANGUES, LANGUE_PAR_DEFAUT } from "@/langues"
-import { SCRIPT_THEME } from "@/lib/theme"
+import { SCRIPT_CHARGEMENT, SCRIPT_THEME } from "@/lib/theme"
 import "../globals.css"
 
 /**
@@ -87,6 +87,8 @@ export default async function LayoutRacine({
       <head>
         {/* Avant tout rendu, sinon la page clignote dans le mauvais thème. */}
         <script dangerouslySetInnerHTML={{ __html: SCRIPT_THEME }} />
+        {/* Idem : sans lui, changer de langue rejouait l'écran d'ouverture. */}
+        <script dangerouslySetInnerHTML={{ __html: SCRIPT_CHARGEMENT }} />
       </head>
       <body className="min-h-dvh antialiased">
         <FournisseurLangue langue={langue} d={d}>
