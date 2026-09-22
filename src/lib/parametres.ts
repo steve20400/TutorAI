@@ -11,16 +11,24 @@ export type Parametres = {
   ia_active: boolean
   paiement_actif: boolean
   enregistrement_actif: boolean
+  portefeuille_actif: boolean
   resolution_video: "360p" | "480p" | "720p"
   inscriptions_ouvertes: boolean
+  /**
+   * Deux par défaut : l'élève et son répétiteur. C'est la promesse du produit,
+   * donc le comportement par défaut — pas une option à cocher.
+   */
+  participants_max: number
 }
 
 const DEFAUTS: Parametres = {
   ia_active: false,
   paiement_actif: false,
   enregistrement_actif: false,
+  portefeuille_actif: false,
   resolution_video: "480p",
   inscriptions_ouvertes: true,
+  participants_max: 2,
 }
 
 /**
@@ -49,11 +57,25 @@ export async function lireParametres(): Promise<Parametres> {
  * derrière. Toute action appartenant à un module désactivable doit passer
  * par ici, pas seulement l'écran qui y mène.
  */
-export async function exigerModuleActif(
-  module: keyof Parametres,
-): Promise<void> {
+type Interrupteur = {
+  [C in keyof Parametres]: Parametres[C] extends boolean ? C : never
+}[keyof Parametres]
+
+export async function exigerModuleActif(module: Interrupteur): Promise<void> {
   const parametres = await lireParametres()
   if (parametres[module] !== true) {
     throw new Error(`Module désactivé : ${module}`)
   }
+}
+
+/**
+ * Nombre de participants encore admis dans une séance.
+ *
+ * À appeler au moment de délivrer le jeton d'accès à la salle, jamais
+ * seulement à l'affichage : refuser un troisième participant dans l'interface
+ * n'empêcherait personne d'appeler la route qui se trouve derrière.
+ */
+export async function placeDisponible(dejaPresents: number): Promise<boolean> {
+  const { participants_max } = await lireParametres()
+  return dejaPresents < participants_max
 }
