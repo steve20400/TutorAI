@@ -294,4 +294,62 @@ select verifier('le mode est bien revenu au montant fixe',
                 (select case when mode = 'par_eleve_actif' then 1 else 0 end
                    from facturation where id = 1), 1);
 
+-- =============================================================================
+-- L'espace d'administration est fermé au niveau de la base
+--
+-- Trois serrures protègent l'administration : le middleware qui garde la
+-- route, le contrôle du rôle dans la page, et ces politiques-ci. Les deux
+-- premières sont du code applicatif — on peut les contourner en appelant
+-- directement l'API. Celles-ci, non.
+-- =============================================================================
+
+reset role;
+set local "request.jwt.claims" = '';
+
+insert into journal_admin (admin_id, action, cible_type, cible_id)
+select id, 'test', 'parametre', 'ia_active' from profils limit 1;
+
+set local role authenticated;
+set local "request.jwt.claims" = '{"sub":"11111111-1111-1111-1111-111111111111","role":"authenticated"}';
+
+select verifier('un eleve ne lit PAS le journal d''administration',
+                (select count(*)::int from journal_admin), 0);
+
+-- Allumer le tuteur IA depuis un compte élève : l'écriture ne touche aucune
+-- ligne, la politique la rejette en silence.
+update parametres set valeur = 'true'::jsonb where cle = 'ia_active';
+
+select verifier('un eleve ne peut PAS allumer un module',
+                (select case when valeur = 'true'::jsonb then 1 else 0 end
+                   from parametres where cle = 'ia_active'), 0);
+
+-- Se facturer zéro franc à soi-même.
+insert into redevances
+  (repetiteur_id, periode, mode, montant_unitaire, eleves_actifs, montant_total, echeance)
+select '44444444-4444-4444-4444-444444444444', '2020-01-01'::date,
+       'par_eleve_actif', 0, 0, 0, current_date
+where false;
+
+select verifier('un eleve ne cree PAS de redevance',
+                (select count(*)::int from redevances where periode = '2020-01-01'), 0);
+
+-- Et le répétiteur lui-même ne peut pas se déclarer vérifié : le déclencheur
+-- `sur_maj_repetiteur` lève. On attrape pour que la suite continue.
+set local "request.jwt.claims" = '{"sub":"55555555-5555-5555-5555-555555555555","role":"authenticated"}';
+
+do $$
+begin
+  update repetiteurs set statut = 'verifie'
+  where id = '55555555-5555-5555-5555-555555555555';
+exception when insufficient_privilege then
+  null;
+end $$;
+
+reset role;
+set local "request.jwt.claims" = '';
+
+select verifier('un repetiteur ne se declare PAS verifie lui-meme',
+                (select case when statut = 'verifie' then 1 else 0 end
+                   from repetiteurs where id = '55555555-5555-5555-5555-555555555555'), 0);
+
 rollback;
