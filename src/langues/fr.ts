@@ -29,6 +29,8 @@ export const fr = {
       "Choisissez une image : JPEG, PNG ou WebP.",
     photoEchec:
       "L'envoi a échoué. Vérifiez votre connexion et réessayez.",
+    photoDifferee:
+      "envoi reporté, il reprendra tout seul au retour du réseau",
     voirLaPhoto: "Voir la photo en grand",
     fermerLaPhoto: "Fermer",
     telechargerLaPhoto: "Télécharger",

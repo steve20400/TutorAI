@@ -129,7 +129,7 @@ export function PhotoProfil({
       // Le fichier entre dans la file AVANT de partir. S'il n'arrive pas —
       // connexion coupée, onglet fermé, page rechargée — le Service Worker le
       // reprend dès que le réseau revient, sans qu'on ait à le rechoisir.
-      await mettreEnFile({
+      const { reprisePossible } = await mettreEnFile({
         id: chemin,
         supabaseUrl: base,
         clePubliable: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? "",
@@ -146,9 +146,11 @@ export function PhotoProfil({
         .upload(chemin, reduite, { contentType: "image/jpeg", upsert: false })
 
       if (error) {
-        // Échec : l'envoi reste dans la file, le Service Worker s'en charge.
-        // On ne lève pas — ce n'est pas une perte, c'est un report.
-        return
+        // L'envoi reste dans la file. Reste à savoir si quelqu'un la reprendra :
+        // sans Service Worker — navigation privée, navigateur qui le refuse —
+        // personne ne le fera, et annoncer un report serait mentir.
+        if (!reprisePossible) throw error
+        return "differe" as const
       }
 
       await poserPhotoDeProfil(apercu)

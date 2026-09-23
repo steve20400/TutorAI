@@ -12,15 +12,27 @@ import {
 import { useLangue } from "@/langues/contexte"
 import { reprendreLesEnvois } from "@/lib/envois"
 
+type Etat = "en_cours" | "fini" | "differe" | "echoue"
+
+/** Ce qu'un travail peut annoncer en se terminant sans lever. */
+type Issue = "differe" | undefined
+
 type Envoi = {
   id: number
   libelle: string
-  etat: "en_cours" | "fini" | "echoue"
+  etat: Etat
 }
 
 type Televersement = {
-  /** Lance un envoi qui survivra au changement de page. */
-  lancer: (libelle: string, travail: () => Promise<void>) => void
+  /**
+   * Lance un envoi qui survivra au changement de page.
+   *
+   * Le travail renvoie « differe » quand le fichier n'est pas parti mais qu'il
+   * est en sécurité dans la file : ce n'est ni une réussite, ni une perte, et
+   * le dire franchement évite d'annoncer une photo enregistrée qui ne l'est
+   * pas encore.
+   */
+  lancer: (libelle: string, travail: () => Promise<Issue>) => void
   envois: Envoi[]
 }
 
@@ -39,11 +51,10 @@ const Contexte = createContext<Televersement | null>(null)
  * L'envoi continue donc pendant qu'on va ailleurs, et un indicateur discret
  * dit qu'il tourne encore.
  *
- * Ce qui ne survit PAS : fermer l'onglet ou recharger la page. Le navigateur
- * interrompt alors la requête, et il n'existe pas de moyen simple de la
- * reprendre — un Service Worker le pourrait, au prix d'une complexité que
- * cette fonction ne justifie pas. L'indicateur reste donc visible tant que
- * l'envoi dure : quelqu'un qui le voit sait qu'il vaut mieux attendre.
+ * Fermer l'onglet ou recharger la page interrompt la requête en cours, mais
+ * ne perd plus le fichier : il a été rangé dans IndexedDB avant de partir, et
+ * le Service Worker le reprend. L'indicateur reste visible tant que l'envoi
+ * dure, et dit lequel des trois cas s'est produit.
  */
 export function FournisseurTeleversement({
   children,
@@ -85,20 +96,23 @@ export function FournisseurTeleversement({
   }, [])
 
   const lancer = useCallback(
-    (libelle: string, travail: () => Promise<void>) => {
+    (libelle: string, travail: () => Promise<Issue>) => {
       const id = Date.now() + Math.floor(Math.random() * 1000)
       poserEnvois((liste) => [...liste, { id, libelle, etat: "en_cours" }])
 
       void travail()
-        .then(() => {
+        .then((issue) => {
+          const etat: Etat = issue === "differe" ? "differe" : "fini"
           poserEnvois((liste) =>
-            liste.map((e) => (e.id === id ? { ...e, etat: "fini" } : e)),
+            liste.map((e) => (e.id === id ? { ...e, etat } : e)),
           )
           // On efface la ligne après un instant : un « terminé » qui reste à
           // l'écran finit par ressembler à quelque chose qui n'est pas fini.
+          // Un report tient plus longtemps — il demande de comprendre quelque
+          // chose, pas seulement de constater.
           setTimeout(
             () => poserEnvois((liste) => liste.filter((e) => e.id !== id)),
-            2500,
+            etat === "differe" ? 8000 : 2500,
           )
         })
         .catch(() => {
@@ -162,7 +176,9 @@ function Indicateur({ envois }: { envois: Envoi[] }) {
               ? `${e.libelle} — ${d.commun.photoEnvoi}`
               : e.etat === "fini"
                 ? `${e.libelle} — ${d.commun.photoEnvoyee}`
-                : `${e.libelle} — ${d.commun.photoEchec}`}
+                : e.etat === "differe"
+                  ? `${e.libelle} — ${d.commun.photoDifferee}`
+                  : `${e.libelle} — ${d.commun.photoEchec}`}
           </span>
         </div>
       ))}

@@ -31,6 +31,7 @@ export const en: Dictionnaire = {
       "This image is too heavy even after resizing. Try another one.",
     photoMauvaisType: "Choose an image: JPEG, PNG or WebP.",
     photoEchec: "Upload failed. Check your connection and try again.",
+    photoDifferee: "upload postponed, it will resume on its own",
     voirLaPhoto: "View photo",
     fermerLaPhoto: "Close",
     telechargerLaPhoto: "Download",

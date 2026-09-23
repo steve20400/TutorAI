@@ -37,8 +37,45 @@ function ouvrir(): Promise<IDBDatabase> {
   })
 }
 
-/** Met l'envoi dans la file, puis demande au navigateur de s'en charger. */
-export async function mettreEnFile(envoi: EnvoiEnAttente): Promise<void> {
+/**
+ * Combien de temps on attend le Service Worker avant de s'en passer.
+ *
+ * `serviceWorker.ready` ne se résout JAMAIS si aucun Service Worker ne
+ * s'enregistre — navigation privée, réglage du navigateur, extension qui le
+ * bloque. Sans cette limite, l'envoi resterait « en cours » indéfiniment et
+ * personne ne saurait quoi faire de cet écran.
+ */
+const ATTENTE_SW = 3000
+
+/** Ce que la file a pu garantir : une reprise automatique, ou rien. */
+export type MiseEnFile = { reprisePossible: boolean }
+
+function serviceWorkerPret(): Promise<ServiceWorkerRegistration | null> {
+  if (!("serviceWorker" in navigator)) return Promise.resolve(null)
+  return Promise.race([
+    navigator.serviceWorker.ready,
+    new Promise<null>((r) => setTimeout(() => r(null), ATTENTE_SW)),
+  ]).catch(() => null)
+}
+
+/**
+ * Met l'envoi dans la file, puis demande au navigateur de s'en charger.
+ *
+ * Cette fonction ne lève pas parce que la reprise automatique est
+ * indisponible. C'est une distinction qui a son importance : Background Sync
+ * existe mais peut être ÉTEINT — par un réglage, par une stratégie
+ * d'entreprise, en navigation privée — et `sync.register()` lève alors
+ * « Background Sync is disabled ». Tant que cette erreur remontait, elle
+ * emportait l'envoi entier avec elle : le fichier ne partait pas, alors que
+ * la connexion était bonne et que rien n'empêchait de l'envoyer tout de suite.
+ *
+ * Ce qui est renvoyé dit seulement si, en cas d'échec, quelqu'un reprendra le
+ * travail. L'appelant s'en sert pour annoncer « reprise au retour du réseau »
+ * plutôt qu'« envoyé », ou l'inverse.
+ */
+export async function mettreEnFile(
+  envoi: EnvoiEnAttente,
+): Promise<MiseEnFile> {
   const base = await ouvrir()
   await new Promise<void>((resoudre, rejeter) => {
     const t = base.transaction(MAGASIN, "readwrite")
@@ -47,8 +84,8 @@ export async function mettreEnFile(envoi: EnvoiEnAttente): Promise<void> {
     t.onerror = () => rejeter(t.error)
   })
 
-  const inscription = await navigator.serviceWorker?.ready
-  if (!inscription) return
+  const inscription = await serviceWorkerPret()
+  if (!inscription) return { reprisePossible: false }
 
   // Background Sync : le navigateur rappelle le Service Worker dès que la
   // connexion revient, même si l'onglet a été fermé entre-temps.
@@ -57,13 +94,19 @@ export async function mettreEnFile(envoi: EnvoiEnAttente): Promise<void> {
   }).sync
 
   if (sync) {
-    await sync.register(ETIQUETTE)
-  } else {
-    // Safari et iOS ne l'ont pas. On demande la reprise tout de suite, et
-    // elle recommencera à la prochaine ouverture de l'application : c'est
-    // moins bien, et toujours mieux que de perdre le fichier.
-    inscription.active?.postMessage({ type: "reprendre-envois" })
+    try {
+      await sync.register(ETIQUETTE)
+      return { reprisePossible: true }
+    } catch {
+      // Présent mais éteint. On retombe sur la reprise à l'ouverture.
+    }
   }
+
+  // Safari et iOS ne l'ont pas non plus. On demande la reprise tout de suite,
+  // et elle recommencera à la prochaine ouverture de l'application : c'est
+  // moins bien, et toujours mieux que de perdre le fichier.
+  inscription.active?.postMessage({ type: "reprendre-envois" })
+  return { reprisePossible: true }
 }
 
 /** À l'ouverture de l'application : reprendre ce qui traîne. */
