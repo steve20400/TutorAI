@@ -101,3 +101,42 @@ export async function api<T>(
     )
   }
 }
+
+/**
+ * Le même appel, mais en gardant la réponse telle quelle.
+ *
+ * `api()` lit du JSON ; certaines routes répondent en flux d'événements, et le
+ * lire d'un coup reviendrait à ne pas avoir de flux. Celle-ci rend la réponse
+ * brute, à charge de l'appelant de la parcourir.
+ *
+ * Le délai est plus large : une réplique de tuteur peut s'écrire pendant une
+ * minute, et le compteur ne doit pas la couper au milieu d'une phrase.
+ */
+const DELAI_FLUX = 120_000
+
+export async function apiFlux(
+  chemin: string,
+  corps: unknown,
+): Promise<Response> {
+  const base = variableRequise("API_URL").replace(/\/+$/, "")
+  const jeton = await jetonDeSession()
+
+  const controleur = new AbortController()
+  const minuterie = setTimeout(() => controleur.abort(), DELAI_FLUX)
+
+  try {
+    return await fetch(`${base}${chemin}`, {
+      method: "POST",
+      headers: {
+        ...(jeton ? { Authorization: `Bearer ${jeton}` } : {}),
+        "Content-Type": "application/json",
+        accept: "text/event-stream",
+      },
+      body: JSON.stringify(corps),
+      signal: controleur.signal,
+      cache: "no-store",
+    })
+  } finally {
+    clearTimeout(minuterie)
+  }
+}
