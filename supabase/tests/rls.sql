@@ -750,4 +750,94 @@ select verifier('un adulte ne se detache PAS tout seul',
 reset role;
 set local "request.jwt.claims" = '';
 
+-- ── Le rattachement par reconnaissance ──────────────────────────────────────
+-- Un adulte demande, il n'obtient rien — pas même la confirmation que le
+-- compte existe. L'enfant reconnaît, ou pas.
+set local role authenticated;
+set local "request.jwt.claims" = '{"sub":"33333333-3333-3333-3333-333333333333","role":"authenticated"}';
+
+select demander_rattachement('bilal');
+select demander_rattachement('personne qui n existe pas');
+select demander_rattachement('bilal');
+
+-- L'adulte ne lit rien de cette table : même pour compter ce qu'il a demandé.
+select verifier('un adulte ne lit pas les demandes',
+                (select count(*)::int from demandes_rattachement), 0);
+
+-- ── Ce que l'enfant voit ────────────────────────────────────────────────────
+set local "request.jwt.claims" = '{"sub":"22222222-2222-2222-2222-222222222222","role":"authenticated"}';
+
+-- Trois appels, une seule demande : le nom inconnu n'en a créé aucune, et le
+-- second appel sur le même enfant n'a pas fait de doublon.
+select verifier('trois demandes, une seule arrive a l''enfant',
+                (select count(*)::int from demandes_a_reconnaitre()), 1);
+
+select verifier('l''enfant voit un prenom, pas une adresse',
+                (select count(*)::int from demandes_a_reconnaitre()
+                  where prenom is not null), 1);
+
+-- ── Il refuse : rien ne se passe, et ça ne se voit pas ──────────────────────
+select repondre_rattachement((select id from demandes_a_reconnaitre() limit 1), false);
+
+select verifier('apres un refus, aucun lien',
+                (select count(*)::int from liens_familiaux
+                  where eleve_id = '22222222-2222-2222-2222-222222222222'), 0);
+
+select verifier('et la demande disparait de son ecran',
+                (select count(*)::int from demandes_a_reconnaitre()), 0);
+
+-- ── Il reconnaît : le lien naît, mais provisoire ────────────────────────────
+set local "request.jwt.claims" = '{"sub":"11111111-1111-1111-1111-111111111111","role":"authenticated"}';
+set local "request.jwt.claims" = '{"sub":"33333333-3333-3333-3333-333333333333","role":"authenticated"}';
+
+-- Un refus est definitif pour ce couple : l'adulte ne peut plus redemander.
+-- C'est voulu — sans quoi il suffirait d'insister jusqu'a ce que l'enfant se
+-- trompe. Ici on efface la trace hors RLS, pour rejouer le cas de l'accord.
+reset role;
+delete from demandes_rattachement
+where adulte_id = '33333333-3333-3333-3333-333333333333';
+set local role authenticated;
+set local "request.jwt.claims" = '{"sub":"33333333-3333-3333-3333-333333333333","role":"authenticated"}';
+select demander_rattachement('bilal');
+
+set local "request.jwt.claims" = '{"sub":"22222222-2222-2222-2222-222222222222","role":"authenticated"}';
+select repondre_rattachement((select id from demandes_a_reconnaitre() limit 1), true);
+
+select verifier('apres reconnaissance, le lien existe',
+                (select count(*)::int from liens_familiaux
+                  where parent_id = '33333333-3333-3333-3333-333333333333'
+                    and eleve_id  = '22222222-2222-2222-2222-222222222222'), 1);
+
+set local "request.jwt.claims" = '{"sub":"33333333-3333-3333-3333-333333333333","role":"authenticated"}';
+
+select verifier('pendant 48 h, le lien ne donne PAS acces aux seances',
+                (select case when est_mon_enfant('22222222-2222-2222-2222-222222222222')
+                             then 1 else 0 end), 0);
+
+select verifier('pendant 48 h, il donne quand meme le prenom',
+                (select case when est_mon_enfant_provisoire('22222222-2222-2222-2222-222222222222')
+                             then 1 else 0 end), 1);
+
+select verifier('et les messages de l''enfant restent fermes',
+                (select count(*)::int from messages m
+                  join seances s on s.id = m.seance_id
+                  join tuteurs_ia t on t.id = s.tuteur_id
+                  where t.eleve_id = '22222222-2222-2222-2222-222222222222'), 0);
+
+-- Quarante-huit heures plus tard, le lien devient plein.
+reset role;
+update liens_familiaux set actif_le = now() - interval '1 minute'
+where parent_id = '33333333-3333-3333-3333-333333333333'
+  and eleve_id  = '22222222-2222-2222-2222-222222222222';
+
+set local role authenticated;
+set local "request.jwt.claims" = '{"sub":"33333333-3333-3333-3333-333333333333","role":"authenticated"}';
+
+select verifier('passe 48 h, le lien donne acces',
+                (select case when est_mon_enfant('22222222-2222-2222-2222-222222222222')
+                             then 1 else 0 end), 1);
+
+reset role;
+set local "request.jwt.claims" = '';
+
 rollback;
