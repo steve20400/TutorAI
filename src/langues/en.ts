@@ -549,7 +549,7 @@ export const en: Dictionnaire = {
       telephone: "Phone",
       identifiant: "Sign-in username",
       identifiantAide:
-        "This is what you type to sign in, instead of your email address. It is uppercased automatically.",
+        "This is what you type to sign in, instead of your address. Capitals and accents do not matter.",
       photo: "Photo",
       photoUrl: "Photo address",
       photoAide:

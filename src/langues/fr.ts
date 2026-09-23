@@ -557,7 +557,7 @@ export const fr = {
       telephone: "Téléphone",
       identifiant: "Identifiant de connexion",
       identifiantAide:
-        "C'est ce que vous saisissez pour vous connecter, à la place de votre adresse. Il est mis en majuscules automatiquement.",
+        "C'est ce que vous saisissez pour vous connecter, à la place de votre adresse. Les majuscules et les accents n'ont pas d'importance.",
       photo: "Photo",
       photoUrl: "Adresse de la photo",
       photoAide:

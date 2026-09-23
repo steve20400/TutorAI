@@ -2,6 +2,7 @@
 
 import { redirect } from "next/navigation"
 import { revalidatePath } from "next/cache"
+import { cookies } from "next/headers"
 
 import { chemin, langueDeFormulaire, type Langue } from "@/langues"
 import { api, ErreurApi } from "@/lib/api"
@@ -36,11 +37,36 @@ async function exigerSession(langue: Langue): Promise<void> {
  * service — clé manquante, porte-monnaie éteint — laisse donc la valeur
  * inchangée, ce que l'interrupteur montre en revenant à sa position.
  */
+/** Vit le temps d'un rechargement, puis disparaît tout seul. */
+const SIGNALEMENT = "tutela_probleme"
+
+/**
+ * Appelle l'API et, en cas d'échec, le DIT.
+ *
+ * Cette fonction avalait toute erreur de l'API sans un mot. La page se
+ * rechargeait identique, et un écran qui ne change pas se lit comme « il n'y
+ * avait rien à faire », jamais comme « refusé ». C'est ainsi qu'« Apposer le
+ * cachet » a pu ne rien faire pendant des semaines sans que personne ne le
+ * remarque.
+ *
+ * Le message part dans un témoin de courte durée plutôt que dans une valeur
+ * de retour : ces actions sont branchées sur des `<form action={…}>` nus, qui
+ * ne reçoivent rien en retour. Le témoin est lu une fois par la coquille de
+ * l'administration, et expire de lui-même.
+ */
 async function agir(chemin_: string, corps?: unknown): Promise<void> {
   try {
     await api(chemin_, { methode: "POST", corps })
   } catch (erreur) {
     if (!(erreur instanceof ErreurApi)) throw erreur
+
+    const boite = await cookies()
+    boite.set(SIGNALEMENT, erreur.message, {
+      path: "/",
+      maxAge: 15,
+      httpOnly: false,
+      sameSite: "lax",
+    })
   }
   revalidatePath("/", "layout")
 }

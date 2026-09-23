@@ -171,6 +171,59 @@ body {
   }
 }
 
+/* --- Les ascenseurs ---------------------------------------------------------
+   Le navigateur en dessine un gris système, identique partout. Sur l'encre de
+   la barre latérale, qui reste sombre dans les quatre thèmes, cette barre
+   claire fait une balafre : c'est la seule chose à l'écran qui ne vienne pas
+   de la palette.
+
+   `currentColor` et non `var(--texte)`, pour la même raison que le motif : le
+   même réglage sert sur le papier et sur l'encre, et c'est le conteneur qui
+   donne sa couleur. Sur la barre latérale le texte est clair, donc le curseur
+   l'est aussi ; sur une page crème il est à l'encre.
+
+   Le rail reste transparent, et le curseur porte une bordure transparente
+   rognée au fond (`background-clip`) : il paraît plus fin qu'il n'est, tout en
+   gardant une cible assez large pour être attrapée à la souris.
+
+   Firefox ne connaît que `scrollbar-width` et `scrollbar-color` ; les autres
+   ne connaissent que les pseudo-éléments. Les deux sont écrits. */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: color-mix(in srgb, currentColor 26%, transparent) transparent;
+}
+
+::-webkit-scrollbar {
+  width: 11px;
+  height: 11px;
+}
+
+::-webkit-scrollbar-track,
+::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: color-mix(in srgb, currentColor 26%, transparent);
+  border-radius: 999px;
+  border: 3px solid transparent;
+  background-clip: padding-box;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: color-mix(in srgb, currentColor 44%, transparent);
+}
+
+/* Un ascenseur qui ne sert qu'à faire défiler une rangée de filtres n'a rien à
+   montrer : la rangée dit elle-même qu'elle continue, par son dégradé de bord.
+   Une barre en plus ne ferait qu'ajouter une ligne sous les boutons. */
+.rangee-filtres {
+  scrollbar-width: none;
+}
+.rangee-filtres::-webkit-scrollbar {
+  display: none;
+}
+
 /* --- Éléments partagés ----------------------------------------------------- */
 
 .carte {
