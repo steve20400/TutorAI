@@ -4,11 +4,13 @@ import {
   createContext,
   useCallback,
   useContext,
+  useEffect,
   useState,
   type ReactNode,
 } from "react"
 
 import { useLangue } from "@/langues/contexte"
+import { reprendreLesEnvois } from "@/lib/envois"
 
 type Envoi = {
   id: number
@@ -49,6 +51,38 @@ export function FournisseurTeleversement({
   children: ReactNode
 }) {
   const [envois, poserEnvois] = useState<Envoi[]>([])
+
+  /**
+   * Le Service Worker, et la reprise de ce qui traîne.
+   *
+   * Il ne met aucune page en cache : il ne sert qu'à reprendre un envoi
+   * interrompu. Un cache mal réglé servirait une version périmée pendant des
+   * jours — le jour où une correction de sécurité part en production, une
+   * partie des gens continuerait de tourner sur l'ancienne.
+   */
+  useEffect(() => {
+    if (!("serviceWorker" in navigator)) return
+
+    void navigator.serviceWorker
+      .register("/sw.js")
+      .then(() => reprendreLesEnvois())
+      .catch(() => {
+        // Navigation privée, ou Service Worker refusé : les envois partent
+        // alors directement, sans reprise possible. Rien à signaler ici.
+      })
+
+    // Le Service Worker prévient quand un envoi différé a fini : sans cela,
+    // l'écran continuerait d'afficher l'ancienne photo jusqu'au prochain
+    // rechargement.
+    const surMessage = (e: MessageEvent) => {
+      if (e.data?.type === "envoi-termine") {
+        poserEnvois((liste) => liste.filter((x) => String(x.id) !== e.data.id))
+      }
+    }
+    navigator.serviceWorker.addEventListener("message", surMessage)
+    return () =>
+      navigator.serviceWorker.removeEventListener("message", surMessage)
+  }, [])
 
   const lancer = useCallback(
     (libelle: string, travail: () => Promise<void>) => {

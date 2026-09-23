@@ -6,6 +6,7 @@ import { Avatar } from "@/composants/avatar"
 import { poserPhotoDeProfil } from "@/actions/compte"
 import { useLangue } from "@/langues/contexte"
 import { useTeleversement } from "@/composants/televersement"
+import { mettreEnFile } from "@/lib/envois"
 import { supabaseNavigateur } from "@/lib/supabase/client"
 
 /** Côté du carré final. 256 suffit : l'avatar le plus grand fait 72 pixels,
@@ -108,30 +109,52 @@ export function PhotoProfil({
       return
     }
 
-    // L'envoi part dans le contexte, au-dessus des pages : on peut quitter
-    // cet écran pendant qu'il tourne.
-    //
-    // Il enregistre LUI-MÊME l'adresse en base. Attendre que l'utilisateur
-    // clique « Enregistrer » supposerait qu'il est encore devant le
-    // formulaire — or c'est précisément ce qu'on vient de lui permettre de
-    // quitter. Téléverser une photo, c'est la poser.
+    // Un nom nouveau à chaque envoi : remplacer le fichier en place
+    // laisserait l'ancienne image dans le cache des navigateurs, et la
+    // nouvelle photo mettrait des jours à apparaître chez les autres.
+    const chemin = `${compteId}/${Date.now()}.jpg`
+    const base = process.env.NEXT_PUBLIC_SUPABASE_URL ?? ""
+
+    // L'aperçu change tout de suite, avant même que le fichier soit parti.
+    // Attendre la fin pour montrer la nouvelle photo laisserait croire que
+    // rien ne s'est passé — surtout quand l'envoi peut durer une minute.
+    const apercu = `${base}/storage/v1/object/public/photos/${chemin}`
+
     lancer(t.choisirPhoto, async () => {
       const supabase = supabaseNavigateur()
-      // Un nom nouveau à chaque envoi : remplacer le fichier en place
-      // laisserait l'ancienne image dans le cache des navigateurs, et la
-      // nouvelle photo mettrait des jours à apparaître chez les autres.
-      const chemin = `${compteId}/${Date.now()}.jpg`
+      const {
+        data: { session },
+      } = await supabase.auth.getSession()
 
+      // Le fichier entre dans la file AVANT de partir. S'il n'arrive pas —
+      // connexion coupée, onglet fermé, page rechargée — le Service Worker le
+      // reprend dès que le réseau revient, sans qu'on ait à le rechoisir.
+      await mettreEnFile({
+        id: chemin,
+        supabaseUrl: base,
+        clePubliable: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? "",
+        jeton: session?.access_token ?? "",
+        chemin,
+        blob: reduite,
+        rattacherA: "/api/photo",
+      })
+
+      // On tente l'envoi immédiatement : si la connexion tient, la photo est
+      // là en une seconde et le Service Worker n'aura rien à reprendre.
       const { error } = await supabase.storage
         .from("photos")
         .upload(chemin, reduite, { contentType: "image/jpeg", upsert: false })
 
-      if (error) throw error
+      if (error) {
+        // Échec : l'envoi reste dans la file, le Service Worker s'en charge.
+        // On ne lève pas — ce n'est pas une perte, c'est un report.
+        return
+      }
 
-      const { data } = supabase.storage.from("photos").getPublicUrl(chemin)
-      await poserPhotoDeProfil(data.publicUrl)
-      surChangement(data.publicUrl)
+      await poserPhotoDeProfil(apercu)
     })
+
+    surChangement(apercu)
   }
 
   return (
