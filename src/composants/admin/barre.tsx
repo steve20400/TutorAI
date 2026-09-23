@@ -427,18 +427,27 @@ export function BarreAdmin({
         </div>
 
         <div className="admin-rangee flex items-center gap-2.5">
-          <Avatar nom={nom ?? identifiant} photoUrl={photoUrl} taille={26} />
-          <span className="admin-libelle min-w-0 flex-1 leading-tight">
-            <span className="block truncate text-[11.5px] font-medium">
-              {identifiant}
+          {/* L'identité mène au compte. C'est là qu'on la cherche — et sans
+              ce lien, changer son mot de passe demandait d'ouvrir la base,
+              ce qu'on ne fait pas pour une opération courante. */}
+          <Link
+            href={chemin(langue, "/admin/profil")}
+            title={d.adminPages.profil.etiquette}
+            className="flex min-w-0 flex-1 items-center gap-2.5 rounded-[8px] transition hover:bg-white/10"
+          >
+            <Avatar nom={nom ?? identifiant} photoUrl={photoUrl} taille={26} />
+            <span className="admin-libelle min-w-0 flex-1 leading-tight">
+              <span className="block truncate text-[11.5px] font-medium">
+                {identifiant}
+              </span>
+              <span
+                className="block truncate text-[10px]"
+                style={{ color: "#93a0bb" }}
+              >
+                {d.adminNav.administrateur}
+              </span>
             </span>
-            <span
-              className="block truncate text-[10px]"
-              style={{ color: "#93a0bb" }}
-            >
-              {d.adminNav.administrateur}
-            </span>
-          </span>
+          </Link>
           <form action={seDeconnecter} className="shrink-0">
             <input type="hidden" name="langue" value={langue} />
             <button

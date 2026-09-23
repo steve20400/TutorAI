@@ -9,6 +9,7 @@ export type ProfilAdmin = {
   role: string
   identifiant: string | null
   prenom: string | null
+  photo_url: string | null
 }
 
 /**

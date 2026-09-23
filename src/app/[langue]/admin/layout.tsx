@@ -48,7 +48,7 @@ export default async function LayoutAdmin({
         d={d}
         identifiant={profil.identifiant}
         nom={profil.prenom}
-        photoUrl={null}
+        photoUrl={profil.photo_url ?? null}
         aVerifier={count}
       />
       <main className="flex-1 overflow-y-auto">{children}</main>
