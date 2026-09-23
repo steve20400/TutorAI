@@ -105,6 +105,25 @@ export async function changerResolution(donnees: FormData): Promise<void> {
   await agir("/v1/admin/parametres/resolution_video", { valeur })
 }
 
+/** Les trois que le service sait appeler. Un autre nom laisserait le tuteur muet. */
+const FOURNISSEURS = ["anthropic", "gemini", "compatible"] as const
+
+/**
+ * Choisit d'où vient le tuteur.
+ *
+ * Changer de fournisseur ne change rien d'autre : le contexte, le programme
+ * et la mémoire de l'élève sont les mêmes pour les trois. Seule la clé exigée
+ * pour allumer le module change avec lui.
+ */
+export async function changerFournisseur(donnees: FormData): Promise<void> {
+  const langue = langueDeFormulaire(donnees)
+  const valeur = String(donnees.get("fournisseur") ?? "")
+  if (!(FOURNISSEURS as readonly string[]).includes(valeur)) return
+
+  await exigerSession(langue)
+  await agir("/v1/admin/parametres/ia_fournisseur", { valeur })
+}
+
 const MODES = ["par_eleve_actif", "pourcentage_gains"] as const
 
 /**

@@ -22,6 +22,12 @@ export type Parametres = {
    * donc le comportement par défaut — pas une option à cocher.
    */
   participants_max: number
+  /**
+   * D'où vient le tuteur. Personne, côté élève, ne voit jamais ce nom — ce
+   * qui est précisément ce qui permet d'en changer sans que quiconque s'en
+   * aperçoive.
+   */
+  ia_fournisseur: "anthropic" | "gemini" | "compatible"
 }
 
 const DEFAUTS: Parametres = {
@@ -32,6 +38,7 @@ const DEFAUTS: Parametres = {
   resolution_video: "480p",
   inscriptions_ouvertes: true,
   participants_max: 2,
+  ia_fournisseur: "anthropic",
 }
 
 /**

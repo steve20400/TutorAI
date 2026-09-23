@@ -10,7 +10,7 @@ import {
 } from "@/langues"
 import { exigerAdmin } from "@/lib/admin"
 import { lireParametres } from "@/lib/parametres"
-import { basculerParametre, changerResolution } from "@/actions/admin"
+import { basculerParametre, changerFournisseur, changerResolution } from "@/actions/admin"
 import { MODULES, type CleModule } from "@/lib/modules"
 
 /**
@@ -19,9 +19,16 @@ import { MODULES, type CleModule } from "@/lib/modules"
  * aussi, parce qu'un bouton désactivé ne protège que l'interface.
  */
 const CLE_REQUISE: Partial<Record<CleModule, string>> = {
-  ia_active: "anthropic",
   paiement_actif: "mobile_money",
 }
+
+/** Les trois fournisseurs, et la clé que chacun exige pour s'allumer. */
+const FOURNISSEURS = [
+  { cle: "anthropic", nom: "Anthropic", cleExigee: "anthropic" },
+  { cle: "gemini", nom: "Gemini", cleExigee: "gemini" },
+  // Un modèle qui tourne sur votre propre machine n'a souvent aucune clé.
+  { cle: "compatible", nom: "Compatible OpenAI", cleExigee: null },
+] as const
 
 const RESOLUTIONS = ["360p", "480p", "720p"] as const
 
@@ -49,6 +56,14 @@ export default async function PageModule({
   // est le comportement voulu, pas un manque.
   const cleManquante = CLE_REQUISE[cle] !== undefined
 
+  // Pour le tuteur, la clé exigée suit le fournisseur choisi : exiger une clé
+  // Anthropic alors que l'administration a basculé sur Gemini garderait
+  // l'interrupteur grisé sans que personne comprenne pourquoi.
+  const fournisseur =
+    typeof parametres.ia_fournisseur === "string"
+      ? parametres.ia_fournisseur
+      : "anthropic"
+
   return (
     <>
       <div className="px-5 sm:px-7 pt-7">
@@ -68,6 +83,29 @@ export default async function PageModule({
 
       <div className="flex max-w-2xl flex-col gap-5 px-5 sm:px-7 pb-7">
         <p className="doux text-[13px] leading-relaxed">{textes.detail}</p>
+
+        {cle === "ia_active" ? (
+          <section className="carte p-5">
+            <div className="text-[14px] font-medium">{t.fournisseurTitre}</div>
+            <p className="doux mt-1 text-[12px] leading-relaxed">
+              {t.fournisseurDetail}
+            </p>
+            <form action={changerFournisseur} className="mt-3 flex flex-wrap gap-2">
+              <input type="hidden" name="langue" value={langue} />
+              {FOURNISSEURS.map((f) => (
+                <button
+                  key={f.cle}
+                  type="submit"
+                  name="fournisseur"
+                  value={f.cle}
+                  className={fournisseur === f.cle ? "bt1" : "bt2"}
+                >
+                  {f.nom}
+                </button>
+              ))}
+            </form>
+          </section>
+        ) : null}
 
         {cle === "enregistrement_actif" ? (
           <section className="carte p-5">

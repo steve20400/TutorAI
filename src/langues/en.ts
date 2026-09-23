@@ -522,6 +522,8 @@ export const en: Dictionnaire = {
       revoquer: "Revoke",
       jamaisRelue:
         "Encrypted in the database, never shown again in clear. You will only see its last four characters.",
+      fournisseurTitre: "Where the tutor comes from",
+      fournisseurDetail: "Context, syllabus and the pupil's memory are the same for all three. Only the required key changes. No pupil ever sees which one is used.",
       resolutionTitre: "Recording quality",
       introuvable: "This module does not exist.",
     },
