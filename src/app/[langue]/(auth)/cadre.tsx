@@ -21,6 +21,7 @@ export function CadreAuth({
   langue,
   etiquette,
   phare,
+  action,
   children,
 }: {
   langue: Langue
@@ -28,6 +29,14 @@ export function CadreAuth({
   etiquette: string
   /** Grand titre de la colonne de gauche, sur grand écran. */
   phare: string
+  /**
+   * Posé sur la ligne de l'étiquette, poussé à droite.
+   *
+   * Sur sa propre ligne, il coûterait une hauteur que le téléphone n'a pas à
+   * donner : les trois choix de rôle sont la vraie question de l'écran, et
+   * c'est eux qu'on veut voir sans faire défiler.
+   */
+  action?: React.ReactNode
   children: React.ReactNode
 }) {
   const d = dictionnaire(langue)
@@ -70,8 +79,11 @@ export function CadreAuth({
             </section>
 
             <section className="flex w-full max-w-md flex-col justify-center gap-6 justify-self-center lg:justify-self-end">
-              <div className="text-[11px] font-semibold uppercase tracking-[0.18em] opacity-55">
-                {etiquette}
+              <div className="flex items-start justify-between gap-5">
+                <div className="pt-2 text-[11px] font-semibold uppercase tracking-[0.18em] opacity-55">
+                  {etiquette}
+                </div>
+                {action}
               </div>
               {children}
             </section>

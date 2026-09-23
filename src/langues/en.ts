@@ -110,15 +110,17 @@ export const en: Dictionnaire = {
     titre: "Create an account",
     sousTitre: "To start, you are…",
     dejaCompte: "Already have an account?",
+    essayerIA: "Try Tutela AI",
+    essayerIADetail: "no account — nothing is kept",
     seConnecter: "Sign in",
     roles: {
       eleve: {
-        titre: "I am a student",
+        titre: "I am a child",
         detail: "Revise, be questioned on my syllabus",
       },
       parent: {
-        titre: "I am a parent",
-        detail: "Follow my child, find a tutor I can trust",
+        titre: "I am an adult",
+        detail: "Find a tutor, for me or for my child",
       },
       repetiteur: {
         titre: "I am a tutor",

@@ -109,15 +109,21 @@ export const fr = {
     titre: "Créer un compte",
     sousTitre: "Pour commencer, tu es…",
     dejaCompte: "Tu as déjà un compte ?",
+    essayerIA: "Utiliser Tutela IA",
+    essayerIADetail: "sans compte — rien n'est gardé",
     seConnecter: "Se connecter",
     roles: {
       eleve: {
-        titre: "Je suis élève",
+        titre: "Je suis un enfant",
         detail: "Réviser, être interrogé sur mon programme",
       },
       parent: {
-        titre: "Je suis parent",
-        detail: "Suivre mon enfant, trouver un répétiteur de confiance",
+        // « Adulte » et non « parent » : ce compte sert aussi bien à celui qui
+        // cherche un répétiteur pour son enfant qu'à l'étudiant majeur qui en
+        // cherche un pour lui-même. Le détail doit donc couvrir les deux, sans
+        // quoi le second croit s'être trompé de bouton.
+        titre: "Je suis adulte",
+        detail: "Trouver un répétiteur, pour moi ou pour mon enfant",
       },
       repetiteur: {
         titre: "Je suis répétiteur",
