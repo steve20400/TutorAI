@@ -1,6 +1,9 @@
+import Link from "next/link"
+
 import { EnteteAdmin, RienEncore } from "@/composants/admin/entete"
 import { Avatar } from "@/composants/avatar"
 import {
+  chemin,
   dictionnaire,
   estLangue,
   LANGUE_PAR_DEFAUT,
@@ -16,6 +19,9 @@ type Famille = {
   pays: string | null
   identifiant: string | null
   desactive_le: string | null
+  /** Le jour où un parent dépose sa photo, elle remplace ses initiales ici
+   *  sans autre changement. */
+  photo_url: string | null
   enfants: { id: string; prenom: string | null; nom: string | null }[]
 }
 
@@ -61,13 +67,15 @@ export default async function PageFamilles({
         {liste.map((p) => {
           const n = enfantsPar.get(p.id) ?? 0
           return (
-            <div
+            <Link
               key={p.id}
-              className="flex items-center gap-4 border-b py-3"
+              href={chemin(langue, `/admin/familles/${p.id}`)}
+              className="flex items-center gap-4 border-b py-3 transition hover:opacity-70"
               style={{ borderColor: "var(--bordure)" }}
             >
               <Avatar
                 nom={[p.prenom, p.nom].filter(Boolean).join(" ")}
+                photoUrl={p.photo_url ?? null}
                 taille={30}
               />
               <div className="min-w-0 flex-1">
@@ -85,7 +93,7 @@ export default async function PageFamilles({
               <span className={n === 0 ? "badge-eteint" : "badge-verifie"}>
                 {n === 0 ? t.aucuneSeance : pluriel(langue, n, t.enfants)}
               </span>
-            </div>
+            </Link>
           )
         })}
       </div>

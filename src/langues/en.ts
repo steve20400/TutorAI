@@ -386,6 +386,18 @@ export const en: Dictionnaire = {
       retirerCachet: "Remove the stamp",
     },
     familles: {
+      detailFamille: "Family",
+      leParent: "Parent",
+      lesEnfants: "Children",
+      lesContrats: "Tutors engaged",
+      aucunContrat:
+        "No tutor engaged. This family has not booked any session yet.",
+      aucunEnfantRattache: "No child linked to this account.",
+      seancesTenues: { one: "session held", other: "sessions held" },
+      depuisLe: "since {date}",
+      inscritLe: "Joined on {date}",
+      compteDesactiveLe: "Account deactivated on {date}",
+      voirLaFamille: "Open",
       etiquette: "Families",
       chercher: "Search a family…",
       compte: { one: "{n} family", other: "{n} families" },

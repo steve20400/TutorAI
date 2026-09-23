@@ -391,6 +391,18 @@ export const fr = {
       retirerCachet: "Retirer le cachet",
     },
     familles: {
+      detailFamille: "Famille",
+      leParent: "Le parent",
+      lesEnfants: "Les enfants",
+      lesContrats: "Répétiteurs engagés",
+      aucunContrat:
+        "Aucun répétiteur engagé. Cette famille n'a encore réservé aucune séance.",
+      aucunEnfantRattache: "Aucun enfant rattaché à ce compte.",
+      seancesTenues: { one: "séance tenue", other: "séances tenues" },
+      depuisLe: "depuis le {date}",
+      inscritLe: "Inscrit le {date}",
+      compteDesactiveLe: "Compte désactivé le {date}",
+      voirLaFamille: "Ouvrir",
       etiquette: "Familles",
       chercher: "Chercher une famille…",
       compte: { one: "{n} famille", other: "{n} familles" },
