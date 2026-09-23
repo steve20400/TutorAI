@@ -18,6 +18,9 @@ export const fr = {
   },
 
   commun: {
+    voirLaPhoto: "Voir la photo en grand",
+    fermerLaPhoto: "Fermer",
+    telechargerLaPhoto: "Télécharger",
     seDeconnecter: "Se déconnecter",
     quitter: "Quitter",
     enCours: "Un instant…",

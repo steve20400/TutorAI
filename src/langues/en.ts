@@ -22,6 +22,9 @@ export const en: Dictionnaire = {
   },
 
   commun: {
+    voirLaPhoto: "View photo",
+    fermerLaPhoto: "Close",
+    telechargerLaPhoto: "Download",
     seDeconnecter: "Sign out",
     quitter: "Leave",
     enCours: "One moment…",
