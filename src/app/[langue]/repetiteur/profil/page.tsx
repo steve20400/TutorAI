@@ -3,6 +3,7 @@ import { redirect } from "next/navigation"
 import { BoutonDeconnexion } from "@/composants/deconnexion"
 import { Registre } from "@/composants/registre"
 import { chemin, dictionnaire, estLangue, LANGUE_PAR_DEFAUT } from "@/langues"
+import { api } from "@/lib/api"
 import { supabaseServeur } from "@/lib/supabase/server"
 import { FormulaireProfil } from "./formulaire"
 
@@ -15,6 +16,29 @@ const TON: Record<Statut, "attente" | "ok" | "alerte"> = {
   en_attente: "attente",
   verifie: "ok",
   refuse: "alerte",
+}
+
+type ReponseProfil = {
+  fiche: {
+    id: string
+    bio: string | null
+    ville: string | null
+    matieres: string[] | null
+    niveaux: string[] | null
+    tarif_mensuel: number | null
+    annees_experience: number | null
+    disponibilites_texte: string | null
+    statut: string
+    motif_refus: string | null
+    verifie_le: string | null
+  } | null
+  profil: {
+    prenom: string | null
+    nom: string | null
+    identifiant: string | null
+    telephone: string | null
+    desactive_le: string | null
+  } | null
 }
 
 export default async function PageProfilRepetiteur({
@@ -34,22 +58,23 @@ export default async function PageProfilRepetiteur({
 
   if (!user) redirect(chemin(langue, "/connexion"))
 
-  const { data: profil } = await supabase
-    .from("profils")
-    .select("prenom, nom, role")
-    .eq("id", user.id)
-    .single()
+  // Le rôle et la fiche arrivent ensemble : un seul aller-retour vers le
+  // service pour ouvrir l'écran.
+  //
+  // `fiche` est nulle pour qui n'est pas répétiteur — la politique de lecture
+  // ne lui renvoie rien —, ce qui suffit à écarter un élève ou un parent tombé
+  // sur cette adresse.
+  let reponse: ReponseProfil | null = null
+  try {
+    reponse = await api<ReponseProfil>("/v1/repetiteur/profil")
+  } catch {
+    reponse = null
+  }
 
-  // Un élève ou un parent qui tomberait sur cette adresse n'a rien à y faire.
-  if (profil?.role !== "repetiteur") redirect(chemin(langue, "/"))
+  const profil = reponse?.profil ?? null
+  const fiche = reponse?.fiche ?? null
 
-  const { data: fiche } = await supabase
-    .from("repetiteurs")
-    .select(
-      "bio, ville, matieres, niveaux, tarif_mensuel, annees_experience, disponibilites_texte, statut, motif_refus",
-    )
-    .eq("id", user.id)
-    .single()
+  if (!fiche) redirect(chemin(langue, "/"))
 
   const brutStatut = fiche?.statut ?? "brouillon"
   const statut: Statut = (STATUTS as readonly string[]).includes(brutStatut)
@@ -65,7 +90,7 @@ export default async function PageProfilRepetiteur({
           <div>
             <h1 className="text-2xl font-medium">{d.repetiteurProfil.titre}</h1>
             <p className="doux mt-0.5 text-sm">
-              {profil.prenom} {profil.nom ?? ""}
+              {profil?.prenom} {profil?.nom ?? ""}
             </p>
           </div>
           <BoutonDeconnexion langue={langue} />
