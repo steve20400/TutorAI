@@ -160,10 +160,14 @@ export function PhotoProfil({
   }
 
   return (
-    <div className="flex items-center gap-4">
+    // La rangée se replie : sur un écran de 320 points, l'avatar et les deux
+    // boutons ne tiennent pas côte à côte, et les serrer colle le bouton
+    // contre le bord de la carte. Repliés, les boutons prennent toute la
+    // largeur et se rangent l'un à côté de l'autre.
+    <div className="flex flex-wrap items-center gap-4">
       <Avatar nom={nom} photoUrl={photoUrl} taille={72} />
 
-      <div className="flex min-w-0 flex-col gap-2">
+      <div className="flex min-w-0 flex-1 basis-[210px] flex-col gap-2">
         <input
           ref={champ}
           type="file"

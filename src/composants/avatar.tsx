@@ -19,6 +19,12 @@ import { useLangue } from "@/langues/contexte"
  * Une vraie photo s'agrandit et se télécharge au clic ; des initiales, non.
  * Il n'y a rien à agrandir dans deux lettres, et un curseur qui promet une
  * action qui n'arrive pas est pire que pas de curseur du tout.
+ *
+ * Une photo qui ne se charge pas retombe sur les initiales. Sans cela, le
+ * navigateur affiche le texte de remplacement — le nom en entier — à l'endroit
+ * d'un rond de soixante-douze pixels : il déborde, passe sous les boutons
+ * voisins, et l'écran paraît cassé. Le cas n'a rien de théorique : l'aperçu
+ * s'affiche dès que le fichier est choisi, donc avant qu'il soit arrivé.
  */
 
 /** Teintes sourdes, lisibles avec du texte foncé dans les deux thèmes. */
@@ -62,6 +68,13 @@ export function Avatar({
 }) {
   const libelle = (nom ?? "").trim()
   const [ouverte, poserOuverte] = useState(false)
+  const [cassee, poserCassee] = useState(false)
+
+  // Une nouvelle adresse mérite une nouvelle tentative : sans cette remise à
+  // zéro, une photo remplacée après un échec resterait invisible.
+  useEffect(() => {
+    poserCassee(false)
+  }, [photoUrl])
 
   // Un avatar choisi dans la liste : un dessin, pas une image à télécharger.
   // Il ne s'agrandit pas non plus — il n'y a rien de plus à en voir.
@@ -90,7 +103,7 @@ export function Avatar({
     )
   }
 
-  if (!estUnePhoto(photoUrl)) {
+  if (cassee || !estUnePhoto(photoUrl)) {
     return (
       <span
         aria-hidden
@@ -129,6 +142,7 @@ export function Avatar({
           alt={libelle}
           width={taille}
           height={taille}
+          onError={() => poserCassee(true)}
           className="h-full w-full object-cover"
         />
       </button>
