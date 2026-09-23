@@ -135,7 +135,7 @@ export const en: Dictionnaire = {
 
   erreurs: {
     compteDesactive:
-      "This account has been deactivated by the administration. Contact us if you believe this is a mistake.",
+      "This account has been deactivated by the administration. To learn why, or to contest it, write to {contact}.",
     identifiantsIncorrects: "Wrong email or password.",
     emailNonConfirme:
       "Your email is not confirmed yet. Check your inbox.",

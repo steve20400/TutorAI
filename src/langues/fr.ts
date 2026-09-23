@@ -131,7 +131,7 @@ export const fr = {
 
   erreurs: {
     compteDesactive:
-      "Ce compte a été désactivé par l'administration. Écrivez-nous si vous pensez qu'il s'agit d'une erreur.",
+      "Ce compte a été désactivé par l'administration. Pour en connaître le motif ou le contester, écrivez à {contact}.",
     identifiantsIncorrects: "Email ou mot de passe incorrect.",
     emailNonConfirme:
       "Ton email n'est pas encore confirmé. Vérifie ta boîte de réception.",

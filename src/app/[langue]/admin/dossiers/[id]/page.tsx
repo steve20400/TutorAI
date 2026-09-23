@@ -1,6 +1,7 @@
 import Link from "next/link"
 
 import { EnteteAdmin, RienEncore } from "@/composants/admin/entete"
+import { Avatar } from "@/composants/avatar"
 import {
   chemin,
   dictionnaire,
@@ -31,6 +32,7 @@ type FicheComplete = {
     statut: string
     verifie_le: string | null
     motif_refus: string | null
+    photo_url: string | null
   } | null
   profil: {
     prenom: string | null
@@ -105,6 +107,30 @@ export default async function PageDossier({
       <EnteteAdmin etiquette={fiche.ville ?? "—"} titre={nom} />
 
       <div className="max-w-3xl px-5 sm:px-7 pb-7">
+        {/* Le visage, ou les initiales en attendant.
+            Vérifier un dossier, c'est décider si cette personne approchera un
+            enfant. Une fiche sans visage rend la décision plus abstraite
+            qu'elle ne l'est — et le jour où le répétiteur dépose sa photo,
+            c'est ici qu'elle doit apparaître, sans autre changement. */}
+        <div className="mb-5 flex items-center gap-4">
+          <Avatar
+            nom={nom}
+            photoUrl={fiche.photo_url ?? null}
+            taille={72}
+          />
+          <div className="min-w-0">
+            <p className="text-[15px] font-medium">{nom}</p>
+            {profil?.identifiant ? (
+              <p className="doux font-mono text-[11.5px]">
+                {profil.identifiant}
+              </p>
+            ) : null}
+            {profil?.telephone ? (
+              <p className="doux mt-0.5 text-[12.5px]">{profil.telephone}</p>
+            ) : null}
+          </div>
+        </div>
+
         <p className="doux text-[13px] leading-relaxed">
           {(fiche.niveaux ?? []).map((n: string) => d.niveaux[n] ?? n).join(", ")}
           {" · "}

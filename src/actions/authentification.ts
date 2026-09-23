@@ -12,6 +12,7 @@ import {
   type Dictionnaire,
   type Langue,
 } from "@/langues"
+import { api } from "@/lib/api"
 import { supabaseServeur } from "@/lib/supabase/server"
 
 export type EtatFormulaire = {
@@ -34,11 +35,18 @@ function langueDe(donnees: FormData): Langue {
 }
 
 /** Messages d'erreur Supabase traduits. Personne ne doit lire de l'anglais brut. */
-function traduire(message: string, d: Dictionnaire): string {
+function traduire(message: string, d: Dictionnaire, contact: string): string {
   const m = message.toLowerCase()
-  // Un compte désactivé doit le savoir. « Identifiants incorrects » ferait
-  // ressaisir indéfiniment un mot de passe pourtant juste.
-  if (m.includes("banned")) return d.erreurs.compteDesactive
+  // Un compte désactivé doit le savoir, et savoir où écrire. « Identifiants
+  // incorrects » ferait ressaisir indéfiniment un mot de passe pourtant juste,
+  // et un refus sans adresse de contact est une porte fermée sans sonnette.
+  //
+  // Le motif lui-même n'est PAS affiché ici : il faudrait le lire avant toute
+  // authentification, donc le livrer à qui saisit un identifiant au hasard.
+  // C'est par écrit qu'on le donne, à quelqu'un dont on sait qui il est.
+  if (m.includes("banned")) {
+    return remplir(d.erreurs.compteDesactive, { contact })
+  }
   if (m.includes("invalid login credentials"))
     return d.erreurs.identifiantsIncorrects
   if (m.includes("email not confirmed")) return d.erreurs.emailNonConfirme
@@ -47,6 +55,25 @@ function traduire(message: string, d: Dictionnaire): string {
   if (m.includes("rate limit") || m.includes("too many"))
     return d.erreurs.tropDeTentatives
   return d.erreurs.generique
+}
+
+/**
+ * Adresse à laquelle on conteste une décision.
+ *
+ * Lue en base et non codée ici : elle changera le jour où une vraie boîte de
+ * contact existera, et il ne faudra pas redéployer pour ça. En cas de panne,
+ * on retombe sur une chaîne vide plutôt que d'empêcher la connexion — le
+ * message perd sa fin, la porte reste ouverte.
+ */
+async function contactAdministration(): Promise<string> {
+  try {
+    const { contact_administration } = await api<{
+      contact_administration?: string
+    }>("/v1/contact", { sansSession: true })
+    return contact_administration ?? ""
+  } catch {
+    return ""
+  }
 }
 
 export async function seConnecter(
@@ -80,7 +107,7 @@ export async function seConnecter(
     password: motDePasse,
   })
 
-  if (error) return { erreur: traduire(error.message, d) }
+  if (error) return { erreur: traduire(error.message, d, await contactAdministration()) }
 
   revalidatePath("/", "layout")
 
@@ -178,7 +205,7 @@ export async function sInscrire(
     },
   })
 
-  if (error) return { erreur: traduire(error.message, d) }
+  if (error) return { erreur: traduire(error.message, d, await contactAdministration()) }
 
   // Si la confirmation par email est active dans Supabase, aucune session
   // n'est ouverte tout de suite.
