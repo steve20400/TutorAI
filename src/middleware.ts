@@ -59,7 +59,18 @@ export const config = {
      *   - les fichiers internes de Next (_next/static, _next/image)
      *   - l'API, qui n'a pas de langue
      *   - les fichiers statiques (favicon, images, manifeste PWA)
+     *   - `sw.js`, le Service Worker
+     *
+     * Ce dernier mérite son nom en toutes lettres. Sans lui, le middleware
+     * redirigeait /sw.js vers /fr/sw.js, qui n'existe pas : le navigateur
+     * recevait une page HTML à la place du script, refusait de l'enregistrer,
+     * et la reprise des envois ne fonctionnait pas — sans qu'aucune erreur
+     * n'apparaisse nulle part.
+     *
+     * Un Service Worker doit de plus être servi depuis la racine : sa portée
+     * est limitée au dossier d'où il vient, et depuis /fr/ il ne verrait pas
+     * les pages anglaises.
      */
-    "/((?!_next/static|_next/image|api/|favicon.ico|manifest.webmanifest|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico)$).*)",
+    "/((?!_next/static|_next/image|api/|sw\\.js|favicon.ico|manifest.webmanifest|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico)$).*)",
   ],
 }
