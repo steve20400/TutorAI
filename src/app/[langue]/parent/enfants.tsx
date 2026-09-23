@@ -26,10 +26,13 @@ export function Enfants({
   langue,
   d,
   enfants,
+  serviceMuet = false,
 }: {
   langue: Langue
   d: Dictionnaire
   enfants: Enfant[]
+  /** Le service Tuteurs n'a pas répondu. Différent de « aucun enfant ». */
+  serviceMuet?: boolean
 }) {
   const [etat, action, enCours] = useActionState(creerEnfant, ETAT_INITIAL)
   const t = d.parent
@@ -38,7 +41,11 @@ export function Enfants({
     <section className="carte p-5">
       <div className="font-medium">{t.mesEnfants}</div>
 
-      {enfants.length === 0 ? (
+      {serviceMuet ? (
+        // Ne jamais afficher « aucun enfant » quand on n'a pas pu demander :
+        // un parent qui lit ça croit que son enfant a disparu.
+        <p className="doux mt-1 text-sm leading-relaxed">{t.serviceMuet}</p>
+      ) : enfants.length === 0 ? (
         <p className="doux mt-1 text-sm leading-relaxed">{t.aucunEnfant}</p>
       ) : (
         <ul className="mt-3 flex flex-col gap-2">

@@ -10,6 +10,7 @@ import {
   pluriel,
   remplir,
 } from "@/langues"
+import { api } from "@/lib/api"
 import { Enfants, type Enfant } from "./enfants"
 import { supabaseServeur } from "@/lib/supabase/server"
 
@@ -52,22 +53,20 @@ export default async function AccueilParent({
 
   const verifies = count ?? 0
 
-  // Les enfants rattachés. La politique de `liens_familiaux` ne renvoie que
-  // ceux de l'appelant : pas de filtre à écrire ici, et surtout pas à oublier.
-  const { data: liens } = await supabase
-    .from("liens_familiaux")
-    .select("eleve_id")
-    .eq("parent_id", user.id)
-
-  const idsEnfants = (liens ?? []).map((l) => l.eleve_id as string)
-
-  const { data: fichesEnfants } = idsEnfants.length
-    ? await supabase
-        .from("profils")
-        .select("id, prenom, nom, identifiant")
-        .in("id", idsEnfants)
-        .order("prenom")
-    : { data: [] as Enfant[] }
+  // Les enfants viennent du service Tuteurs, qui retransmet le jeton à
+  // Postgres : la politique de `liens_familiaux` ne renvoie que ceux de
+  // l'appelant, donc aucun filtre à écrire ici — ni à oublier.
+  //
+  // Une panne du service ne doit pas emporter la page entière : le reste de
+  // l'espace parent, l'annuaire compris, n'en dépend pas.
+  let enfants: Enfant[] = []
+  let serviceMuet = false
+  try {
+    const rep = await api<{ donnees: Enfant[] }>("/v1/enfants")
+    enfants = rep.donnees
+  } catch {
+    serviceMuet = true
+  }
 
   return (
     <Registre>
@@ -97,7 +96,8 @@ export default async function AccueilParent({
         <Enfants
           langue={langue}
           d={d}
-          enfants={(fichesEnfants ?? []) as Enfant[]}
+          enfants={enfants}
+          serviceMuet={serviceMuet}
         />
       </main>
     </Registre>

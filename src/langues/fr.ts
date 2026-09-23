@@ -171,6 +171,10 @@ export const fr = {
     aucunRepetiteur:
       "Aucun répétiteur vérifié pour l'instant. L'annuaire ouvrira dès que les premiers profils auront passé la vérification.",
     annuaireEtape: "Annuaire — étape 3",
+    serviceMuet:
+      "La liste de vos enfants n'a pas pu être chargée. Réessayez dans un instant — vos comptes ne sont pas perdus.",
+    creationImpossible:
+      "Le compte n'a pas pu être créé : le service n'a pas répondu. Aucun compte n'a été enregistré, vous pouvez recommencer.",
     ajouterEnfant: "Ajouter un enfant",
     prenomEnfant: "Prénom de l'enfant",
     nomEnfant: "Nom (facultatif)",

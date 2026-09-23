@@ -175,6 +175,10 @@ export const en: Dictionnaire = {
     aucunRepetiteur:
       "No verified tutor yet. The directory opens as soon as the first profiles pass the checks.",
     annuaireEtape: "Directory — step 3",
+    serviceMuet:
+      "Your children's list could not be loaded. Try again in a moment — the accounts are not lost.",
+    creationImpossible:
+      "The account could not be created: the service did not respond. Nothing was saved, you can try again.",
     ajouterEnfant: "Add a child",
     prenomEnfant: "Child's first name",
     nomEnfant: "Last name (optional)",
