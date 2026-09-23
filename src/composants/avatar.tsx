@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react"
 
+import { avatarDe, estUnePhoto } from "@/lib/avatars"
 import { useLangue } from "@/langues/contexte"
 
 /**
@@ -62,7 +63,34 @@ export function Avatar({
   const libelle = (nom ?? "").trim()
   const [ouverte, poserOuverte] = useState(false)
 
-  if (!photoUrl) {
+  // Un avatar choisi dans la liste : un dessin, pas une image à télécharger.
+  // Il ne s'agrandit pas non plus — il n'y a rien de plus à en voir.
+  const avatar = avatarDe(photoUrl)
+  if (avatar) {
+    return (
+      <span
+        aria-hidden
+        title={libelle || undefined}
+        className={`grid shrink-0 place-items-center overflow-hidden rounded-full ${className ?? ""}`}
+        style={{ width: taille, height: taille, background: avatar.fond }}
+      >
+        <svg
+          viewBox="0 0 48 48"
+          width={taille}
+          height={taille}
+          fill="none"
+          stroke={avatar.trait}
+          strokeWidth="2.6"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        >
+          <path d={avatar.forme} />
+        </svg>
+      </span>
+    )
+  }
+
+  if (!estUnePhoto(photoUrl)) {
     return (
       <span
         aria-hidden
@@ -84,6 +112,9 @@ export function Avatar({
     )
   }
 
+  // `estUnePhoto` a déjà écarté null et les avatars : c'est bien une image.
+  const url = photoUrl as string
+
   return (
     <>
       <button
@@ -94,7 +125,7 @@ export function Avatar({
       >
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
-          src={photoUrl}
+          src={url}
           alt={libelle}
           width={taille}
           height={taille}
@@ -104,7 +135,7 @@ export function Avatar({
 
       {ouverte ? (
         <VuePhoto
-          url={photoUrl}
+          url={url}
           nom={libelle}
           fermer={() => poserOuverte(false)}
         />

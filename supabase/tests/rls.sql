@@ -642,4 +642,47 @@ set local "request.jwt.claims" = '';
 select verifier('un parent n''ecrit PAS au registre',
                 (select count(*)::int from journal_admin where cible_id = 'parent_ecrit'), 0);
 
+-- ---------------------------------------------------------------------------
+-- Un enfant ne met pas sa photo.
+--
+-- Decision de protection et non d'ergonomie. Une photo d'enfant sur une
+-- plateforme ou des adultes cherchent des eleves est une information dont
+-- personne n'a besoin : ni le repetiteur, qui verra l'enfant en seance, ni le
+-- parent, qui sait a quoi ressemble le sien. Elle ne sert qu'a celui qui
+-- regarde sans raison.
+--
+-- La regle est en base et pas seulement dans l'ecran : un formulaire qui
+-- n'offre pas le champ ne protege rien, l'action derriere accepte quand meme
+-- ce qu'on lui envoie. C'est la lecon de `repetiteurs.statut` et de
+-- `profils.role`, deux fois la meme erreur.
+do $$
+begin
+  update profils set photo_url = 'https://ailleurs.test/enfant.jpg'
+  where id = '11111111-1111-1111-1111-111111111111';
+exception when insufficient_privilege then
+  null;
+end $$;
+
+select verifier('un eleve ne pose PAS de photo',
+                (select count(*)::int from profils
+                  where id = '11111111-1111-1111-1111-111111111111'
+                    and photo_url is not null), 0);
+
+update profils set photo_url = 'avatar:05'
+where id = '11111111-1111-1111-1111-111111111111';
+
+select verifier('un eleve choisit un avatar de la liste',
+                (select count(*)::int from profils
+                  where id = '11111111-1111-1111-1111-111111111111'
+                    and photo_url = 'avatar:05'), 1);
+
+-- Un parent, lui, met sa photo : c'est un adulte qui choisit de se montrer.
+update profils set photo_url = 'https://ailleurs.test/parent.jpg'
+where id = '33333333-3333-3333-3333-333333333333';
+
+select verifier('un parent PEUT poser une photo',
+                (select count(*)::int from profils
+                  where id = '33333333-3333-3333-3333-333333333333'
+                    and photo_url like 'https://%'), 1);
+
 rollback;
