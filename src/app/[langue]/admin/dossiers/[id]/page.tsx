@@ -2,6 +2,7 @@ import Link from "next/link"
 
 import { EnteteAdmin, RienEncore } from "@/composants/admin/entete"
 import { Avatar } from "@/composants/avatar"
+import { LecteurPiece } from "@/composants/admin/lecteur"
 import {
   chemin,
   dictionnaire,
@@ -42,7 +43,15 @@ type FicheComplete = {
     desactive_le: string | null
     motif_desactivation: string | null
   } | null
-  pieces: { type_cle: string; statut: string; motif: string | null }[]
+  pieces: {
+    id: string
+    type_cle: string
+    statut: string
+    motif: string | null
+    /** Nul tant qu'aucun fichier n'a été déposé pour cette pièce. */
+    chemin: string | null
+    deposee_le: string | null
+  }[]
   types: {
     cle: string
     libelle_fr: string
@@ -186,6 +195,21 @@ export default async function PageDossier({
                     ? t.manquante
                     : t.statuts[p.statut as keyof typeof t.statuts]}
                 </div>
+
+                {/* On consulte ici, on ne télécharge que si on en a besoin.
+                    Obliger à télécharger laisserait des copies de cartes
+                    d'identité dans le dossier « Téléchargements » de
+                    quiconque vérifie — sur un ordinateur partagé, c'est
+                    exactement ce qu'il ne faut pas. */}
+                {p ? (
+                  <div className="mt-2.5">
+                    <LecteurPiece
+                      pieceId={p.id}
+                      libelle={libelle}
+                      disponible={Boolean(p.chemin)}
+                    />
+                  </div>
+                ) : null}
               </div>
             )
           })}

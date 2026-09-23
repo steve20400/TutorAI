@@ -357,6 +357,15 @@ export const en: Dictionnaire = {
         illisible: "unreadable",
         refusee: "rejected",
       },
+      consulter: "View",
+      telecharger: "Download",
+      fermerLecteur: "Close",
+      chargementPiece: "Opening…",
+      pieceIllisible:
+        "This document cannot be displayed here. Download it to open it.",
+      pieceAbsente: "No file uploaded for this document.",
+      lienTemporaire:
+        "This link expires in fifteen minutes. Every viewing is recorded in the register.",
       demanderPiece: "Ask for a document",
       refuser: "Reject",
       motifRefus: "Reason for rejection",

@@ -362,6 +362,15 @@ export const fr = {
         illisible: "illisible",
         refusee: "refusée",
       },
+      consulter: "Consulter",
+      telecharger: "Télécharger",
+      fermerLecteur: "Fermer",
+      chargementPiece: "Ouverture…",
+      pieceIllisible:
+        "Ce document ne peut pas s'afficher ici. Téléchargez-le pour l'ouvrir.",
+      pieceAbsente: "Aucun fichier déposé pour cette pièce.",
+      lienTemporaire:
+        "Ce lien expire dans quinze minutes. Chaque consultation est consignée au registre.",
       demanderPiece: "Demander une pièce",
       refuser: "Refuser",
       motifRefus: "Motif du refus",
