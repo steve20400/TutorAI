@@ -3,6 +3,7 @@ import { redirect } from "next/navigation"
 
 import { chemin, dictionnaire, estLangue, LANGUE_PAR_DEFAUT } from "@/langues"
 import { exigerModulePage } from "@/lib/parametres"
+import { api } from "@/lib/api"
 import { supabaseServeur } from "@/lib/supabase/server"
 import { Assistant, type OptionProgramme } from "./assistant"
 
@@ -30,12 +31,9 @@ export default async function PageNouveauTuteur({
 
   // On ne charge que les colonnes d'identification — surtout pas `contenu`,
   // qui pèse plusieurs centaines de kilo-octets par programme.
-  const { data: programmes } = await supabase
-    .from("programmes")
-    .select("id, pays, sous_systeme, niveau, matiere")
-    .eq("publie", true)
-    .order("niveau")
-    .order("matiere")
+  const { donnees: programmes } = await api<{ donnees: OptionProgramme[] }>(
+    "/v1/programmes",
+  )
 
   const options = (programmes ?? []) as OptionProgramme[]
 

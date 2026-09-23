@@ -3,6 +3,7 @@ import { redirect } from "next/navigation"
 
 import { chemin, dictionnaire, estLangue, LANGUE_PAR_DEFAUT } from "@/langues"
 import { exigerModulePage } from "@/lib/parametres"
+import { api } from "@/lib/api"
 import { supabaseServeur } from "@/lib/supabase/server"
 import { demarrerSeance } from "@/actions/seance"
 
@@ -28,20 +29,27 @@ export default async function PageTuteur({
 
   if (!user) redirect(chemin(langue, "/connexion"))
 
-  const { data: tuteur } = await supabase
-    .from("tuteurs_ia")
-    .select("id, matiere, niveau")
-    .eq("id", tuteurId)
-    .single()
+  let reponse: {
+    tuteur: { id: string; matiere: string; niveau: string } | null
+    seances: {
+      id: string
+      statut: string
+      lecon_titre: string | null
+      demarree_le: string | null
+    }[]
+  } | null = null
+  try {
+    reponse = await api(`/v1/tuteurs/${tuteurId}`)
+  } catch {
+    reponse = null
+  }
 
+  const tuteur = reponse?.tuteur ?? null
+  const seances = reponse?.seances ?? []
+
+  // Tuteur inconnu, ou service muet : on repart de la liste plutôt que
+  // d'afficher un écran à moitié rempli.
   if (!tuteur) redirect(chemin(langue, "/tuteur"))
-
-  const { data: seances } = await supabase
-    .from("seances")
-    .select("id, statut, lecon_titre, demarree_le")
-    .eq("tuteur_id", tuteur.id)
-    .order("demarree_le", { ascending: false })
-    .limit(20)
 
   const enCours = seances?.find((s) => s.statut === "en_cours")
   const passees = (seances ?? []).filter((s) => s.statut !== "en_cours")
@@ -101,13 +109,17 @@ export default async function PageTuteur({
                     {s.lecon_titre ?? d.tuteur.leconNonIdentifiee}
                   </span>
                   {/* La date suit la langue de la page : « 4 mars » en
-                      français, « 4 March » en anglais. */}
-                  <span className="doux mt-0.5 block text-xs">
-                    {new Date(s.demarree_le).toLocaleDateString(langue, {
-                      day: "numeric",
-                      month: "long",
-                    })}
-                  </span>
+                      français, « 4 March » en anglais. Une séance créée mais
+                      jamais démarrée n'en a pas — on n'affiche alors rien
+                      plutôt que le 1er janvier 1970. */}
+                  {s.demarree_le ? (
+                    <span className="doux mt-0.5 block text-xs">
+                      {new Date(s.demarree_le).toLocaleDateString(langue, {
+                        day: "numeric",
+                        month: "long",
+                      })}
+                    </span>
+                  ) : null}
                 </Link>
               </li>
             ))}

@@ -38,20 +38,18 @@ export default async function AccueilParent({
 
   if (!user) redirect(chemin(langue, "/connexion"))
 
-  const { data: profil } = await supabase
-    .from("profils")
-    .select("prenom, role")
-    .eq("id", user.id)
-    .single()
+  const profil = await api<{ prenom: string | null; role: string }>("/v1/moi")
 
-  if (profil?.role !== "parent") redirect(chemin(langue, "/"))
+  if (profil.role !== "parent") redirect(chemin(langue, "/"))
 
-  const { count } = await supabase
-    .from("repetiteurs")
-    .select("id", { count: "exact", head: true })
-    .eq("statut", "verifie")
-
-  const verifies = count ?? 0
+  // L'annuaire compte les fiches que ce parent peut réellement voir : la
+  // politique écarte déjà les non vérifiées, les impayées et les comptes
+  // désactivés. Compter en direct donnerait un nombre plus grand que la liste
+  // qui suit — et un écart entre les deux se lit comme un bug.
+  const { pagination } = await api<{ pagination: { total: number } }>(
+    "/v1/repetiteurs?parPage=1",
+  )
+  const verifies = pagination.total
 
   // Les enfants viennent du service Tuteurs, qui retransmet le jeton à
   // Postgres : la politique de `liens_familiaux` ne renvoie que ceux de
@@ -74,7 +72,7 @@ export default async function AccueilParent({
         <header className="flex items-baseline justify-between pt-6">
           <div>
             <h1 className="text-2xl font-medium">
-              {remplir(d.parent.bonjour, { prenom: profil.prenom })}
+              {remplir(d.parent.bonjour, { prenom: profil.prenom ?? "" })}
             </h1>
             <p className="doux mt-0.5 text-sm">{d.parent.espace}</p>
           </div>

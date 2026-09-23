@@ -10,6 +10,7 @@ import {
   LANGUE_PAR_DEFAUT,
   remplir,
 } from "@/langues"
+import { api } from "@/lib/api"
 import { lireParametres } from "@/lib/parametres"
 import { supabaseServeur } from "@/lib/supabase/server"
 
@@ -43,11 +44,11 @@ export default async function Accueil({
   // n'en a pas n'aurait pas trouvé son chemin.
   if (!user) redirect(chemin(langue, "/inscription"))
 
-  const { data: profil } = await supabase
-    .from("profils")
-    .select("prenom, role, photo_url")
-    .eq("id", user.id)
-    .single()
+  const profil = await api<{
+    prenom: string | null
+    role: string
+    photo_url: string | null
+  }>("/v1/moi")
 
   // Chaque rôle a son chez-soi, et la racine n'est celui que de l'élève.
   //
@@ -56,17 +57,10 @@ export default async function Accueil({
   // partagé, ou simplement en effaçant la fin de l'adresse — tombait sur
   // l'accueil élève, avec un message qui ne le concernait pas : « ton espace
   // s'ouvrira quand un parent t'aura rattaché à son compte ».
-  if (profil?.role === "admin") redirect(chemin(langue, "/admin"))
-  if (profil?.role === "parent") redirect(chemin(langue, "/parent"))
-  if (profil?.role === "repetiteur") redirect(chemin(langue, "/repetiteur/profil"))
+  if (profil.role === "admin") redirect(chemin(langue, "/admin"))
+  if (profil.role === "parent") redirect(chemin(langue, "/parent"))
+  if (profil.role === "repetiteur") redirect(chemin(langue, "/repetiteur/profil"))
 
-  const { data: tuteurs } = await supabase
-    .from("tuteurs_ia")
-    .select("id, matiere, niveau")
-    .eq("eleve_id", user.id)
-    .order("cree_le", { ascending: true })
-
-  const premier = tuteurs?.[0]
 
   // Les entrées du tuteur IA ne s'affichent que si le module est allumé. Les
   // routes derrière refusent déjà, mais proposer un lien qui renvoie à la page
@@ -75,12 +69,26 @@ export default async function Accueil({
   // tuteur », alors qu'il n'aurait jamais dû voir l'entrée.
   const { ia_active } = await lireParametres()
 
+  // La liste des tuteurs ne sert qu'à savoir s'il en existe un : le module
+  // peut être éteint, auquel cas on n'affiche pas l'entrée du tout.
+  let tuteurs: { matiere: string; niveau: string }[] = []
+  if (ia_active) {
+    try {
+      const rep = await api<{ donnees: typeof tuteurs }>("/v1/tuteurs")
+      tuteurs = rep.donnees
+    } catch {
+      tuteurs = []
+    }
+  }
+
+  const premier = tuteurs[0]
+
   return (
     <main className="mx-auto flex min-h-dvh max-w-md flex-col gap-4 p-6">
       <header className="flex items-baseline justify-between pt-8">
         <div>
           <h1 className="text-2xl font-medium">
-            {remplir(d.accueil.bonjour, { prenom: profil?.prenom ?? "" })}
+            {remplir(d.accueil.bonjour, { prenom: profil.prenom ?? "" })}
           </h1>
           <p className="doux mt-1 text-sm">{d.accueil.question}</p>
         </div>
@@ -94,8 +102,8 @@ export default async function Accueil({
             className="transition hover:opacity-80"
           >
             <Avatar
-              nom={profil?.prenom ?? ""}
-              photoUrl={profil?.photo_url ?? null}
+              nom={profil.prenom ?? ""}
+              photoUrl={profil.photo_url}
               taille={32}
             />
           </Link>

@@ -3,6 +3,7 @@ import { redirect } from "next/navigation"
 
 import { chemin, dictionnaire, estLangue, LANGUE_PAR_DEFAUT } from "@/langues"
 import { exigerModulePage } from "@/lib/parametres"
+import { api } from "@/lib/api"
 import { supabaseServeur } from "@/lib/supabase/server"
 
 export default async function PageTuteurs({
@@ -27,11 +28,9 @@ export default async function PageTuteurs({
 
   if (!user) redirect(chemin(langue, "/connexion"))
 
-  const { data: tuteurs } = await supabase
-    .from("tuteurs_ia")
-    .select("id, matiere, niveau, manuels")
-    .eq("eleve_id", user.id)
-    .order("cree_le", { ascending: true })
+  const { donnees: tuteurs } = await api<{
+    donnees: { id: string; matiere: string; niveau: string; manuels: unknown }[]
+  }>("/v1/tuteurs")
 
   if (!tuteurs || tuteurs.length === 0) {
     redirect(chemin(langue, "/tuteur/nouveau"))
