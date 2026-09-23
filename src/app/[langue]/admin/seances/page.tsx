@@ -6,6 +6,14 @@ import {
   pluriel,
 } from "@/langues"
 import { exigerAdmin } from "@/lib/admin"
+import { api } from "@/lib/api"
+
+type Seance = {
+  id: string
+  contrat_id: string
+  demarree_le: string | null
+  terminee_le: string | null
+}
 
 export default async function PageSeances({
   params,
@@ -17,15 +25,11 @@ export default async function PageSeances({
   const d = dictionnaire(langue)
   const t = d.adminPages.seances
 
-  const { supabase } = await exigerAdmin(langue)
+  await exigerAdmin(langue)
 
-  const { data: seances } = await supabase
-    .from("seances_humaines")
-    .select("id, demarree_le, terminee_le")
-    .not("demarree_le", "is", null)
-    .is("terminee_le", null)
-
-  const enCours = seances ?? []
+  const { donnees: enCours } = await api<{ donnees: Seance[] }>(
+    "/v1/seances?enCours=true",
+  )
 
   if (enCours.length === 0) {
     return (

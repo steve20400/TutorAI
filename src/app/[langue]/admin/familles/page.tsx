@@ -7,6 +7,17 @@ import {
   pluriel,
 } from "@/langues"
 import { exigerAdmin } from "@/lib/admin"
+import { api } from "@/lib/api"
+
+type Famille = {
+  id: string
+  prenom: string | null
+  nom: string | null
+  pays: string | null
+  identifiant: string | null
+  desactive_le: string | null
+  enfants: { id: string; prenom: string | null; nom: string | null }[]
+}
 
 export default async function PageFamilles({
   params,
@@ -18,23 +29,17 @@ export default async function PageFamilles({
   const d = dictionnaire(langue)
   const t = d.adminPages.familles
 
-  const { supabase } = await exigerAdmin(langue)
+  await exigerAdmin(langue)
 
-  const [{ data: parents }, { data: liens }] = await Promise.all([
-    supabase
-      .from("profils")
-      .select("id, prenom, nom, pays")
-      .eq("role", "parent")
-      .order("prenom"),
-    supabase.from("liens_familiaux").select("parent_id, eleve_id"),
-  ])
+  // Le service renvoie les enfants avec chaque parent : ni second appel, ni
+  // rapprochement à refaire ici.
+  const { donnees: liste } = await api<{ donnees: Famille[] }>(
+    "/v1/admin/familles",
+  )
 
-  const liste = parents ?? []
-
-  const enfantsPar = new Map<string, number>()
-  for (const l of liens ?? []) {
-    enfantsPar.set(l.parent_id, (enfantsPar.get(l.parent_id) ?? 0) + 1)
-  }
+  const enfantsPar = new Map<string, number>(
+    liste.map((p) => [p.id, p.enfants.length]),
+  )
 
   if (liste.length === 0) {
     return (

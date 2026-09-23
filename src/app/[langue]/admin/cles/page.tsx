@@ -2,6 +2,7 @@ import { poserCle } from "@/actions/admin"
 import { EnteteAdmin } from "@/composants/admin/entete"
 import { dictionnaire, estLangue, LANGUE_PAR_DEFAUT, type Langue } from "@/langues"
 import { exigerAdmin } from "@/lib/admin"
+import { api } from "@/lib/api"
 
 type Cle = {
   nom: string
@@ -23,14 +24,13 @@ export default async function PageCles({
   const d = dictionnaire(langue)
   const t = d.adminPages.cles
 
-  const { supabase } = await exigerAdmin(langue)
+  await exigerAdmin(langue)
 
-  // Par `lister_cles` et non par un `select` : la politique de lecture
-  // n'ouvre que les clés publiques, donc un select direct n'aurait montré ni
-  // Anthropic ni les agrégateurs — et la page aurait affiché « non
-  // renseignée » pour une clé qui fonctionne. La fonction renvoie tout sauf
-  // la valeur, que personne ne relit.
-  const { data } = await supabase.rpc("lister_cles")
+  // Le service appelle `lister_cles`, qui ne renvoie jamais la colonne
+  // `valeur` — pas même à l'administration. Une clé secrète lue dans un
+  // navigateur d'administrateur est une clé lue par toutes les extensions
+  // qu'il y a installées.
+  const { donnees: data } = await api<{ donnees: Cle[] }>("/v1/admin/cles")
 
   const cles = ((data ?? []) as Cle[]).sort(
     (a, b) => ORDRE.indexOf(a.nom) - ORDRE.indexOf(b.nom),

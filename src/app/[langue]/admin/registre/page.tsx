@@ -1,12 +1,23 @@
 import { EnteteAdmin, RienEncore } from "@/composants/admin/entete"
 import { dictionnaire, estLangue, LANGUE_PAR_DEFAUT } from "@/langues"
 import { exigerAdmin } from "@/lib/admin"
+import { api } from "@/lib/api"
 
 const COULEUR_ACTION: Record<string, string> = {
   verification: "var(--accent-doux-texte)",
   refus: "var(--erreur-texte)",
   activation: "var(--accent)",
   desactivation: "var(--texte-doux)",
+}
+
+type LigneRegistre = {
+  id: number
+  admin_id: string | null
+  action: string
+  cible_type: string | null
+  cible_id: string | null
+  motif: string | null
+  cree_le: string
 }
 
 export default async function PageRegistre({
@@ -19,15 +30,11 @@ export default async function PageRegistre({
   const d = dictionnaire(langue)
   const t = d.adminPages.registre
 
-  const { supabase } = await exigerAdmin(langue)
+  await exigerAdmin(langue)
 
-  const { data: lignes } = await supabase
-    .from("journal_admin")
-    .select("id, action, cible_type, cible_id, motif, cree_le, admin_id")
-    .order("cree_le", { ascending: false })
-    .limit(80)
-
-  const liste = lignes ?? []
+  const { donnees: liste } = await api<{ donnees: LigneRegistre[] }>(
+    "/v1/admin/registre?limite=80",
+  )
 
   if (liste.length === 0) {
     return (

@@ -11,6 +11,7 @@ import {
   remplir,
 } from "@/langues"
 import { exigerAdmin } from "@/lib/admin"
+import { api } from "@/lib/api"
 import { lireParametres } from "@/lib/parametres"
 
 export default async function TableauDeBord({
@@ -23,69 +24,27 @@ export default async function TableauDeBord({
   const d = dictionnaire(langue)
   const t = d.adminPages.tableauDeBord
 
-  const { supabase } = await exigerAdmin(langue)
+  await exigerAdmin(langue)
   const parametres = await lireParametres()
 
-  const [attente, verifies, familles, enCours, villes, cles] = await Promise.all([
-    supabase
-      .from("repetiteurs")
-      .select("id", { count: "exact", head: true })
-      .eq("statut", "en_attente"),
-    supabase.from("repetiteurs").select("ville").eq("statut", "verifie"),
-    supabase
-      .from("profils")
-      .select("id", { count: "exact", head: true })
-      .eq("role", "parent"),
-    supabase
-      .from("seances_humaines")
-      .select("id", { count: "exact", head: true })
-      .not("demarree_le", "is", null)
-      .is("terminee_le", null),
-    supabase
-      .from("villes")
-      .select("nom, lon, lat")
-      .eq("visible", true)
-      .order("nom"),
-    supabase
-      .from("cles_api")
-      .select("nom, valeur")
-      .in("nom", ["carte_style", "carte_cle"]),
-  ])
+  // Tout l'écran en un appel : six requêtes séparées voudraient dire six
+  // allers-retours vers un service qui peut dormir cinquante secondes.
+  const tb = await api<{
+    aVerifier: number
+    familles: number
+    seancesEnCours: number
+    villes: { nom: string; lon: number | null; lat: number | null }[]
+    comptes: Record<string, number>
+    styleCarte: string
+  }>("/v1/admin/tableau-de-bord")
 
-  const aVerifier = attente.count ?? 0
-  const nbFamilles = familles.count ?? 0
-  const nbEnCours = enCours.count ?? 0
+  const aVerifier = tb.aVerifier
+  const nbFamilles = tb.familles
+  const nbEnCours = tb.seancesEnCours
+  const ouvertes = tb.villes
+  const comptes = tb.comptes
+  const styleCarte = tb.styleCarte
 
-  const ouvertes = (villes.data ?? []) as {
-    nom: string
-    lon: number | null
-    lat: number | null
-  }[]
-
-  // Le style de la carte vient de la base : changer de fournisseur de tuiles,
-  // ou passer à des tuiles hébergées à la maison, ne doit pas demander un
-  // déploiement. `{cle}` y est remplacé par la clé du fournisseur — beaucoup
-  // l'attendent en paramètre d'URL, et aucun ne s'accorde sur son nom.
-  const parNom = new Map(
-    ((cles.data ?? []) as { nom: string; valeur: string | null }[]).map((c) => [
-      c.nom,
-      c.valeur,
-    ]),
-  )
-  const styleCarte = (
-    parNom.get("carte_style") ?? "https://demotiles.maplibre.org/style.json"
-  ).replace("{cle}", parNom.get("carte_cle") ?? "")
-
-  // Répartition par ville, calculée ici : la base ne sait pas regrouper sans
-  // vue dédiée, et le volume reste minuscule pendant des années.
-  //
-  // Un objet et non une Map : une Map ne franchit pas la frontière vers un
-  // composant client, elle y arriverait vide.
-  const comptes: Record<string, number> = {}
-  for (const r of verifies.data ?? []) {
-    const ville = (r.ville ?? "").trim()
-    if (ville) comptes[ville] = (comptes[ville] ?? 0) + 1
-  }
   // Classement des villes ouvertes, les mieux pourvues d'abord. Les villes à
   // zéro restent dans la liste, en bas : ce sont elles qui appellent une
   // décision.

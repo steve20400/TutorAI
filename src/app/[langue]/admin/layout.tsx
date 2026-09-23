@@ -1,6 +1,7 @@
 import { BarreAdmin } from "@/composants/admin/barre"
 import { dictionnaire, estLangue, LANGUE_PAR_DEFAUT } from "@/langues"
 import { exigerAdmin } from "@/lib/admin"
+import { api } from "@/lib/api"
 
 /**
  * Coquille de l'espace d'administration.
@@ -20,14 +21,20 @@ export default async function LayoutAdmin({
   const langue = estLangue(brut) ? brut : LANGUE_PAR_DEFAUT
   const d = dictionnaire(langue)
 
-  const { supabase, profil } = await exigerAdmin(langue)
+  const profil = await exigerAdmin(langue)
 
   // Le compteur de la barre : il doit être juste sur toutes les pages, donc il
   // se lit ici et non dans la page des dossiers.
-  const { count } = await supabase
-    .from("repetiteurs")
-    .select("id", { count: "exact", head: true })
-    .eq("statut", "en_attente")
+  //
+  // Une panne du service ne doit pas fermer l'administration : la garde a déjà
+  // vérifié le rôle, et une pastille manquante vaut mieux qu'un écran blanc.
+  let count = 0
+  try {
+    const { donnees } = await api<{ donnees: unknown[] }>("/v1/admin/dossiers")
+    count = donnees.length
+  } catch {
+    count = 0
+  }
 
   return (
     <div
@@ -42,7 +49,7 @@ export default async function LayoutAdmin({
         identifiant={profil.identifiant}
         nom={profil.prenom}
         photoUrl={null}
-        aVerifier={count ?? 0}
+        aVerifier={count}
       />
       <main className="flex-1 overflow-y-auto">{children}</main>
     </div>

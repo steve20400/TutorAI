@@ -11,6 +11,7 @@ import {
   remplir,
 } from "@/langues"
 import { exigerAdmin } from "@/lib/admin"
+import { api } from "@/lib/api"
 
 const FILTRES = ["tous", "en_attente", "verifie", "refuse"] as const
 
@@ -19,6 +20,22 @@ const COULEUR_STATUT: Record<string, string> = {
   en_attente: "var(--voyant)",
   refuse: "var(--erreur-texte)",
   brouillon: "var(--texte-doux)",
+}
+
+type Fiche = {
+  id: string
+  ville: string | null
+  matieres: string[] | null
+  niveaux: string[] | null
+  statut: string
+  verifie_le: string | null
+  cree_le: string
+  profil: {
+    prenom: string | null
+    nom: string | null
+    identifiant: string | null
+    desactive_le: string | null
+  } | null
 }
 
 export default async function PageRepetiteurs({
@@ -34,29 +51,23 @@ export default async function PageRepetiteurs({
   const d = dictionnaire(langue)
   const t = d.adminPages.repetiteurs
 
-  const { supabase } = await exigerAdmin(langue)
+  await exigerAdmin(langue)
 
-  let requete = supabase
-    .from("repetiteurs")
-    .select("id, ville, matieres, statut")
-    .order("maj_le", { ascending: false })
+  // Le filtre s'applique ici et non dans l'appel : le service renvoie tout
+  // l'annuaire en une fois, et filtrer côté Render obligerait à un
+  // aller-retour à chaque clic sur une pastille — sur un service qui peut
+  // dormir, chaque changement de filtre coûterait une minute.
+  const { donnees: toutes } = await api<{ donnees: Fiche[] }>(
+    "/v1/admin/repetiteurs",
+  )
 
-  if ((FILTRES as readonly string[]).includes(filtre) && filtre !== "tous") {
-    requete = requete.eq("statut", filtre)
-  }
+  const liste =
+    (FILTRES as readonly string[]).includes(filtre) && filtre !== "tous"
+      ? toutes.filter((r) => r.statut === filtre)
+      : toutes
 
-  const { data: fiches } = await requete
-  const liste = fiches ?? []
-
-  const { data: profils } = await supabase
-    .from("profils")
-    .select("id, prenom, nom")
-    .in("id", liste.length ? liste.map((r) => r.id) : ["00000000-0000-0000-0000-000000000000"])
-
-  const nomDe = (id: string) => {
-    const p = profils?.find((x) => x.id === id)
-    return [p?.prenom, p?.nom].filter(Boolean).join(" ") || "—"
-  }
+  const nomDe = (r: Fiche) =>
+    [r.profil?.prenom, r.profil?.nom].filter(Boolean).join(" ") || "—"
 
   // La recherche porte sur le nom, la ville et les matières. Elle se fait ici
   // plutôt qu'en base : le volume reste petit des années, et une recherche en
@@ -65,7 +76,7 @@ export default async function PageRepetiteurs({
   const visibles = terme
     ? liste.filter((r) =>
         [
-          nomDe(r.id),
+          nomDe(r),
           r.ville ?? "",
           ...(r.matieres ?? []).map((m: string) => d.matieres[m] ?? m),
         ]
@@ -149,7 +160,7 @@ export default async function PageRepetiteurs({
                       href={chemin(langue, `/admin/dossiers/${r.id}`)}
                       className="transition hover:opacity-70"
                     >
-                      {nomDe(r.id)}
+                      {nomDe(r)}
                     </Link>
                   </td>
                   <td className="doux truncate py-2.5">{r.ville ?? "—"}</td>

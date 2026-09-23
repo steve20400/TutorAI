@@ -2,7 +2,14 @@ import { EnteteAdmin } from "@/composants/admin/entete"
 import { FormulaireFacturation } from "@/composants/admin/facturation"
 import { dictionnaire, estLangue, LANGUE_PAR_DEFAUT } from "@/langues"
 import { exigerAdmin } from "@/lib/admin"
+import { api } from "@/lib/api"
 import { lireParametres } from "@/lib/parametres"
+
+type Facturation = {
+  mode: string
+  montant_par_eleve: number
+  delai_masquage_jours: number
+}
 
 export default async function PageFacturation({
   params,
@@ -14,14 +21,10 @@ export default async function PageFacturation({
   const d = dictionnaire(langue)
   const t = d.adminPages.facturation
 
-  const { supabase } = await exigerAdmin(langue)
+  await exigerAdmin(langue)
   const parametres = await lireParametres()
 
-  const { data: facturation } = await supabase
-    .from("facturation")
-    .select("mode, montant_par_eleve, delai_masquage_jours")
-    .eq("id", 1)
-    .single()
+  const facturation = await api<Facturation>("/v1/admin/facturation")
 
   return (
     <>

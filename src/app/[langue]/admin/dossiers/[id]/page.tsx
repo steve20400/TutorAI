@@ -10,12 +10,45 @@ import {
   remplir,
 } from "@/langues"
 import { exigerAdmin } from "@/lib/admin"
+import { api } from "@/lib/api"
 import {
   apposerCachet,
   desactiverCompte,
   reactiverCompte,
   refuserDossier,
 } from "@/actions/admin"
+
+type FicheComplete = {
+  fiche: {
+    id: string
+    ville: string | null
+    bio: string | null
+    matieres: string[] | null
+    niveaux: string[] | null
+    tarif_mensuel: number | null
+    annees_experience: number | null
+    disponibilites_texte: string | null
+    statut: string
+    verifie_le: string | null
+    motif_refus: string | null
+  } | null
+  profil: {
+    prenom: string | null
+    nom: string | null
+    identifiant: string | null
+    telephone: string | null
+    desactive_le: string | null
+    motif_desactivation: string | null
+  } | null
+  pieces: { type_cle: string; statut: string; motif: string | null }[]
+  types: {
+    cle: string
+    libelle_fr: string
+    libelle_en: string
+    requise: boolean
+    ordre: number
+  }[]
+}
 
 export default async function PageDossier({
   params,
@@ -27,25 +60,23 @@ export default async function PageDossier({
   const d = dictionnaire(langue)
   const t = d.adminPages.dossier
 
-  const { supabase } = await exigerAdmin(langue)
+  await exigerAdmin(langue)
 
-  const [{ data: fiche }, { data: types }, { data: pieces }] = await Promise.all([
-    supabase
-      .from("repetiteurs")
-      .select(
-        "id, ville, bio, matieres, niveaux, tarif_mensuel, annees_experience, disponibilites_texte, statut",
-      )
-      .eq("id", id)
-      .maybeSingle(),
-    supabase
-      .from("types_pieces")
-      .select("cle, libelle_fr, libelle_en, requise, ordre")
-      .order("ordre"),
-    supabase
-      .from("pieces_justificatives")
-      .select("type_cle, statut, motif")
-      .eq("repetiteur_id", id),
-  ])
+  // Une seule requête pour tout l'écran : la fiche, l'identité, les pièces
+  // déposées et celles qui sont attendues. Quatre allers-retours vers un
+  // service qui peut dormir auraient rendu ce dossier plus long à ouvrir
+  // qu'à traiter.
+  let reponse: FicheComplete | null = null
+  try {
+    reponse = await api<FicheComplete>(`/v1/admin/dossiers/${id}`)
+  } catch {
+    reponse = null
+  }
+
+  const fiche = reponse?.fiche ?? null
+  const types = reponse?.types ?? []
+  const pieces = reponse?.pieces ?? []
+  const profil = reponse?.profil ?? null
 
   if (!fiche) {
     return (
@@ -56,11 +87,6 @@ export default async function PageDossier({
     )
   }
 
-  const { data: profil } = await supabase
-    .from("profils")
-    .select("prenom, nom, desactive_le")
-    .eq("id", id)
-    .maybeSingle()
 
   const nom = [profil?.prenom, profil?.nom].filter(Boolean).join(" ") || "—"
   const deposees = new Map((pieces ?? []).map((p) => [p.type_cle, p]))

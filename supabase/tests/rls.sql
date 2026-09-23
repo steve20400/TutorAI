@@ -567,4 +567,79 @@ select verifier('l''enfant n''a aucune adresse mail reelle',
                   where p.prenom = 'Essai'
                     and u.email not like '%@eleves.tutela.cm'), 0);
 
+-- ---------------------------------------------------------------------------
+-- Le registre doit pouvoir s'écrire.
+--
+-- Il a porté une politique de lecture et aucune d'écriture pendant tout le
+-- developpement. Postgres refusait donc chaque `insert` — et un `insert` sans
+-- `select` ne leve rien : la reponse est 201, zero ligne affectee, personne ne
+-- le remarque. Aucun cachet, aucun refus, aucun module allume n'a ete
+-- consigne. Les seules entrees venaient des fonctions `security definer`, qui
+-- passent outre.
+--
+-- « Chaque decision est consignee » est la promesse la plus facile a faire et
+-- la plus dure a tenir : elle ne vaut que si l'ecriture est verifiee.
+-- Un administrateur de test. Il n'y en avait pas : les fixtures ne créent
+-- qu'un élève, un parent et deux répétiteurs, et le rôle `admin` ne s'obtient
+-- jamais par inscription — c'est précisément ce que protège le déclencheur
+-- posé en 004.
+insert into auth.users (id, instance_id, aud, role, email, raw_user_meta_data)
+values ('99999999-9999-9999-9999-999999999999',
+        '00000000-0000-0000-0000-000000000000', 'authenticated',
+        'authenticated', 'admin@test.local',
+        '{"prenom":"Registre","role":"eleve"}');
+
+update profils set role = 'admin'
+where id = '99999999-9999-9999-9999-999999999999';
+
+set local role authenticated;
+set local "request.jwt.claims" = '{"sub":"99999999-9999-9999-9999-999999999999","role":"authenticated"}';
+
+insert into journal_admin (admin_id, action, cible_type, cible_id)
+values ('99999999-9999-9999-9999-999999999999', 'essai', 'parametre', 'essai_cle');
+
+select verifier('l''administration ecrit au registre',
+                (select count(*)::int from journal_admin where cible_id = 'essai_cle'), 1);
+
+reset role;
+set local "request.jwt.claims" = '';
+
+-- On ne journalise pas au nom d'un autre : sans cette condition, une decision
+-- pourrait etre inscrite sous l'identite d'un collegue, ce qui retire au
+-- registre la seule chose qu'on lui demande — dire qui a decide.
+set local role authenticated;
+set local "request.jwt.claims" = '{"sub":"99999999-9999-9999-9999-999999999999","role":"authenticated"}';
+
+do $$
+begin
+  insert into journal_admin (admin_id, action, cible_type, cible_id)
+  values ('33333333-3333-3333-3333-333333333333', 'usurpation', 'parametre', 'vol');
+exception when insufficient_privilege then
+  null;
+end $$;
+
+reset role;
+set local "request.jwt.claims" = '';
+
+select verifier('un admin ne journalise PAS au nom d''un autre',
+                (select count(*)::int from journal_admin where cible_id = 'vol'), 0);
+
+-- Un parent n'ecrit rien au registre, evidemment.
+set local role authenticated;
+set local "request.jwt.claims" = '{"sub":"33333333-3333-3333-3333-333333333333","role":"authenticated"}';
+
+do $$
+begin
+  insert into journal_admin (admin_id, action, cible_type, cible_id)
+  values ('33333333-3333-3333-3333-333333333333', 'essai', 'parametre', 'parent_ecrit');
+exception when insufficient_privilege then
+  null;
+end $$;
+
+reset role;
+set local "request.jwt.claims" = '';
+
+select verifier('un parent n''ecrit PAS au registre',
+                (select count(*)::int from journal_admin where cible_id = 'parent_ecrit'), 0);
+
 rollback;

@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation"
 
 import { chemin, type Langue } from "@/langues"
-import { supabaseServeur } from "./supabase/server"
+import { api } from "./api"
 
 /**
  * Paramètres réglables depuis l'espace d'administration, sans redéploiement.
@@ -41,13 +41,10 @@ const DEFAUTS: Parametres = {
  */
 export async function lireParametres(): Promise<Parametres> {
   try {
-    const supabase = await supabaseServeur()
-    const { data } = await supabase.from("parametres").select("cle, valeur")
-
-    if (!data) return DEFAUTS
-
-    const lus = Object.fromEntries(data.map((p) => [p.cle, p.valeur]))
-    return { ...DEFAUTS, ...lus } as Parametres
+    const lus = await api<Partial<Parametres>>("/v1/parametres", {
+      sansSession: true,
+    })
+    return { ...DEFAUTS, ...lus }
   } catch {
     return DEFAUTS
   }

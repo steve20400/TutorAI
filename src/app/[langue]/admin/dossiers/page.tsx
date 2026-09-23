@@ -9,6 +9,7 @@ import {
   remplir,
 } from "@/langues"
 import { exigerAdmin } from "@/lib/admin"
+import { api } from "@/lib/api"
 
 /** Décalages de la pile. Au-delà, l'œil ne distingue plus les épaisseurs. */
 const EPAISSEURS = [
@@ -19,9 +20,31 @@ const EPAISSEURS = [
   { x: 5, y: 4, r: 0.9 },
 ]
 
-function joursDepuis(date: string): number {
-  const ms = Date.now() - new Date(date).getTime()
-  return Math.floor(ms / 86_400_000)
+/** `maj_le` peut être nul sur une fiche jamais modifiée : on retombe alors
+ *  sur sa date de création, jamais sur « aujourd'hui » — un dossier déposé il
+ *  y a trois semaines ne doit pas se présenter comme arrivé ce matin. */
+function joursDepuis(date: string | null, repli: string): number {
+  const ms = Date.now() - new Date(date ?? repli).getTime()
+  return Math.max(0, Math.floor(ms / 86_400_000))
+}
+
+/** Ce que le service renvoie pour une fiche, identité comprise. */
+type Dossier = {
+  id: string
+  ville: string | null
+  matieres: string[] | null
+  niveaux: string[] | null
+  annees_experience: number | null
+  tarif_mensuel: number | null
+  statut: string
+  cree_le: string
+  maj_le: string | null
+  profil: {
+    prenom: string | null
+    nom: string | null
+    identifiant: string | null
+    desactive_le: string | null
+  } | null
 }
 
 export default async function PageDossiers({
@@ -34,17 +57,11 @@ export default async function PageDossiers({
   const d = dictionnaire(langue)
   const t = d.adminPages.dossiers
 
-  const { supabase } = await exigerAdmin(langue)
+  await exigerAdmin(langue)
 
-  const { data: dossiers } = await supabase
-    .from("repetiteurs")
-    .select(
-      "id, ville, matieres, niveaux, annees_experience, tarif_mensuel, cree_le, maj_le",
-    )
-    .eq("statut", "en_attente")
-    .order("maj_le", { ascending: true })
-
-  const liste = dossiers ?? []
+  const { donnees: liste } = await api<{ donnees: Dossier[] }>(
+    "/v1/admin/dossiers?statut=en_attente",
+  )
   const premier = liste[0]
 
   if (!premier) {
@@ -56,17 +73,12 @@ export default async function PageDossiers({
     )
   }
 
-  const { data: profils } = await supabase
-    .from("profils")
-    .select("id, prenom, nom")
-    .in("id", liste.map((r) => r.id))
 
-  const nomDe = (id: string) => {
-    const p = profils?.find((x) => x.id === id)
-    return [p?.prenom, p?.nom].filter(Boolean).join(" ") || "—"
-  }
+  // L'identité arrive avec la fiche : plus de second appel à rapprocher.
+  const nomDe = (d: Dossier) =>
+    [d.profil?.prenom, d.profil?.nom].filter(Boolean).join(" ") || "—"
 
-  const jours = joursDepuis(premier.maj_le)
+  const jours = joursDepuis(premier.maj_le, premier.cree_le)
   const restants = liste.slice(1)
 
   return (
@@ -116,7 +128,7 @@ export default async function PageDossiers({
                 : remplir(t.depose, { jours })}
             </div>
             <h2 className="mt-2 text-[17px] font-semibold">
-              {nomDe(premier.id)}
+              {nomDe(premier)}
             </h2>
             <p className="doux mt-1 truncate text-[12.5px]">
               {(premier.niveaux ?? [])
@@ -161,7 +173,7 @@ export default async function PageDossiers({
                   style={{ borderColor: "var(--bordure)" }}
                 >
                   <span className="min-w-0 flex-1 truncate font-medium">
-                    {nomDe(r.id)}
+                    {nomDe(r)}
                   </span>
                   <span className="doux shrink-0">{r.ville ?? "—"}</span>
                 </Link>
