@@ -685,4 +685,28 @@ select verifier('un parent PEUT poser une photo',
                   where id = '33333333-3333-3333-3333-333333333333'
                     and photo_url like 'https://%'), 1);
 
+-- ── Les coffres ─────────────────────────────────────────────────────────────
+-- Une politique de suppression ne sert à rien sans politique de lecture :
+-- l'API de stockage liste avant d'effacer, et cette liste passe par la RLS.
+-- « Retirer sa photo » a ainsi passé des jours à ne rien retirer du tout.
+select verifier('on peut relire ses photos, donc les effacer',
+                (select count(*)::int from pg_policies
+                  where schemaname = 'storage' and tablename = 'objects'
+                    and cmd = 'SELECT' and qual like '%photos%'), 1);
+
+select verifier('chaque coffre qui autorise a effacer autorise a lister',
+                (select count(*)::int from (
+                   select 'photos' as coffre union all select 'pieces'
+                 ) c
+                 where exists (select 1 from pg_policies p
+                                where p.schemaname = 'storage'
+                                  and p.tablename = 'objects'
+                                  and p.cmd = 'DELETE'
+                                  and p.qual like '%' || c.coffre || '%')
+                   and not exists (select 1 from pg_policies p
+                                where p.schemaname = 'storage'
+                                  and p.tablename = 'objects'
+                                  and p.cmd = 'SELECT'
+                                  and p.qual like '%' || c.coffre || '%')), 0);
+
 rollback;

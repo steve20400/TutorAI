@@ -99,6 +99,34 @@ export function PhotoProfil({
     })
   }
 
+  /**
+   * Efface les anciens fichiers du dossier, sauf celui qu'on garde.
+   *
+   * Sans cela, chaque changement de photo laissait la précédente dans un
+   * coffre public, toujours servie à qui avait gardé son adresse — et
+   * « Retirer » ne retirait qu'une ligne dans la base. Le dossier ne contient
+   * que les fichiers d'une seule personne : celle qui est en train d'agir.
+   */
+  async function nettoyerLeDossier(sauf?: string) {
+    try {
+      const supabase = supabaseNavigateur()
+      const { data } = await supabase.storage.from("photos").list(compteId)
+      if (!data?.length) return
+
+      const aEffacer = data
+        .map((f) => `${compteId}/${f.name}`)
+        .filter((chemin) => chemin !== sauf)
+
+      if (aEffacer.length > 0) {
+        await supabase.storage.from("photos").remove(aEffacer)
+      }
+    } catch {
+      // Un fichier qui survit ne casse rien de visible, et le prochain envoi
+      // repassera derrière. Prévenir ici n'apprendrait rien d'utile à
+      // quelqu'un qui vient de retirer sa photo.
+    }
+  }
+
   async function envoyer(fichier: File) {
     poserErreur(null)
 
@@ -175,6 +203,10 @@ export function PhotoProfil({
       }
 
       await poserPhotoDeProfil(apercu)
+
+      // La nouvelle photo est en place : les précédentes n'ont plus de raison
+      // d'être servies.
+      await nettoyerLeDossier(chemin)
     })
 
     surChangement(apercu)
@@ -221,7 +253,9 @@ export function PhotoProfil({
               onClick={() => {
                 poserApercuLocal(null)
                 surChangement(null)
-                void poserPhotoDeProfil(null)
+                // Le profil d'abord : si l'effacement du fichier échoue, la
+                // photo a quand même disparu de partout où on la montre.
+                void poserPhotoDeProfil(null).then(() => nettoyerLeDossier())
               }}
               className="bt3"
             >
