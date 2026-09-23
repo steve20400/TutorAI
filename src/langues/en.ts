@@ -483,6 +483,32 @@ export const en: Dictionnaire = {
       enregistrer: "Save",
       effacer: "Clear",
     },
+    profil: {
+      etiquette: "My account",
+      titre: "Your account",
+      identite: "Identity",
+      prenom: "First name",
+      nom: "Last name",
+      telephone: "Phone",
+      identifiant: "Sign-in username",
+      identifiantAide:
+        "This is what you type to sign in, instead of your email address. It is uppercased automatically.",
+      photo: "Photo",
+      photoUrl: "Photo address",
+      photoAide:
+        "Uploading will come with document storage. Until then, paste the address of an image already online — or leave it empty to keep your initials.",
+      enregistrer: "Save",
+      enregistre: "Saved.",
+      motDePasse: "Password",
+      motDePasseActuel: "Current password",
+      motDePasseNouveau: "New password",
+      motDePasseAide:
+        "At least eight characters. The current password is required: without it, anyone finding your session open could lock you out.",
+      changerMotDePasse: "Change password",
+      motDePasseChange: "Password changed.",
+      adresse: "Sign-in address",
+      adresseAide: "You can sign in with your username or with this address.",
+    },
     registre: {
       etiquette: "Log — everything is recorded",
       vide: "The log is empty.",

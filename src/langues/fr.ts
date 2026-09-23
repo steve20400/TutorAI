@@ -488,6 +488,33 @@ export const fr = {
       enregistrer: "Enregistrer",
       effacer: "Effacer",
     },
+    profil: {
+      etiquette: "Mon compte",
+      titre: "Votre compte",
+      identite: "Identité",
+      prenom: "Prénom",
+      nom: "Nom",
+      telephone: "Téléphone",
+      identifiant: "Identifiant de connexion",
+      identifiantAide:
+        "C'est ce que vous saisissez pour vous connecter, à la place de votre adresse. Il est mis en majuscules automatiquement.",
+      photo: "Photo",
+      photoUrl: "Adresse de la photo",
+      photoAide:
+        "Le téléversement viendra avec le stockage des pièces. En attendant, collez ici l'adresse d'une image déjà en ligne — ou laissez vide pour garder vos initiales.",
+      enregistrer: "Enregistrer",
+      enregistre: "Enregistré.",
+      motDePasse: "Mot de passe",
+      motDePasseActuel: "Mot de passe actuel",
+      motDePasseNouveau: "Nouveau mot de passe",
+      motDePasseAide:
+        "Huit caractères au moins. Le mot de passe actuel est demandé : sans lui, quelqu'un trouvant votre session ouverte pourrait vous enfermer dehors.",
+      changerMotDePasse: "Changer le mot de passe",
+      motDePasseChange: "Mot de passe changé.",
+      adresse: "Adresse de connexion",
+      adresseAide:
+        "Vous pouvez vous connecter avec votre identifiant ou avec cette adresse.",
+    },
     registre: {
       etiquette: "Registre — tout est consigné",
       vide: "Le registre est vide.",

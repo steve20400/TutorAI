@@ -24,6 +24,11 @@ type Personne = {
   cree_le?: string | null
   desactive_le?: string | null
   motif_desactivation?: string | null
+  photo_url?: string | null
+  /** Lue par une fonction réservée à l'administration : `profils` ne la porte
+   *  pas, elle vit dans auth.users. Nulle pour une adresse interne d'élève,
+   *  que personne ne relève. */
+  courriel?: string | null
 }
 
 type Contrat = {
@@ -99,7 +104,7 @@ export default async function PageFamille({
           </div>
 
           <div className="mt-3 flex items-center gap-4">
-            <Avatar nom={nomDe(parent)} photoUrl={null} taille={58} />
+            <Avatar nom={nomDe(parent)} photoUrl={parent.photo_url ?? null} taille={58} />
             <div className="min-w-0">
               <p className="text-[15px] font-medium">{nomDe(parent)}</p>
               {parent.identifiant ? (
@@ -109,6 +114,14 @@ export default async function PageFamille({
               ) : null}
               {parent.telephone ? (
                 <p className="doux mt-0.5 text-[12.5px]">{parent.telephone}</p>
+              ) : null}
+              {parent.courriel ? (
+                <a
+                  href={`mailto:${parent.courriel}`}
+                  className="doux mt-0.5 block truncate text-[12.5px] underline underline-offset-2"
+                >
+                  {parent.courriel}
+                </a>
               ) : null}
               <p className="doux mt-0.5 text-[11.5px]">
                 {remplir(t.inscritLe, { date: dateCourte(parent.cree_le) })}
@@ -182,7 +195,7 @@ export default async function PageFamille({
             <div className="mt-3 flex flex-col gap-3">
               {enfants.map((e) => (
                 <div key={e.id} className="flex items-center gap-3">
-                  <Avatar nom={nomDe(e)} photoUrl={null} taille={38} />
+                  <Avatar nom={nomDe(e)} photoUrl={e.photo_url ?? null} taille={38} />
                   <div className="min-w-0 flex-1">
                     <p className="text-[13.5px] font-medium">{nomDe(e)}</p>
                     <p className="doux font-mono text-[11px]">
