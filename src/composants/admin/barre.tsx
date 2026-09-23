@@ -119,19 +119,31 @@ function Icone({ cle }: { cle: CleRubrique }) {
 
 function BoutonRepli({
   repliee,
+  ouverte,
   basculer,
   d,
 }: {
   repliee: boolean
+  /** Barre posée par-dessus la page, sur téléphone. */
+  ouverte: boolean
   basculer: () => void
   d: Dictionnaire
 }) {
+  // « Fermer » sur téléphone, « déplier »/« replier » sur grand écran : un
+  // intitulé qui décrit un autre geste que celui du clic trompe qui ne voit
+  // pas l'écran.
+  const etiquette = ouverte
+    ? d.adminNav.replier
+    : repliee
+      ? d.adminNav.ouvrir
+      : d.adminNav.replier
+
   return (
     <button
       type="button"
       onClick={basculer}
-      aria-label={repliee ? d.adminNav.ouvrir : d.adminNav.replier}
-      title={repliee ? d.adminNav.ouvrir : d.adminNav.replier}
+      aria-label={etiquette}
+      title={etiquette}
       className="grid h-[26px] w-[26px] shrink-0 place-items-center rounded-[7px] transition hover:bg-white/10"
       style={{ border: "1px solid rgb(255 255 255 / 0.22)", color: "#c3cde0" }}
     >
@@ -147,7 +159,11 @@ function BoutonRepli({
         <rect x="1.2" y="2.2" width="13.6" height="11.6" rx="2" />
         <path d="M6 2.2v11.6" />
         <path
-          d={repliee ? "M9.4 6.2 11.4 8l-2 1.8" : "M11.4 6.2 9.4 8l2 1.8"}
+          d={
+            ouverte || !repliee
+              ? "M11.4 6.2 9.4 8l2 1.8"
+              : "M9.4 6.2 11.4 8l-2 1.8"
+          }
           strokeLinecap="round"
           strokeLinejoin="round"
         />
@@ -255,7 +271,26 @@ export function BarreAdmin({
     }
   }, [ouverte])
 
+  /**
+   * Un seul bouton, deux gestes selon la taille de l'écran.
+   *
+   * Sur téléphone la barre est posée par-dessus la page : le bouton la ferme.
+   * Sur grand écran elle reste en place : il la réduit à ses icônes.
+   *
+   * `ouverte` n'est vrai que sur téléphone — seul le bouton du haut, masqué à
+   * partir de `lg`, le met à vrai. Il sert donc aussi d'indicateur de
+   * contexte, sans avoir à mesurer la fenêtre.
+   *
+   * Sans cette distinction, le bouton basculait `repliee` sur téléphone, où
+   * cette classe n'a aucun effet : il paraissait mort, et il fallait deviner
+   * qu'on ferme en touchant le voile ou en glissant vers la gauche.
+   */
   function basculer() {
+    if (ouverte) {
+      poserOuverte(false)
+      return
+    }
+
     const suivant = !repliee
     poserRepliee(suivant)
     try {
@@ -338,7 +373,12 @@ export function BarreAdmin({
           TUTELA
         </span>
         <span className="admin-libelle flex-1" />
-        <BoutonRepli repliee={repliee} basculer={basculer} d={d} />
+        <BoutonRepli
+          repliee={repliee}
+          ouverte={ouverte}
+          basculer={basculer}
+          d={d}
+        />
       </div>
 
       <div className="relative flex-1 overflow-y-auto py-2.5">
