@@ -42,6 +42,24 @@ export const en: Dictionnaire = {
     code: "Error 404",
   },
 
+  compte: {
+    titre: "Your account",
+    titreAdulte: "Your account",
+    prenom: "First name",
+    nom: "Last name",
+    telephone: "Phone",
+    identifiant: "Sign-in username",
+    identifiantFige:
+      "This is what you sign in with. It was chosen when your account was created and does not change.",
+    avatar: "Choose your picture",
+    avatarAide:
+      "You do not put a photo here. Pick a drawing, or keep your initials.",
+    sansAvatar: "My initials",
+    enregistrer: "Save",
+    enregistre: "Saved.",
+    retour: "Back",
+  },
+
   chargement: {
     aria: "Loading TUTELA",
     sloganLigne1: "A verified tutor.",

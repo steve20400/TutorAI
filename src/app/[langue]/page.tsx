@@ -1,6 +1,7 @@
 import Link from "next/link"
 import { redirect } from "next/navigation"
 
+import { Avatar } from "@/composants/avatar"
 import { BoutonDeconnexion } from "@/composants/deconnexion"
 import {
   chemin,
@@ -44,7 +45,7 @@ export default async function Accueil({
 
   const { data: profil } = await supabase
     .from("profils")
-    .select("prenom, role")
+    .select("prenom, role, photo_url")
     .eq("id", user.id)
     .single()
 
@@ -84,7 +85,22 @@ export default async function Accueil({
           <p className="doux mt-1 text-sm">{d.accueil.question}</p>
         </div>
 
-        <BoutonDeconnexion langue={langue} libelle={d.commun.quitter} />
+        <span className="flex items-center gap-3">
+          {/* L'avatar mène au compte. Un enfant cherche son image là où elle
+              s'affiche, pas dans un menu de réglages. */}
+          <Link
+            href={chemin(langue, "/compte")}
+            title={d.compte.titre}
+            className="transition hover:opacity-80"
+          >
+            <Avatar
+              nom={profil?.prenom ?? ""}
+              photoUrl={profil?.photo_url ?? null}
+              taille={32}
+            />
+          </Link>
+          <BoutonDeconnexion langue={langue} libelle={d.commun.quitter} />
+        </span>
       </header>
 
       <div className="mt-4 flex flex-col gap-3">

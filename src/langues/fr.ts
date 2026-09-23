@@ -38,6 +38,24 @@ export const fr = {
     code: "Erreur 404",
   },
 
+  compte: {
+    titre: "Ton compte",
+    titreAdulte: "Votre compte",
+    prenom: "Prénom",
+    nom: "Nom",
+    telephone: "Téléphone",
+    identifiant: "Identifiant de connexion",
+    identifiantFige:
+      "C'est avec lui que tu te connectes. Il a été choisi à la création de ton compte et ne change pas.",
+    avatar: "Choisis ton image",
+    avatarAide:
+      "Tu ne mets pas de photo ici. Choisis un dessin, ou garde tes initiales.",
+    sansAvatar: "Mes initiales",
+    enregistrer: "Enregistrer",
+    enregistre: "C'est enregistré.",
+    retour: "Retour",
+  },
+
   chargement: {
     aria: "Chargement de TUTELA",
     sloganLigne1: "Un répétiteur vérifié.",
