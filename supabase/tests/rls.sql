@@ -709,4 +709,45 @@ select verifier('chaque coffre qui autorise a effacer autorise a lister',
                                   and p.cmd = 'SELECT'
                                   and p.qual like '%' || c.coffre || '%')), 0);
 
+-- ── Personne ne s'approprie un enfant ───────────────────────────────────────
+-- La politique d'écriture disait `parent_id = auth.uid()` : elle vérifiait
+-- l'identité du demandeur, jamais son droit sur l'enfant. Un adulte qui
+-- connaissait l'identifiant d'un enfant s'y rattachait. Or un répétiteur
+-- connaît ceux de ses élèves : ils sont dans le contrat.
+set local role authenticated;
+set local "request.jwt.claims" = '{"sub":"33333333-3333-3333-3333-333333333333","role":"authenticated"}';
+
+do $$
+begin
+  insert into liens_familiaux (parent_id, eleve_id)
+  values ('33333333-3333-3333-3333-333333333333',
+          '22222222-2222-2222-2222-222222222222');
+exception when insufficient_privilege then
+  null;
+end $$;
+
+select verifier('un adulte ne se rattache PAS a un enfant qui n''est pas le sien',
+                (select count(*)::int from liens_familiaux
+                  where parent_id = '33333333-3333-3333-3333-333333333333'
+                    and eleve_id  = '22222222-2222-2222-2222-222222222222'), 0);
+
+-- Et il ne se détache pas non plus tout seul : partir d'un dossier d'enfant
+-- effacerait la trace de qui en répondait.
+do $$
+begin
+  delete from liens_familiaux
+  where parent_id = '33333333-3333-3333-3333-333333333333'
+    and eleve_id  = '11111111-1111-1111-1111-111111111111';
+exception when insufficient_privilege then
+  null;
+end $$;
+
+select verifier('un adulte ne se detache PAS tout seul',
+                (select count(*)::int from liens_familiaux
+                  where parent_id = '33333333-3333-3333-3333-333333333333'
+                    and eleve_id  = '11111111-1111-1111-1111-111111111111'), 1);
+
+reset role;
+set local "request.jwt.claims" = '';
+
 rollback;
