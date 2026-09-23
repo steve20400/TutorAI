@@ -69,11 +69,13 @@ export function Avatar({
   const libelle = (nom ?? "").trim()
   const [ouverte, poserOuverte] = useState(false)
   const [cassee, poserCassee] = useState(false)
+  const [essai, poserEssai] = useState(0)
 
   // Une nouvelle adresse mérite une nouvelle tentative : sans cette remise à
   // zéro, une photo remplacée après un échec resterait invisible.
   useEffect(() => {
     poserCassee(false)
+    poserEssai(0)
   }, [photoUrl])
 
   // Un avatar choisi dans la liste : un dessin, pas une image à télécharger.
@@ -128,6 +130,15 @@ export function Avatar({
   // `estUnePhoto` a déjà écarté null et les avatars : c'est bien une image.
   const url = photoUrl as string
 
+  // Une photo qui vient d'être déposée peut mettre une seconde à être servie.
+  // On retente une fois avant de conclure, avec un paramètre différent pour
+  // que le navigateur ne resserve pas son échec mis en cache. Jamais sur une
+  // adresse locale : un `blob:` avec une interrogation n'existe pas.
+  const source =
+    essai === 0 || url.startsWith("blob:")
+      ? url
+      : `${url}${url.includes("?") ? "&" : "?"}r=${essai}`
+
   return (
     <>
       <button
@@ -138,11 +149,17 @@ export function Avatar({
       >
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
-          src={url}
+          src={source}
           alt={libelle}
           width={taille}
           height={taille}
-          onError={() => poserCassee(true)}
+          onError={() => {
+            if (essai === 0) {
+              setTimeout(() => poserEssai(1), 2500)
+            } else {
+              poserCassee(true)
+            }
+          }}
           className="h-full w-full object-cover"
         />
       </button>

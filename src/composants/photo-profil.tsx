@@ -1,6 +1,6 @@
 "use client"
 
-import { useRef, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 
 import { Avatar } from "@/composants/avatar"
 import { poserPhotoDeProfil } from "@/actions/compte"
@@ -52,6 +52,22 @@ export function PhotoProfil({
   const champ = useRef<HTMLInputElement>(null)
   const [enCours, poserEnCours] = useState(false)
   const [erreur, poserErreur] = useState<string | null>(null)
+
+  /**
+   * L'aperçu, pris sur le fichier lui-même.
+   *
+   * Montrer tout de suite l'adresse distante ne marche pas : le fichier n'y
+   * est pas encore, l'image échoue, et l'avatar retombe sur les initiales sans
+   * plus jamais réessayer — il fallait recharger la page pour voir sa propre
+   * photo. Le fichier, lui, est déjà là, dans la mémoire du navigateur.
+   */
+  const [apercuLocal, poserApercuLocal] = useState<string | null>(null)
+
+  // Une adresse locale occupe de la mémoire tant qu'on ne la relâche pas.
+  useEffect(() => {
+    if (!apercuLocal) return
+    return () => URL.revokeObjectURL(apercuLocal)
+  }, [apercuLocal])
 
   /**
    * Redimensionne en carré, en rognant au centre.
@@ -118,6 +134,11 @@ export function PhotoProfil({
     // L'aperçu change tout de suite, avant même que le fichier soit parti.
     // Attendre la fin pour montrer la nouvelle photo laisserait croire que
     // rien ne s'est passé — surtout quand l'envoi peut durer une minute.
+    poserApercuLocal(URL.createObjectURL(reduite))
+
+    // L'adresse distante, elle, est celle qu'on enregistre : jamais un
+    // `blob:`, qui ne veut rien dire en dehors de cet onglet et qui partirait
+    // tel quel dans le champ caché du formulaire.
     const apercu = `${base}/storage/v1/object/public/photos/${chemin}`
 
     lancer(t.choisirPhoto, async () => {
@@ -165,7 +186,7 @@ export function PhotoProfil({
     // contre le bord de la carte. Repliés, les boutons prennent toute la
     // largeur et se rangent l'un à côté de l'autre.
     <div className="flex flex-wrap items-center gap-4">
-      <Avatar nom={nom} photoUrl={photoUrl} taille={72} />
+      <Avatar nom={nom} photoUrl={apercuLocal ?? photoUrl} taille={72} />
 
       <div className="flex min-w-0 flex-1 basis-[210px] flex-col gap-2">
         <input
@@ -198,6 +219,7 @@ export function PhotoProfil({
             <button
               type="button"
               onClick={() => {
+                poserApercuLocal(null)
                 surChangement(null)
                 void poserPhotoDeProfil(null)
               }}
