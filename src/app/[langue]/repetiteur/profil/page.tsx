@@ -31,6 +31,7 @@ type ReponseProfil = {
     statut: string
     motif_refus: string | null
     verifie_le: string | null
+    photo_url: string | null
   } | null
   profil: {
     prenom: string | null
@@ -116,7 +117,10 @@ export default async function PageProfilRepetiteur({
         </section>
 
         <FormulaireProfil
+          compteId={fiche.id}
+          nom={[profil?.prenom, profil?.nom].filter(Boolean).join(" ")}
           valeurs={{
+            photo_url: fiche?.photo_url ?? null,
             bio: fiche?.bio ?? "",
             ville: fiche?.ville ?? "",
             matieres: fiche?.matieres ?? [],

@@ -18,6 +18,17 @@ export const fr = {
   },
 
   commun: {
+    choisirPhoto: "Choisir une photo",
+    changerPhoto: "Changer la photo",
+    retirerPhoto: "Retirer",
+    photoEnvoyee: "photo enregistrée",
+    photoEnvoi: "Envoi…",
+    photoTropGrande:
+      "Cette image est trop lourde même après réduction. Essayez-en une autre.",
+    photoMauvaisType:
+      "Choisissez une image : JPEG, PNG ou WebP.",
+    photoEchec:
+      "L'envoi a échoué. Vérifiez votre connexion et réessayez.",
     voirLaPhoto: "Voir la photo en grand",
     fermerLaPhoto: "Fermer",
     telechargerLaPhoto: "Télécharger",

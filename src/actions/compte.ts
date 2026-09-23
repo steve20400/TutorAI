@@ -70,3 +70,28 @@ export async function changerMotDePasse(
     return { erreur: "service" }
   }
 }
+
+/**
+ * Enregistre l'adresse d'une photo, seule.
+ *
+ * Appelée par le téléversement quand il se termine — c'est-à-dire peut-être
+ * après que la personne a changé d'écran. Elle ne peut donc pas compter sur un
+ * formulaire encore affiché, ni renvoyer un message à lire : elle écrit, et
+ * c'est tout.
+ */
+export async function poserPhotoDeProfil(url: string | null): Promise<void> {
+  try {
+    // Sur `profils` : la colonne y existe pour tout le monde depuis la
+    // migration 018. Celle de `repetiteurs` reste en place — l'annuaire la
+    // lit déjà — et le service recopie l'une vers l'autre pour un répétiteur,
+    // plutôt que de faire choisir à chaque écran laquelle regarder.
+    await api("/v1/compte", {
+      methode: "POST",
+      corps: { photo_url: url ?? "" },
+    })
+    revalidatePath("/", "layout")
+  } catch {
+    // L'indicateur de téléversement signale déjà l'échec. Lever ici ferait
+    // remonter une erreur dans une page qui n'est peut-être plus à l'écran.
+  }
+}

@@ -1,7 +1,8 @@
 "use client"
 
-import { useActionState } from "react"
+import { useActionState, useState } from "react"
 
+import { PhotoProfil } from "@/composants/photo-profil"
 import { useLangue } from "@/langues/contexte"
 import { Message } from "../../(auth)/champs"
 import { enregistrerProfil, type EtatProfil } from "@/actions/repetiteur"
@@ -10,6 +11,7 @@ import { MATIERES, NIVEAUX } from "@/lib/referentiel"
 const ETAT_INITIAL: EtatProfil = {}
 
 type Valeurs = {
+  photo_url?: string | null
   bio: string
   ville: string
   matieres: string[]
@@ -19,7 +21,15 @@ type Valeurs = {
   disponibilites_texte: string
 }
 
-export function FormulaireProfil({ valeurs }: { valeurs: Valeurs }) {
+export function FormulaireProfil({
+  valeurs,
+  compteId,
+  nom,
+}: {
+  valeurs: Valeurs
+  compteId: string
+  nom: string
+}) {
   const { langue, d } = useLangue()
   const [etat, action, enCours] = useActionState(
     enregistrerProfil,
@@ -27,10 +37,21 @@ export function FormulaireProfil({ valeurs }: { valeurs: Valeurs }) {
   )
 
   const f = d.repetiteurFormulaire
+  const [photo, poserPhoto] = useState<string | null>(valeurs.photo_url ?? null)
 
   return (
     <form action={action} className="flex flex-col gap-6">
       <input type="hidden" name="langue" value={langue} />
+
+      {/* La photo s'enregistre seule, dès l'envoi : elle ne dépend pas du
+          bouton en bas du formulaire, et l'envoi survit au changement de
+          page. C'est le premier visage qu'une famille verra. */}
+      <PhotoProfil
+        nom={nom}
+        photoUrl={photo}
+        compteId={compteId}
+        surChangement={poserPhoto}
+      />
 
       <Section titre={f.ceQueVousEnseignez}>
         <Cases

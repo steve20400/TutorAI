@@ -22,6 +22,15 @@ export const en: Dictionnaire = {
   },
 
   commun: {
+    choisirPhoto: "Choose a photo",
+    changerPhoto: "Change photo",
+    retirerPhoto: "Remove",
+    photoEnvoyee: "photo saved",
+    photoEnvoi: "Uploading…",
+    photoTropGrande:
+      "This image is too heavy even after resizing. Try another one.",
+    photoMauvaisType: "Choose an image: JPEG, PNG or WebP.",
+    photoEchec: "Upload failed. Check your connection and try again.",
     voirLaPhoto: "View photo",
     fermerLaPhoto: "Close",
     telechargerLaPhoto: "Download",

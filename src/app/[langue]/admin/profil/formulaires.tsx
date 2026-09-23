@@ -1,13 +1,13 @@
 "use client"
 
-import { useActionState } from "react"
+import { useActionState, useState } from "react"
 
 import {
   changerMotDePasse,
   enregistrerCompte,
   type EtatCompte,
 } from "@/actions/compte"
-import { Avatar } from "@/composants/avatar"
+import { PhotoProfil } from "@/composants/photo-profil"
 import type { Dictionnaire, Langue } from "@/langues"
 
 const VIDE: EtatCompte = {}
@@ -42,6 +42,7 @@ export function FormulairesCompte({
   adresse: string | null
 }) {
   const t = d.adminPages.profil
+  const [photo, poserPhoto] = useState<string | null>(compte.photo_url)
   const [etatIdentite, actionIdentite, identiteEnCours] = useActionState(
     enregistrerCompte,
     VIDE,
@@ -73,23 +74,16 @@ export function FormulairesCompte({
         <form action={actionIdentite} className="mt-4 flex flex-col gap-3">
           <input type="hidden" name="langue" value={langue} />
 
-          <div className="flex items-center gap-4">
-            <Avatar
-              nom={[compte.prenom, compte.nom].filter(Boolean).join(" ")}
-              photoUrl={compte.photo_url}
-              taille={64}
-            />
-            <label className="min-w-0 flex-1">
-              <span className="doux block text-[11.5px]">{t.photoUrl}</span>
-              <input
-                name="photo_url"
-                defaultValue={compte.photo_url ?? ""}
-                placeholder="https://…"
-                className="champ mt-1 w-full px-3 py-2 text-[13px]"
-              />
-            </label>
-          </div>
-          <p className="doux text-[11.5px] leading-relaxed">{t.photoAide}</p>
+          {/* Le champ reste, caché : c'est lui qui part avec le formulaire.
+              Le téléversement ne fait qu'y déposer l'adresse obtenue. */}
+          <input type="hidden" name="photo_url" value={photo ?? ""} />
+
+          <PhotoProfil
+            nom={[compte.prenom, compte.nom].filter(Boolean).join(" ")}
+            photoUrl={photo}
+            compteId={compte.id}
+            surChangement={poserPhoto}
+          />
 
           <div className="flex flex-wrap gap-3">
             <label className="min-w-[150px] flex-1">

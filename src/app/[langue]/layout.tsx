@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next"
 
 import { EcranChargement } from "@/composants/chargement"
+import { FournisseurTeleversement } from "@/composants/televersement"
 import { FournisseurLangue } from "@/langues/contexte"
 import { dictionnaire, estLangue, LANGUES, LANGUE_PAR_DEFAUT } from "@/langues"
 import { SCRIPT_CHARGEMENT, SCRIPT_THEME } from "@/lib/theme"
@@ -92,8 +93,13 @@ export default async function LayoutRacine({
       </head>
       <body className="min-h-dvh antialiased">
         <FournisseurLangue langue={langue} d={d}>
-          <EcranChargement />
-          {children}
+          {/* Au-dessus des pages : un envoi de fichier doit survivre au
+              changement d'écran. Le layout racine n'est pas démonté par la
+              navigation, contrairement aux pages. */}
+          <FournisseurTeleversement>
+            <EcranChargement />
+            {children}
+          </FournisseurTeleversement>
         </FournisseurLangue>
       </body>
     </html>
