@@ -747,6 +747,32 @@ body {
   background: var(--surface);
 }
 
+/* --- La carte en mode sombre -------------------------------------------------
+   Les tuiles d'OpenStreetMap sont dessinées claires, et il n'en existe pas de
+   version sombre libre. Une carte blanche au milieu d'un tableau de bord à
+   l'encre éblouit, et c'est le seul élément de l'écran qui ne vienne pas de
+   la palette.
+
+   On inverse, puis on fait tourner la teinte d'un demi-tour : l'inversion
+   seule rendrait la végétation magenta et l'eau orange. Avec la rotation, le
+   vert redevient vert et l'eau redevient bleue, en sombre. Le contraste et la
+   luminosité sont adoucis pour que la carte ne crie pas plus fort que le
+   reste.
+
+   Les pastilles, elles, sont EN DEHORS de la toile — ce sont des éléments
+   HTML posés par-dessus. Elles ne subissent donc pas le filtre, et gardent
+   les couleurs du produit. C'est exactement ce qu'on veut : le fond
+   s'assombrit, nos points restent les nôtres. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .maplibregl-canvas {
+    filter: invert(1) hue-rotate(180deg) brightness(0.92) contrast(0.88);
+  }
+}
+
+:root[data-theme="dark"] .maplibregl-canvas {
+  filter: invert(1) hue-rotate(180deg) brightness(0.92) contrast(0.88);
+}
+
 .pastille-ville {
   display: grid;
   place-items: center;
