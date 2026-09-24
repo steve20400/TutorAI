@@ -1,6 +1,7 @@
 "use client"
 
-import { useEffect, useRef, useState } from "react"
+import { useCallback, useEffect, useRef, useState } from "react"
+import { createPortal } from "react-dom"
 
 /**
  * Ce qu'il reste, et ce que ça veut dire.
@@ -34,6 +35,50 @@ export function Jauge({
 }) {
   const [ouvert, setOuvert] = useState(false)
   const cadre = useRef<HTMLDivElement>(null)
+  const bouton = useRef<HTMLButtonElement>(null)
+  const panneau = useRef<HTMLDivElement>(null)
+
+  /**
+   * Le panneau est posé sur la page entière, pas dans la conversation.
+   *
+   * Dans le flux, il était coupé : le fil de discussion masque ce qui dépasse,
+   * et sur un téléphone étroit le panneau sortait de l'écran. Un panneau qu'on
+   * ouvre et qu'on ne voit pas est pire qu'un panneau absent.
+   *
+   * Donc `position: fixed`, des coordonnées calculées depuis le bouton, et
+   * bornées à l'écran — il ne peut plus sortir, quelle que soit la largeur.
+   */
+  const [place, setPlace] = useState<{ gauche: number; bas: number } | null>(null)
+
+  const placer = useCallback(() => {
+    const b = bouton.current?.getBoundingClientRect()
+    if (!b) return
+
+    const largeur = panneau.current?.offsetWidth ?? 300
+    const marge = 12
+
+    const gauche = Math.min(
+      Math.max(marge, b.left),
+      Math.max(marge, window.innerWidth - largeur - marge),
+    )
+
+    setPlace({ gauche, bas: window.innerHeight - b.top + 8 })
+  }, [])
+
+  useEffect(() => {
+    if (!ouvert) return
+    placer()
+
+    // La barre d'adresse d'un téléphone apparaît et disparaît au défilement :
+    // sans ces deux écoutes, le panneau resterait où il était et flotterait à
+    // côté de son bouton.
+    window.addEventListener("resize", placer)
+    window.addEventListener("scroll", placer, true)
+    return () => {
+      window.removeEventListener("resize", placer)
+      window.removeEventListener("scroll", placer, true)
+    }
+  }, [ouvert, placer])
 
   // Refermer en cliquant ailleurs, et à la touche d'échappement : un panneau
   // qu'on ne sait pas fermer est un panneau qu'on n'ouvre plus.
@@ -41,7 +86,12 @@ export function Jauge({
     if (!ouvert) return
 
     const dehors = (e: MouseEvent) => {
-      if (!cadre.current?.contains(e.target as Node)) setOuvert(false)
+      const cible = e.target as Node
+      // Le panneau n'est plus un descendant du cadre — il vit à la racine de
+      // la page. Sans ce second test, cliquer dedans le refermerait.
+      if (cadre.current?.contains(cible)) return
+      if (panneau.current?.contains(cible)) return
+      setOuvert(false)
     }
     const echap = (e: KeyboardEvent) => {
       if (e.key === "Escape") setOuvert(false)
@@ -65,6 +115,7 @@ export function Jauge({
   return (
     <div ref={cadre} className="relative">
       <button
+        ref={bouton}
         type="button"
         onClick={() => setOuvert((o) => !o)}
         aria-expanded={ouvert}
@@ -100,15 +151,22 @@ export function Jauge({
         </svg>
       </button>
 
-      {ouvert ? (
+      {ouvert && typeof document !== "undefined"
+        ? createPortal(
         <div
-          // Ancré à GAUCHE, comme l'anneau qui l'ouvre : ancré à droite, il
-          // s'étendait vers l'extérieur de l'écran et se retrouvait coupé sur
-          // un téléphone étroit.
-          className="absolute bottom-10 left-0 z-30 w-[min(19rem,calc(100vw-2.5rem))] rounded-[12px] p-4 shadow-lg"
+          ref={panneau}
+          role="dialog"
+          aria-label={titre}
+          className="fixed z-50 w-[min(19rem,calc(100vw-1.5rem))] rounded-[12px] p-4 shadow-lg"
           style={{
             background: "var(--surface)",
             border: "1px solid var(--bordure)",
+            left: place?.gauche ?? 12,
+            bottom: place?.bas ?? 60,
+            // Tant qu'on n'a pas mesuré, on ne montre rien : un panneau qui
+            // apparaît au mauvais endroit puis saute se remarque plus qu'il
+            // n'informe.
+            visibility: place ? "visible" : "hidden",
           }}
         >
           <div className="text-[13px] font-medium">{titre}</div>
@@ -139,8 +197,10 @@ export function Jauge({
               {children}
             </div>
           ) : null}
-        </div>
-      ) : null}
+        </div>,
+        document.body,
+      )
+        : null}
     </div>
   )
 }
