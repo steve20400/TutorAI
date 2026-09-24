@@ -28,7 +28,21 @@ const uniques = (valeurs: string[]) => [...new Set(valeurs)]
  *
  * Une étape qui n'a qu'une seule réponse possible n'est pas affichée.
  */
-export function Assistant({ options }: { options: OptionProgramme[] }) {
+export function Assistant({
+  options,
+  catalogue,
+}: {
+  options: OptionProgramme[]
+  /**
+   * Toutes les matières connues, programme chargé ou non.
+   *
+   * On ne recensera jamais tous les programmes de tous les pays avant
+   * d'ouvrir. Un élève de cinquième qui veut réviser son anglais ne doit pas
+   * se heurter à une porte fermée — il écrit sa matière, et elle entre au
+   * catalogue pour l'élève suivant.
+   */
+  catalogue: string[]
+}) {
   const { langue, d } = useLangue()
 
   const paysDisponibles = useMemo(
@@ -42,6 +56,9 @@ export function Assistant({ options }: { options: OptionProgramme[] }) {
   const [sousSysteme, setSousSysteme] = useState("")
   const [niveau, setNiveau] = useState("")
   const [matieres, setMatieres] = useState<string[]>([])
+  /** Matières nommées par l'élève, faute de programme officiel. */
+  const [libres, setLibres] = useState<string[]>([])
+  const [saisieLibre, setSaisieLibre] = useState("")
 
   const sousSystemesDisponibles = useMemo(
     () => uniques(options.filter((o) => o.pays === pays).map((o) => o.sous_systeme)),
@@ -93,6 +110,30 @@ export function Assistant({ options }: { options: OptionProgramme[] }) {
 
   const suivant = () => setIndice((i) => Math.min(i + 1, etapes.length - 1))
   const precedent = () => setIndice((i) => Math.max(i - 1, 0))
+
+  /**
+   * Ajoute une matière écrite par l'élève.
+   *
+   * On refuse un doublon de ce que le programme propose déjà : sans ce
+   * contrôle, un élève créerait deux tuteurs de mathématiques, l'un avec
+   * programme et l'autre sans, et ne comprendrait pas pourquoi l'un le suit
+   * et pas l'autre.
+   */
+  const ajouterLibre = () => {
+    const propre = saisieLibre.trim().replace(/\s+/g, " ")
+    if (propre.length < 2) return
+
+    const dejaProposee = matieresDisponibles.some(
+      (o) => o.matiere.toLowerCase() === propre.toLowerCase(),
+    )
+    if (dejaProposee || libres.some((m) => m.toLowerCase() === propre.toLowerCase())) {
+      setSaisieLibre("")
+      return
+    }
+
+    setLibres((l) => [...l, propre.charAt(0).toUpperCase() + propre.slice(1)])
+    setSaisieLibre("")
+  }
 
   const basculerMatiere = (id: string) =>
     setMatieres((m) => (m.includes(id) ? m.filter((x) => x !== id) : [...m, id]))
@@ -174,12 +215,67 @@ export function Assistant({ options }: { options: OptionProgramme[] }) {
               actif={matieres.includes(o.id)}
               onClick={() => basculerMatiere(o.id)}
             >
-              {d.matieres[o.matiere] ?? o.matiere}
+              <span className="flex items-center justify-between gap-2">
+                <span>{d.matieres[o.matiere] ?? o.matiere}</span>
+                {/* Le programme officiel est ce qui distingue ce tuteur d'un
+                    robot bavard : quand il est là, on le dit. */}
+                <span className="badge-verifie shrink-0 text-[10px]">
+                  {d.tuteur.suitLeProgramme}
+                </span>
+              </span>
             </Choix>
           ))}
+
+          {libres.map((m) => (
+            <Choix key={m} actif onClick={() => setLibres((l) => l.filter((x) => x !== m))}>
+              <span className="flex items-center justify-between gap-2">
+                <span>{m}</span>
+                <span className="doux shrink-0 text-[10px]">
+                  {d.tuteur.sansProgramme}
+                </span>
+              </span>
+            </Choix>
+          ))}
+
+          {/* La porte de secours. Elle vient APRÈS les matières officielles,
+              pour que celles-ci restent le chemin normal. */}
+          <div className="mt-1 flex flex-col gap-1.5">
+            <label className="doux text-[12px]">{d.tuteur.autreMatiere}</label>
+            <div className="flex gap-2">
+              <input
+                value={saisieLibre}
+                onChange={(e) => setSaisieLibre(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key !== "Enter") return
+                  e.preventDefault()
+                  ajouterLibre()
+                }}
+                list="catalogue-matieres"
+                maxLength={60}
+                placeholder={d.tuteur.autreMatierePlaceholder}
+                className="champ min-w-0 flex-1 px-3 py-2 text-[14px]"
+              />
+              {/* Ce que d'autres élèves ont déjà demandé : on propose sans
+                  imposer, et la liste s'enrichit d'elle-même. */}
+              <datalist id="catalogue-matieres">
+                {catalogue.map((m) => (
+                  <option key={m} value={m} />
+                ))}
+              </datalist>
+              <button
+                type="button"
+                onClick={ajouterLibre}
+                disabled={saisieLibre.trim().length < 2}
+                className="bt2 shrink-0 px-3 py-2 text-[13px]"
+              >
+                {d.tuteur.ajouter}
+              </button>
+            </div>
+          </div>
+
           <button
             type="button"
-            disabled={matieres.length === 0}
+            disabled={matieres.length === 0 && libres.length === 0}
             onClick={suivant}
             className="bouton mt-2 px-4 py-2.5"
           >
@@ -199,6 +295,10 @@ export function Assistant({ options }: { options: OptionProgramme[] }) {
           {matieres.map((id) => (
             <input key={id} type="hidden" name="programmeId" value={id} />
           ))}
+          {libres.map((m) => (
+            <input key={m} type="hidden" name="matiereLibre" value={m} />
+          ))}
+          <input type="hidden" name="niveauLibre" value={niveau} />
 
           <textarea
             name="manuels"
@@ -213,10 +313,12 @@ export function Assistant({ options }: { options: OptionProgramme[] }) {
               {d.tuteur.pays[pays] ?? pays} · {d.niveaux[niveau] ?? niveau}
             </div>
             <div className="doux">
-              {matieresDisponibles
-                .filter((o) => matieres.includes(o.id))
-                .map((o) => d.matieres[o.matiere] ?? o.matiere)
-                .join(", ")}
+              {[
+                ...matieresDisponibles
+                  .filter((o) => matieres.includes(o.id))
+                  .map((o) => d.matieres[o.matiere] ?? o.matiere),
+                ...libres,
+              ].join(", ")}
             </div>
           </div>
 

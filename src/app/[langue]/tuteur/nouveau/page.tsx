@@ -4,6 +4,7 @@ import { redirect } from "next/navigation"
 import { chemin, dictionnaire, estLangue, LANGUE_PAR_DEFAUT } from "@/langues"
 import { exigerModulePage } from "@/lib/parametres"
 import { api } from "@/lib/api"
+import { lireReferentiel } from "@/lib/referentiel"
 import { supabaseServeur } from "@/lib/supabase/server"
 import { Assistant, type OptionProgramme } from "./assistant"
 
@@ -37,9 +38,14 @@ export default async function PageNouveauTuteur({
 
   const options = (programmes ?? []) as OptionProgramme[]
 
-  // Sans programme officiel chargé, il n'y a pas de tuteur possible — et c'est
-  // volontaire. L'ancrage curriculaire est le produit ; sans lui il ne reste
-  // qu'un assistant générique de plus.
+  // Le catalogue complet, programme chargé ou non. Il ne sert qu'à suggérer :
+  // l'élève reste libre d'écrire une matière que personne n'a encore demandée.
+  const { matieres: catalogue } = await lireReferentiel()
+
+  // Sans AUCUN programme chargé, on ne peut proposer ni pays ni niveau, donc
+  // l'assistant n'a plus de première question. C'est le seul cas qui reste
+  // bloquant : dès qu'un programme existe, un élève peut nommer sa matière
+  // lui-même et travailler sans table des matières.
   if (options.length === 0) {
     return (
       <main className="mx-auto flex min-h-dvh max-w-md flex-col justify-center gap-4 p-6">
@@ -68,5 +74,5 @@ export default async function PageNouveauTuteur({
     )
   }
 
-  return <Assistant options={options} />
+  return <Assistant options={options} catalogue={catalogue} />
 }
