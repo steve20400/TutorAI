@@ -12,6 +12,15 @@ export type Enfant = {
   prenom: string | null
   nom: string | null
   identifiant: string | null
+  /**
+   * Vrai pendant les quarante-huit heures qui suivent une reconnaissance.
+   *
+   * Sans cette mention, l'adulte verrait le prénom de l'enfant et rien
+   * d'autre — ni séances, ni travail — et croirait à une panne. On lui dit
+   * pourquoi, et jusqu'à quand.
+   */
+  provisoire?: boolean
+  actif_le?: string | null
 }
 
 /**
@@ -58,8 +67,15 @@ export function Enfants({
               <span className="font-medium">
                 {[e.prenom, e.nom].filter(Boolean).join(" ")}
               </span>
-              <span className="doux font-mono text-xs">
-                {t.identifiantDe} : {e.identifiant}
+              <span className="flex flex-wrap items-baseline gap-2">
+                {e.provisoire ? (
+                  <span className="badge-eteint text-[10px]">
+                    {t.lienProvisoire}
+                  </span>
+                ) : null}
+                <span className="doux font-mono text-xs">
+                  {t.identifiantDe} : {e.identifiant}
+                </span>
               </span>
             </li>
           ))}

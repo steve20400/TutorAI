@@ -66,7 +66,10 @@ export function Formulaire({
           name="motDePasse"
           type="password"
           autoComplete="new-password"
-          aide={c.aideMotDePasse}
+          // Six pour un enfant, huit pour un adulte : il doit pouvoir le
+          // taper seul. L'aide disait « 8 caractères minimum » à tout le
+          // monde, ce qui contredisait ce que le formulaire acceptait.
+          aide={role === "eleve" ? c.aideMotDePasseEnfant : c.aideMotDePasse}
           required
         />
 

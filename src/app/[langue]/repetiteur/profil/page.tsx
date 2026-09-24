@@ -1,4 +1,5 @@
 import { redirect } from "next/navigation"
+import { ReglagesRapides } from "@/composants/reglages-rapides"
 
 import { BoutonDeconnexion } from "@/composants/deconnexion"
 import { Registre } from "@/composants/registre"
@@ -99,6 +100,7 @@ export default async function PageProfilRepetiteur({
               {profil?.prenom} {profil?.nom ?? ""}
             </p>
           </div>
+          <ReglagesRapides />
           <BoutonDeconnexion langue={langue} />
         </header>
 

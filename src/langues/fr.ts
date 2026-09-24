@@ -163,6 +163,7 @@ export const fr = {
     telephone: "Votre téléphone",
     aideTelephone:
       "Utilisé par l'équipe pour la vérification, jamais affiché aux familles",
+    aideMotDePasseEnfant: "6 caractères minimum. Choisis-en un que tu retiendras.",
     aideMotDePasse: "8 caractères minimum",
     valider: "Créer le compte",
     avertissementEnfant: "Tu n'as pas besoin d'adresse mail. Mais retiens bien ton mot de passe : tant qu'aucun adulte n'est rattaché à ton compte, personne ne pourra le retrouver pour toi.",
@@ -249,6 +250,8 @@ export const fr = {
     creerLeCompte: "Créer le compte",
     enfantCree:
       "Compte créé. {prenom} se connecte avec l'identifiant {identifiant} et le mot de passe que vous venez de choisir.",
+    lienProvisoire: "rattachement en cours",
+    lienProvisoireDetail: "Pendant quarante-huit heures après la reconnaissance, vous ne voyez que son prénom. Le temps qu'un autre adulte de la famille puisse s'y opposer.",
     identifiantDe: "Identifiant",
     aucunEnfant:
       "Aucun enfant rattaché pour l'instant. Créez-lui un compte : il n'a pas besoin d'adresse mail, seulement d'un identifiant et d'un mot de passe.",

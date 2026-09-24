@@ -1,4 +1,5 @@
 import { redirect } from "next/navigation"
+import { ReglagesRapides } from "@/composants/reglages-rapides"
 
 import { BoutonDeconnexion } from "@/composants/deconnexion"
 import { Registre } from "@/composants/registre"
@@ -77,6 +78,7 @@ export default async function AccueilParent({
             </h1>
             <p className="doux mt-0.5 text-sm">{d.parent.espace}</p>
           </div>
+          <ReglagesRapides />
           <BoutonDeconnexion langue={langue} />
         </header>
 

@@ -1,4 +1,5 @@
 import Link from "next/link"
+import { ReglagesRapides } from "@/composants/reglages-rapides"
 import { Reconnaitre, type DemandeARecconnaitre } from "./reconnaitre"
 import { redirect } from "next/navigation"
 
@@ -121,6 +122,7 @@ export default async function Accueil({
               taille={32}
             />
           </Link>
+          <ReglagesRapides />
           <BoutonDeconnexion langue={langue} libelle={d.commun.quitter} />
         </span>
       </header>

@@ -160,6 +160,7 @@ export const en: Dictionnaire = {
     telephone: "Your phone number",
     aideTelephone:
       "Used by the team for verification, never shown to families",
+    aideMotDePasseEnfant: "6 characters minimum. Pick one you will remember.",
     aideMotDePasse: "8 characters minimum",
     valider: "Create the account",
     avertissementEnfant: "You do not need an email address. But remember your password well: until an adult is linked to your account, nobody can recover it for you.",
@@ -246,6 +247,8 @@ export const en: Dictionnaire = {
     creerLeCompte: "Create the account",
     enfantCree:
       "Account created. {prenom} signs in with the username {identifiant} and the password you just chose.",
+    lienProvisoire: "link pending",
+    lienProvisoireDetail: "For forty-eight hours after recognition you only see their first name. Time enough for another adult in the family to object.",
     identifiantDe: "Username",
     aucunEnfant:
       "No child linked yet. Create an account for them: no email address needed, only a username and a password.",
