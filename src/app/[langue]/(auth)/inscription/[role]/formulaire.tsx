@@ -33,13 +33,23 @@ export function Formulaire({
           <Champ label={c.nom} name="nom" autoComplete="family-name" />
         )}
 
-        <Champ
-          label={t.email}
-          name="email"
-          type="email"
-          autoComplete="email"
-          required
-        />
+        {/* Pas d'adresse pour un enfant.
+
+            Une adresse est un canal vers lui qui ne passe pas par la
+            plateforme, et tout le produit est bâti pour qu'aucun adulte n'ait
+            de canal privé vers un enfant. La contrepartie est qu'il ne peut
+            pas récupérer son mot de passe tant qu'aucun adulte ne lui est
+            rattaché — et on le lui dit AVANT qu'il ne choisisse, pas après
+            l'avoir oublié. */}
+        {role !== "eleve" && (
+          <Champ
+            label={t.email}
+            name="email"
+            type="email"
+            autoComplete="email"
+            required
+          />
+        )}
 
         {role === "repetiteur" && (
           <Champ
@@ -59,6 +69,17 @@ export function Formulaire({
           aide={c.aideMotDePasse}
           required
         />
+
+        {role === "eleve" && (
+          <p
+            className="rounded-[10px] px-3 py-2.5 text-[12.5px] leading-relaxed"
+            style={{
+              background: "color-mix(in srgb, var(--texte) 5%, var(--fond))",
+            }}
+          >
+            {c.avertissementEnfant}
+          </p>
+        )}
 
         <Message erreur={etat.erreur} info={etat.info} />
 

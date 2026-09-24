@@ -135,7 +135,7 @@ export const fr = {
   inscriptionRole: {
     eleve: {
       phare: "Bienvenue.",
-      titre: "Créer ton compte élève",
+      titre: "Créer ton compte",
       sousTitre: "Tu choisiras ta classe et tes matières juste après.",
       prenom: "Ton prénom",
       email: "Ton email",
@@ -143,7 +143,7 @@ export const fr = {
     },
     parent: {
       phare: "Vous saurez toujours ce qui s'est passé.",
-      titre: "Créer votre compte parent",
+      titre: "Créer votre compte",
       sousTitre:
         "Vous pourrez ensuite rattacher vos enfants et consulter leur suivi.",
       prenom: "Votre prénom",
@@ -165,6 +165,7 @@ export const fr = {
       "Utilisé par l'équipe pour la vérification, jamais affiché aux familles",
     aideMotDePasse: "8 caractères minimum",
     valider: "Créer le compte",
+    avertissementEnfant: "Tu n'as pas besoin d'adresse mail. Mais retiens bien ton mot de passe : tant qu'aucun adulte n'est rattaché à ton compte, personne ne pourra le retrouver pour toi.",
     changerRole: "Changer de rôle",
     seConnecter: "Se connecter",
   },
@@ -184,6 +185,7 @@ export const fr = {
     prenomManquant: "Il me faut un prénom.",
     emailManquant: "Il me faut un email.",
     motDePasseTropCourt: "Le mot de passe doit faire au moins 8 caractères.",
+    inscriptionEchouee: "L'inscription n'a pas abouti. Réessaie dans un moment.",
     compteCree:
       "Compte créé. Ouvre l'email envoyé à {email} pour confirmer, puis connecte-toi.",
   },

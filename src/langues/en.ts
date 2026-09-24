@@ -132,7 +132,7 @@ export const en: Dictionnaire = {
   inscriptionRole: {
     eleve: {
       phare: "Welcome.",
-      titre: "Create your student account",
+      titre: "Create your account",
       sousTitre: "You will choose your class and subjects right after.",
       prenom: "Your first name",
       email: "Your email",
@@ -140,7 +140,7 @@ export const en: Dictionnaire = {
     },
     parent: {
       phare: "You will always know what happened.",
-      titre: "Create your parent account",
+      titre: "Create your account",
       sousTitre:
         "You will then be able to add your children and follow their progress.",
       prenom: "Your first name",
@@ -162,6 +162,7 @@ export const en: Dictionnaire = {
       "Used by the team for verification, never shown to families",
     aideMotDePasse: "8 characters minimum",
     valider: "Create the account",
+    avertissementEnfant: "You do not need an email address. But remember your password well: until an adult is linked to your account, nobody can recover it for you.",
     changerRole: "Change role",
     seConnecter: "Sign in",
   },
@@ -181,6 +182,7 @@ export const en: Dictionnaire = {
     prenomManquant: "I need a first name.",
     emailManquant: "I need an email.",
     motDePasseTropCourt: "The password must be at least 8 characters.",
+    inscriptionEchouee: "Sign-up did not go through. Try again in a moment.",
     compteCree:
       "Account created. Open the email sent to {email} to confirm, then sign in.",
   },

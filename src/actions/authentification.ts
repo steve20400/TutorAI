@@ -12,7 +12,7 @@ import {
   type Dictionnaire,
   type Langue,
 } from "@/langues"
-import { api } from "@/lib/api"
+import { api, ErreurApi } from "@/lib/api"
 import { supabaseServeur } from "@/lib/supabase/server"
 
 export type EtatFormulaire = {
@@ -121,6 +121,38 @@ export async function seConnecter(
   redirect(await accueilDeLUtilisateur(supabase, langue))
 }
 
+/**
+ * Ouvre la session d'un compte qui vient d'être créé.
+ *
+ * Le même chemin que la connexion ordinaire : l'identifiant est résolu en
+ * adresse interne, puis on se connecte. Recopier la logique de connexion ici
+ * aurait fini par la faire diverger.
+ */
+async function ouvrirLaSession(
+  identifiant: string,
+  motDePasse: string,
+  langue: Langue,
+  d: ReturnType<typeof dictionnaire>,
+): Promise<EtatFormulaire> {
+  const supabase = await supabaseServeur()
+
+  const { data } = await supabase.rpc("email_par_identifiant", {
+    saisie: identifiant,
+  })
+
+  const { error } = await supabase.auth.signInWithPassword({
+    email: (data as string | null) ?? identifiant,
+    password: motDePasse,
+  })
+
+  if (error) {
+    return { erreur: traduire(error.message, d, await contactAdministration()) }
+  }
+
+  revalidatePath("/", "layout")
+  redirect(chemin(langue, "/"))
+}
+
 /** Rôles qu'un visiteur peut se donner lui-même. `admin` n'en fait pas partie. */
 const ROLES_AUTORISES = ["eleve", "parent", "repetiteur"] as const
 type RoleInscription = (typeof ROLES_AUTORISES)[number]
@@ -183,6 +215,42 @@ export async function sInscrire(
   const role = roleBrut as RoleInscription
 
   if (!prenom) return { erreur: d.erreurs.prenomManquant }
+
+  // ── L'enfant venu seul ───────────────────────────────────────────────────
+  //
+  // Ni adresse, ni confirmation par courriel : une adresse est un canal vers
+  // lui qui ne passe pas par la plateforme, et tout le produit est bâti pour
+  // qu'aucun adulte n'ait de canal privé vers un enfant.
+  //
+  // Le service crée le compte — c'est le seul endroit où un visiteur anonyme
+  // écrit dans `auth.users`, et le plafond horaire vit là-bas — puis on ouvre
+  // sa session ici avec l'identifiant qu'il nous rend.
+  //
+  // Six caractères et non huit : il doit pouvoir le taper seul.
+  if (role === "eleve") {
+    if (motDePasse.length < 6) return { erreur: d.erreurs.motDePasseTropCourt }
+
+    let identifiant: string
+    try {
+      const rendu = await api<{ identifiant: string }>(
+        "/v1/inscription/enfant",
+        {
+          methode: "POST",
+          corps: { prenom, nom: nom || undefined, motDePasse },
+          sansSession: true,
+        },
+      )
+      identifiant = rendu.identifiant
+    } catch (e: unknown) {
+      return {
+        erreur:
+          e instanceof ErreurApi ? e.message : d.erreurs.inscriptionEchouee,
+      }
+    }
+
+    return ouvrirLaSession(identifiant, motDePasse, langue, d)
+  }
+
   if (!email) return { erreur: d.erreurs.emailManquant }
   if (motDePasse.length < 8) return { erreur: d.erreurs.motDePasseTropCourt }
 
