@@ -10,6 +10,8 @@ import {
 import { exigerAdmin } from "@/lib/admin"
 import { lireParametres } from "@/lib/parametres"
 import { MODULES } from "@/lib/modules"
+import { changerDuree } from "@/actions/admin"
+import { BoutonAction } from "@/composants/bouton-action"
 
 export default async function PageModules({
   params,
@@ -71,6 +73,44 @@ export default async function PageModules({
             </Link>
           )
         })}
+      </div>
+
+      {/* Les réglages qui ne sont pas des interrupteurs.
+
+          Ils n'avaient nulle part où vivre : la page des modules ne montrait
+          que ce qui s'allume et s'éteint, et une durée n'est ni l'un ni
+          l'autre. */}
+      <div className="max-w-2xl px-5 pb-7 sm:px-7">
+        <section className="carte p-5">
+          <div className="text-[14px] font-medium">{t.dureeTitre}</div>
+          <p className="doux mt-1 text-[12px] leading-relaxed">
+            {t.dureeDetail}
+          </p>
+
+          <form action={changerDuree} className="mt-3 flex flex-wrap gap-2">
+            <input type="hidden" name="langue" value={langue} />
+            <input
+              name="minutes"
+              type="number"
+              min={1}
+              max={1440}
+              defaultValue={parametres.duree_demande_mot_de_passe_minutes}
+              className="champ w-28 px-3 py-2 text-[14px]"
+            />
+            <BoutonAction className="bt1 px-4 py-2">
+              {d.adminPages.cles.enregistrer}
+            </BoutonAction>
+          </form>
+
+          {/* Ce qui ne dépend pas de ce champ, et qu'il faut dire ici plutôt
+              que de le laisser découvrir. */}
+          <p
+            className="doux mt-3 rounded-[8px] px-3 py-2 text-[11.5px] leading-relaxed"
+            style={{ background: "color-mix(in srgb, var(--texte) 5%, var(--fond))" }}
+          >
+            {t.dureeCourriel}
+          </p>
+        </section>
       </div>
     </>
   )

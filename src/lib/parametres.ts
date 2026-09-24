@@ -37,6 +37,14 @@ export type Parametres = {
    */
   ia_modele_essai: string
   ia_modele_compte: string
+  /**
+   * Combien de temps vaut une demande de mot de passe, en minutes.
+   *
+   * Gouverne le canal interne — la demande affichée dans l'espace de
+   * l'adulte. Le lien envoyé par courriel expire, lui, selon un réglage de
+   * Supabase, hors de cette application.
+   */
+  duree_demande_mot_de_passe_minutes: number
 }
 
 const DEFAUTS: Parametres = {
@@ -50,6 +58,7 @@ const DEFAUTS: Parametres = {
   ia_fournisseur: "anthropic",
   ia_modele_essai: "",
   ia_modele_compte: "",
+  duree_demande_mot_de_passe_minutes: 60,
 }
 
 /**

@@ -144,6 +144,28 @@ export async function changerModeles(donnees: FormData): Promise<void> {
   if (compte) await agir("/v1/admin/parametres/ia_modele_compte", { valeur: compte })
 }
 
+/**
+ * Combien de temps vaut une demande de mot de passe.
+ *
+ * Ce réglage gouverne le canal interne — la demande affichée dans l'espace de
+ * l'adulte. Le lien envoyé par courriel, lui, expire selon un réglage de
+ * Supabase, hors de cette application : l'écran le dit, plutôt que de laisser
+ * croire qu'un seul champ suffit.
+ */
+export async function changerDuree(donnees: FormData): Promise<void> {
+  const langue = langueDeFormulaire(donnees)
+  const minutes = Number(donnees.get("minutes") ?? 0)
+
+  // Une borne large, mais une borne : à zéro la demande serait morte-née, et
+  // à un jour ce ne serait plus une demande, mais une porte.
+  if (!Number.isInteger(minutes) || minutes < 1 || minutes > 1440) return
+
+  await exigerSession(langue)
+  await agir("/v1/admin/parametres/duree_demande_mot_de_passe_minutes", {
+    valeur: minutes,
+  })
+}
+
 const MODES = ["par_eleve_actif", "pourcentage_gains"] as const
 
 /**
