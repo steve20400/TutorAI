@@ -52,13 +52,26 @@ export function Conversation({
         body: JSON.stringify({ contenu }),
       })
 
-      const data = (await r.json()) as { reponse?: string; erreur?: string }
+      const data = (await r.json()) as {
+        reponse?: string
+        /** Famille de la panne : le message, lui, reste au journal du serveur. */
+        code?: keyof typeof d.tuteur.tuteurIndisponible
+        erreur?: string
+      }
 
       if (!r.ok || !data.reponse) {
         // On rend son texte à l'élève plutôt que de le lui faire retaper.
         setBulles((b) => b.filter((x) => x.id !== provisoire))
         setSaisie(contenu)
-        setErreur(data.erreur ?? d.seance.envoiEchoue)
+        // Une phrase que l'élève peut lire, dans sa langue. Le message du
+        // fournisseur est en anglais et technique — « This model is currently
+        // experiencing high demand » — et un enfant de cinquième ne doit
+        // jamais le voir.
+        setErreur(
+          (data.code && d.tuteur.tuteurIndisponible[data.code]) ??
+            data.erreur ??
+            d.seance.envoiEchoue,
+        )
         return
       }
 

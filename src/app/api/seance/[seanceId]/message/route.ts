@@ -68,7 +68,14 @@ export async function POST(
   }
 
   let reponse = ""
-  let erreur: string | null = null
+  /**
+   * Le code de la panne, pas son message.
+   *
+   * Le fournisseur écrit en anglais et en jargon. L'écran choisira une phrase
+   * dans la langue de l'élève — une phrase qu'un enfant de cinquième peut
+   * lire.
+   */
+  let codeErreur: string | null = null
 
   const lecteur = flux.body.getReader()
   const decodeur = new TextDecoder()
@@ -89,10 +96,16 @@ export async function POST(
         const m = JSON.parse(ligne.slice(5).trim()) as {
           type: string
           texte?: string
+          code?: string
           message?: string
         }
         if (m.type === "texte" && m.texte) reponse += m.texte
-        else if (m.type === "erreur") erreur = m.message ?? "appel refusé"
+        else if (m.type === "erreur") {
+          codeErreur = m.code ?? "autre"
+          // Le détail technique reste dans le journal du serveur : il sert à
+          // l'administration, jamais à l'élève.
+          console.error("tuteur indisponible", m.code, m.message)
+        }
       } catch {
         // Une trame illisible ne doit pas emporter toute la réponse.
       }
@@ -101,8 +114,8 @@ export async function POST(
 
   // Une erreur arrivée en cours de flux : le service a déjà gardé ce qui avait
   // été écrit, donc on rend ce qu'on a plutôt que rien.
-  if (erreur && !reponse) {
-    return NextResponse.json({ erreur }, { status: 502 })
+  if (codeErreur && !reponse) {
+    return NextResponse.json({ code: codeErreur }, { status: 502 })
   }
 
   return NextResponse.json({ reponse })

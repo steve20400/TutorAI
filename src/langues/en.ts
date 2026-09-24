@@ -311,6 +311,12 @@ export const en: Dictionnaire = {
     reprendre: "Resume the current session",
     commencer: "Start a session",
     seancesPassees: "Past sessions",
+    tuteurIndisponible: {
+      surcharge: "Your tutor is very busy right now. Wait a moment and send your message again.",
+      cle: "Your tutor is unavailable. Tell an adult: access to the tutor must be renewed.",
+      modele: "Your tutor is unavailable. Tell an adult: a setting needs fixing.",
+      autre: "Your tutor is not answering right now. Try again in a moment.",
+    },
     aucuneSeance: "No session yet. Your tutor is waiting.",
     leconNonIdentifiee: "Lesson not identified yet",
     aucunProgrammeTitre: "No syllabus available",

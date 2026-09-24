@@ -323,6 +323,12 @@ export const fr = {
     reprendre: "Reprendre la séance en cours",
     commencer: "Commencer une séance",
     seancesPassees: "Séances passées",
+    tuteurIndisponible: {
+      surcharge: "Ton tuteur est très demandé en ce moment. Attends quelques instants et renvoie ton message.",
+      cle: "Ton tuteur n'est pas disponible. Préviens un adulte : l'accès au tuteur doit être renouvelé.",
+      modele: "Ton tuteur n'est pas disponible. Préviens un adulte : un réglage doit être corrigé.",
+      autre: "Ton tuteur ne répond pas pour l'instant. Réessaie dans un moment.",
+    },
     aucuneSeance: "Aucune séance pour l'instant. Ton tuteur t'attend.",
     leconNonIdentifiee: "Leçon pas encore identifiée",
     aucunProgrammeTitre: "Aucun programme disponible",
