@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useRef, useState } from "react"
+import { TexteMathematique } from "@/composants/texte-mathematique"
 
 import { useLangue } from "@/langues/contexte"
 import type { AuteurMessage } from "@/types/db"
@@ -86,7 +87,7 @@ export function Conversation({
                 : "max-w-[90%] self-start rounded-2xl rounded-bl-sm bg-black/[0.05] px-4 py-2.5 dark:bg-white/[0.08]"
             }
           >
-            <p className="whitespace-pre-wrap leading-relaxed">{b.contenu}</p>
+            <TexteMathematique texte={b.contenu} />
           </div>
         ))}
 
