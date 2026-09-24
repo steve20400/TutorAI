@@ -1,39 +1,38 @@
+import { api } from "./api"
+
 /**
- * Listes fermées du référentiel scolaire camerounais.
+ * Le référentiel scolaire camerounais : matières et niveaux.
  *
- * Dans un fichier ordinaire et non dans `actions/repetiteur.ts`, qui porte
- * `"use server"` : là-bas, seules les fonctions async traversent la frontière
- * vers le navigateur. Une constante exportée d'un fichier serveur arrive
- * `undefined` côté client — et `[...undefined]` lève « u is not iterable ».
+ * Il était écrit en dur ici, et une deuxième fois dans le service, pour la
+ * validation. Deux listes qui disent la même chose finissent toujours par
+ * diverger — et le jour où elles divergent, personne ne le voit. C'est
+ * exactement ainsi que la clé Gemini a disparu en silence.
  *
- * Ce n'est pas une erreur que la compilation attrape : le type reste correct,
- * et le crash n'apparaît qu'à l'exécution, sur la page de profil du
- * répétiteur, c'est-à-dire sur le premier écran qu'il voit en se connectant.
+ * Ce sont des données, pas du code : le système scolaire bouge, une matière
+ * s'ajoute, un intitulé change. Rien de cela ne doit demander un déploiement.
  *
- * Les deux listes servent aux deux bords : le formulaire les affiche, l'action
- * serveur filtre contre elles ce qui remonte du navigateur.
+ * Attention au piège que portait l'ancien fichier, et qui vaut toujours : le
+ * formulaire du répétiteur est un composant CLIENT. Il ne peut pas appeler
+ * ceci. C'est la page, servie, qui lit le référentiel et le lui passe en
+ * propriété.
  */
-export const MATIERES = [
-  "Mathématiques",
-  "Physique-Chimie",
-  "SVT",
-  "Français",
-  "Anglais",
-  "Philosophie",
-  "Histoire-Géographie",
-  "Informatique",
-  "Économie",
-] as const
+export type Referentiel = {
+  matieres: string[]
+  niveaux: string[]
+}
 
-export const NIVEAUX = [
-  "6e",
-  "5e",
-  "4e",
-  "3e",
-  "2nde",
-  "1ère",
-  "Terminale",
-] as const
-
-export type Matiere = (typeof MATIERES)[number]
-export type Niveau = (typeof NIVEAUX)[number]
+/**
+ * En cas de panne, deux listes vides plutôt qu'une page en erreur.
+ *
+ * Un répétiteur verrait alors un formulaire sans cases à cocher — ce qui est
+ * visiblement anormal, donc signalable — au lieu d'un écran blanc dont il ne
+ * pourrait rien dire.
+ */
+export async function lireReferentiel(): Promise<Referentiel> {
+  try {
+    const r = await api<Referentiel>("/v1/referentiel", { sansSession: true })
+    return { matieres: r.matieres ?? [], niveaux: r.niveaux ?? [] }
+  } catch {
+    return { matieres: [], niveaux: [] }
+  }
+}

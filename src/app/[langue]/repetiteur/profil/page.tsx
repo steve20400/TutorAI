@@ -6,6 +6,7 @@ import { chemin, dictionnaire, estLangue, LANGUE_PAR_DEFAUT } from "@/langues"
 import { api } from "@/lib/api"
 import { supabaseServeur } from "@/lib/supabase/server"
 import { FormulaireProfil } from "./formulaire"
+import { lireReferentiel } from "@/lib/referentiel"
 
 /** Un statut inconnu en base ne doit pas faire disparaître le bandeau. */
 const STATUTS = ["brouillon", "en_attente", "verifie", "refuse"] as const
@@ -75,6 +76,10 @@ export default async function PageProfilRepetiteur({
   const profil = reponse?.profil ?? null
   const fiche = reponse?.fiche ?? null
 
+  // Lu ici, et passé au formulaire : celui-ci est un composant client, il ne
+  // peut pas appeler le service lui-même.
+  const referentiel = await lireReferentiel()
+
   if (!fiche) redirect(chemin(langue, "/"))
 
   const brutStatut = fiche?.statut ?? "brouillon"
@@ -117,6 +122,7 @@ export default async function PageProfilRepetiteur({
         </section>
 
         <FormulaireProfil
+          referentiel={referentiel}
           compteId={fiche.id}
           nom={[profil?.prenom, profil?.nom].filter(Boolean).join(" ")}
           valeurs={{

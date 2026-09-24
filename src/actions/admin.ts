@@ -1,7 +1,6 @@
 "use server"
 
 import { redirect } from "next/navigation"
-import { estUneCle } from "@/lib/cles"
 import { revalidatePath } from "next/cache"
 import { cookies } from "next/headers"
 
@@ -106,9 +105,6 @@ export async function changerResolution(donnees: FormData): Promise<void> {
   await agir("/v1/admin/parametres/resolution_video", { valeur })
 }
 
-/** Les trois que le service sait appeler. Un autre nom laisserait le tuteur muet. */
-const FOURNISSEURS = ["anthropic", "gemini", "compatible"] as const
-
 /**
  * Choisit d'où vient le tuteur.
  *
@@ -119,7 +115,9 @@ const FOURNISSEURS = ["anthropic", "gemini", "compatible"] as const
 export async function changerFournisseur(donnees: FormData): Promise<void> {
   const langue = langueDeFormulaire(donnees)
   const valeur = String(donnees.get("fournisseur") ?? "")
-  if (!(FOURNISSEURS as readonly string[]).includes(valeur)) return
+  // Pas de liste ici : le service refuse déjà un nom qu'aucun de ses
+  // adaptateurs ne sait servir, et lui seul sait lesquels il a.
+  if (!valeur) return
 
   await exigerSession(langue)
   await agir("/v1/admin/parametres/ia_fournisseur", { valeur })
@@ -199,11 +197,11 @@ export async function poserCle(donnees: FormData): Promise<void> {
   const langue = langueDeFormulaire(donnees)
   const nom = String(donnees.get("nom") ?? "")
   const valeur = String(donnees.get("valeur") ?? "").trim()
-  // Un nom inconnu ne ressort plus en silence : c'est ce silence qui avait
-  // laissé croire trois fois de suite qu'une clé venait d'être enregistrée.
-  if (!estUneCle(nom)) {
-    throw new Error(`Clé inconnue : « ${nom} ». À ajouter dans src/lib/cles.ts.`)
-  }
+  // Aucune liste ici. `poser_cle` refuse déjà un nom qui n'existe pas dans
+  // `cles_api`, et c'est la seule autorité légitime : une liste recopiée dans
+  // le code ne protégeait de rien, elle empêchait la base de parler. C'est
+  // elle qui avait fait disparaître la clé Gemini en silence.
+  if (!nom) return
 
   await exigerSession(langue)
   await agir(`/v1/admin/cles/${nom}`, { valeur })

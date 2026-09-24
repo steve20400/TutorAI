@@ -3,7 +3,6 @@
 import { redirect } from "next/navigation"
 import { revalidatePath } from "next/cache"
 import { chemin, langueDeFormulaire } from "@/langues"
-import { MATIERES, NIVEAUX } from "@/lib/referentiel"
 import { api, ErreurApi } from "@/lib/api"
 import { supabaseServeur } from "@/lib/supabase/server"
 
@@ -25,16 +24,10 @@ export async function enregistrerProfil(
   const matieres = donnees
     .getAll("matieres")
     .map(String)
-    .filter((m): m is (typeof MATIERES)[number] =>
-      (MATIERES as readonly string[]).includes(m),
-    )
 
   const niveaux = donnees
     .getAll("niveaux")
     .map(String)
-    .filter((n): n is (typeof NIVEAUX)[number] =>
-      (NIVEAUX as readonly string[]).includes(n),
-    )
 
   if (matieres.length === 0) {
     return { erreur: "Indiquez au moins une matière." }

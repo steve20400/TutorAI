@@ -6,7 +6,7 @@ import { PhotoProfil } from "@/composants/photo-profil"
 import { useLangue } from "@/langues/contexte"
 import { Message } from "../../(auth)/champs"
 import { enregistrerProfil, type EtatProfil } from "@/actions/repetiteur"
-import { MATIERES, NIVEAUX } from "@/lib/referentiel"
+import type { Referentiel } from "@/lib/referentiel"
 
 const ETAT_INITIAL: EtatProfil = {}
 
@@ -25,8 +25,14 @@ export function FormulaireProfil({
   valeurs,
   compteId,
   nom,
+  referentiel,
 }: {
   valeurs: Valeurs
+  /**
+   * Matières et niveaux, lus en base par la page. Ce composant est client :
+   * il ne peut pas aller les chercher lui-même.
+   */
+  referentiel: Referentiel
   compteId: string
   nom: string
 }) {
@@ -56,7 +62,7 @@ export function FormulaireProfil({
       <Section titre={f.ceQueVousEnseignez}>
         <Cases
           nom="matieres"
-          options={[...MATIERES]}
+          options={referentiel.matieres}
           etiquettes={d.matieres}
           cochees={valeurs.matieres}
         />
@@ -65,7 +71,7 @@ export function FormulaireProfil({
       <Section titre={f.aQuelsNiveaux}>
         <Cases
           nom="niveaux"
-          options={[...NIVEAUX]}
+          options={referentiel.niveaux}
           etiquettes={d.niveaux}
           cochees={valeurs.niveaux}
         />

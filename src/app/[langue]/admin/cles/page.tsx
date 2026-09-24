@@ -4,13 +4,14 @@ import { dictionnaire, estLangue, LANGUE_PAR_DEFAUT, type Langue } from "@/langu
 import { exigerAdmin } from "@/lib/admin"
 import { api } from "@/lib/api"
 import { BoutonAction } from "@/composants/bouton-action"
-import { CLES } from "@/lib/cles"
 
 type Cle = {
   nom: string
   publique: boolean
   apercu: string | null
   maj_le: string | null
+  /** Rangé dans `cles_api` : ajouter une clé, c'est insérer une ligne. */
+  ordre: number
 }
 
 
@@ -55,10 +56,10 @@ export default async function PageCles({
     etat = null
   }
 
-  const ordre = CLES as readonly string[]
-  const cles = ((data ?? []) as Cle[]).sort(
-    (a, b) => ordre.indexOf(a.nom) - ordre.indexOf(b.nom),
-  )
+  // `lister_cles` les rend déjà dans l'ordre voulu. Les retrier ici
+  // reviendrait à réécrire cet ordre dans le code, ce qui est exactement ce
+  // qui avait fait diverger les deux listes.
+  const cles = (data ?? []) as Cle[]
 
   return (
     <>

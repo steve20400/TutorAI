@@ -9,6 +9,7 @@ import {
   LANGUE_PAR_DEFAUT,
 } from "@/langues"
 import { exigerAdmin } from "@/lib/admin"
+import { api } from "@/lib/api"
 import { lireParametres } from "@/lib/parametres"
 import { basculerParametre, changerFournisseur, changerResolution } from "@/actions/admin"
 import { MODULES, type CleModule } from "@/lib/modules"
@@ -23,13 +24,7 @@ const CLE_REQUISE: Partial<Record<CleModule, string>> = {
   paiement_actif: "mobile_money",
 }
 
-/** Les trois fournisseurs, et la clé que chacun exige pour s'allumer. */
-const FOURNISSEURS = [
-  { cle: "anthropic", nom: "Anthropic", cleExigee: "anthropic" },
-  { cle: "gemini", nom: "Gemini", cleExigee: "gemini" },
-  // Un modèle qui tourne sur votre propre machine n'a souvent aucune clé.
-  { cle: "compatible", nom: "Compatible OpenAI", cleExigee: null },
-] as const
+
 
 const RESOLUTIONS = ["360p", "480p", "720p"] as const
 
@@ -65,6 +60,21 @@ export default async function PageModule({
       ? parametres.ia_fournisseur
       : "anthropic"
 
+  // La liste des fournisseurs n'est pas recopiée ici : elle vient du service,
+  // qui la tient de ses propres adaptateurs. En ajouter un du côté du site
+  // afficherait un bouton que rien ne sait servir.
+  let fournisseursConnus: string[] = []
+  if (cle === "ia_active") {
+    try {
+      const etat = await api<{ fournisseursConnus: string[] }>(
+        "/v1/admin/tuteur/etat",
+      )
+      fournisseursConnus = etat.fournisseursConnus ?? []
+    } catch {
+      fournisseursConnus = []
+    }
+  }
+
   return (
     <>
       <div className="px-5 sm:px-7 pt-7">
@@ -85,7 +95,7 @@ export default async function PageModule({
       <div className="flex max-w-2xl flex-col gap-5 px-5 sm:px-7 pb-7">
         <p className="doux text-[13px] leading-relaxed">{textes.detail}</p>
 
-        {cle === "ia_active" ? (
+        {cle === "ia_active" && fournisseursConnus.length > 0 ? (
           <section className="carte p-5">
             <div className="text-[14px] font-medium">{t.fournisseurTitre}</div>
             <p className="doux mt-1 text-[12px] leading-relaxed">
@@ -93,14 +103,14 @@ export default async function PageModule({
             </p>
             <form action={changerFournisseur} className="mt-3 flex flex-wrap gap-2">
               <input type="hidden" name="langue" value={langue} />
-              {FOURNISSEURS.map((f) => (
+              {fournisseursConnus.map((f) => (
                 <BoutonAction
-                  key={f.cle}
+                  key={f}
                   nom="fournisseur"
-                  valeur={f.cle}
-                  className={fournisseur === f.cle ? "bt1" : "bt2"}
+                  valeur={f}
+                  className={fournisseur === f ? "bt1" : "bt2"}
                 >
-                  {f.nom}
+                  {d.adminPages.cles[f as keyof typeof d.adminPages.cles] ?? f}
                 </BoutonAction>
               ))}
             </form>

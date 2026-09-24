@@ -532,6 +532,7 @@ export const en: Dictionnaire = {
       intro: "Overview. Each key can also be set from its own module.",
       anthropic: "Anthropic",
       gemini: "Gemini (Google)",
+      compatible: "OpenAI-compatible",
       ia_compatible: "OpenAI-compatible model",
       ia_compatible_url: "Compatible server address",
       orange: "Orange Money",

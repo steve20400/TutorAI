@@ -544,6 +544,7 @@ export const fr = {
       intro: "Vue d'ensemble. Chaque clé se règle aussi depuis son module.",
       anthropic: "Anthropic",
       gemini: "Gemini (Google)",
+      compatible: "Compatible OpenAI",
       ia_compatible: "Modèle compatible OpenAI",
       ia_compatible_url: "Adresse du serveur compatible",
       orange: "Orange Money",
