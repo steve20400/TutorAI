@@ -519,6 +519,9 @@ ajouter: "Ajouter",
     familles: {
       detailFamille: "Famille",
       leParent: "Le parent",
+      rattachements: "Tentatives de rattachement",
+      rattachementsDetail: "{refusees} demandes refusées par des enfants, pour {acceptees} acceptées.",
+      rattachementsAide: "Un adulte que personne n'a jamais reconnu et qui insiste ne cherche pas son enfant. Un parent que d'autres enfants ont reconnu s'est probablement trompé de nom.",
       lesEnfants: "Les enfants",
       lesContrats: "Répétiteurs engagés",
       aucunContrat:

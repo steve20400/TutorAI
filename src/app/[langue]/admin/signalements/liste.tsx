@@ -1,8 +1,9 @@
 "use client"
 
+import Link from "next/link"
 import { useActionState, useState } from "react"
 
-import { dictionnaire, remplir, type Langue } from "@/langues"
+import { chemin, dictionnaire, remplir, type Langue } from "@/langues"
 import {
   marquerLue,
   traiterSignalement,
@@ -116,9 +117,33 @@ function Carte({
         </span>
       </div>
 
+      {/* Le nom mène au dossier.
+
+          Une alerte qui nomme quelqu'un sans permettre de l'atteindre oblige
+          à le chercher dans une autre rubrique, en retenant son nom. C'est
+          exactement le moment où l'on renonce — et c'est le moment où il ne
+          faut pas.
+
+          Un répétiteur a son dossier de vérification, un adulte sa fiche de
+          famille : ce ne sont pas les mêmes écrans, et c'est là qu'on peut
+          suspendre le compte. */}
       {cible ? (
         <div className="mt-1.5 text-[13.5px] font-medium">
-          {remplir(t.vise, { nom: cible })}
+          {s.cible ? (
+            <Link
+              href={chemin(
+                langue,
+                s.cible.role === "repetiteur"
+                  ? `/admin/dossiers/${s.cible.id}`
+                  : `/admin/familles/${s.cible.id}`,
+              )}
+              className="underline underline-offset-4"
+            >
+              {remplir(t.vise, { nom: cible })}
+            </Link>
+          ) : (
+            remplir(t.vise, { nom: cible })
+          )}
         </div>
       ) : null}
 

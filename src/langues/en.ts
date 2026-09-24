@@ -507,6 +507,9 @@ ajouter: "Add",
     familles: {
       detailFamille: "Family",
       leParent: "Parent",
+      rattachements: "Link attempts",
+      rattachementsDetail: "{refusees} requests refused by children, for {acceptees} accepted.",
+      rattachementsAide: "An adult nobody has ever recognised who keeps trying is not looking for their child. A parent other children have recognised probably got the name wrong.",
       lesEnfants: "Children",
       lesContrats: "Tutors engaged",
       aucunContrat:

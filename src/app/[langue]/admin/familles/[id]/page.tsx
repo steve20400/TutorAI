@@ -47,6 +47,12 @@ type Contrat = {
 type Famille = {
   parent: Personne
   enfants: Personne[]
+  /**
+   * Ce que cet adulte a tenté pour se rattacher à des enfants.
+   *
+   * C'est l'information qui décide, quand on arrive ici depuis une alerte.
+   */
+  tentatives?: { refusees: number; acceptees: number; en_attente: number }
   contrats: Contrat[]
 }
 
@@ -90,7 +96,7 @@ export default async function PageFamille({
     )
   }
 
-  const { parent, enfants, contrats } = famille
+  const { parent, enfants, contrats, tentatives } = famille
   const dateCourte = (v: string | null | undefined) =>
     v ? new Date(v).toLocaleDateString(d.meta.htmlLang) : "—"
 
@@ -183,6 +189,30 @@ export default async function PageFamille({
             )}
           </div>
         </section>
+
+        {/* Les tentatives de rattachement.
+
+            Affichées seulement s'il y a eu des refus : pour un parent
+            ordinaire, ce bloc n'a rien à dire et n'a pas à occuper l'écran. */}
+        {tentatives && tentatives.refusees > 0 ? (
+          <section
+            className="carte mt-4 p-5"
+            style={{ borderColor: "var(--erreur-texte)" }}
+          >
+            <div className="doux text-[10px] font-semibold uppercase tracking-[0.14em]">
+              {t.rattachements}
+            </div>
+            <p className="mt-2 text-[13.5px] leading-relaxed">
+              {remplir(t.rattachementsDetail, {
+                refusees: tentatives.refusees,
+                acceptees: tentatives.acceptees,
+              })}
+            </p>
+            <p className="doux mt-2 text-[12px] leading-relaxed">
+              {t.rattachementsAide}
+            </p>
+          </section>
+        ) : null}
 
         {/* Les enfants */}
         <section className="carte mt-4 p-5">
