@@ -190,6 +190,20 @@ export const fr = {
       "Compte créé. Ouvre l'email envoyé à {email} pour confirmer, puis connecte-toi.",
   },
 
+  reconnaitre: {
+
+    question: "{nom} dit être ta maman ou ton papa.",
+
+    aide: "Si tu la reconnais, tu peux dire oui. Si tu ne la reconnais pas, dis non.",
+
+    oui: "Oui, je la reconnais",
+
+    non: "Non, je ne la reconnais pas",
+
+    rassurance: "Personne ne saura que tu as dit non. Tu ne vexeras personne.",
+
+  },
+
   accueil: {
     bonjour: "Bonjour {prenom}",
     question: "Qu'est-ce qu'on fait aujourd'hui ?",
@@ -205,6 +219,15 @@ export const fr = {
   parent: {
     bonjour: "Bonjour {prenom}",
     espace: "Espace parent",
+    rattacher: {
+      titre: "Rattacher un enfant déjà inscrit",
+      detail: "Écrivez son nom de connexion. C'est lui qui vous reconnaîtra sur son propre écran — nous ne vous demanderons jamais son mot de passe.",
+      exemple: "son nom de connexion",
+      envoyer: "Demander",
+      envoyee: "Demande envoyée. Votre enfant la verra à sa prochaine connexion, et c'est lui qui répondra.",
+      nomTropCourt: "Écrivez son nom de connexion.",
+      echec: "La demande n'a pas pu être envoyée. Réessayez dans un moment.",
+    },
     trouverRepetiteur: "Trouver un répétiteur",
     compteRepetiteurs: {
       one: "{n} répétiteur vérifié pour l'instant.",

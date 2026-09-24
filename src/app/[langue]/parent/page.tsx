@@ -12,6 +12,7 @@ import {
 } from "@/langues"
 import { api } from "@/lib/api"
 import { Enfants, type Enfant } from "./enfants"
+import { Rattacher } from "./rattacher"
 import { supabaseServeur } from "@/lib/supabase/server"
 
 /**
@@ -90,6 +91,8 @@ export default async function AccueilParent({
             {d.parent.annuaireEtape}
           </div>
         </section>
+
+        <Rattacher />
 
         <Enfants
           langue={langue}

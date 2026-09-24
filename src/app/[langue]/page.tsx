@@ -1,4 +1,5 @@
 import Link from "next/link"
+import { Reconnaitre, type DemandeARecconnaitre } from "./reconnaitre"
 import { redirect } from "next/navigation"
 
 import { Avatar } from "@/composants/avatar"
@@ -83,6 +84,19 @@ export default async function Accueil({
 
   const premier = tuteurs[0]
 
+  // Les adultes qui disent être ses parents. En tête de son accueil, avant
+  // tout le reste : c'est la question la plus importante qu'on puisse lui
+  // poser, et il ne doit pas avoir à la chercher.
+  let aReconnaitre: DemandeARecconnaitre[] = []
+  try {
+    const rep = await api<{ donnees: DemandeARecconnaitre[] }>(
+      "/v1/liens/a-reconnaitre",
+    )
+    aReconnaitre = rep.donnees ?? []
+  } catch {
+    aReconnaitre = []
+  }
+
   return (
     <main className="mx-auto flex min-h-dvh max-w-md flex-col gap-4 p-6">
       <header className="flex items-baseline justify-between pt-8">
@@ -110,6 +124,8 @@ export default async function Accueil({
           <BoutonDeconnexion langue={langue} libelle={d.commun.quitter} />
         </span>
       </header>
+
+      <Reconnaitre demandes={aReconnaitre} langue={langue} />
 
       <div className="mt-4 flex flex-col gap-3">
         {ia_active ? (

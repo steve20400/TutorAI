@@ -187,6 +187,20 @@ export const en: Dictionnaire = {
       "Account created. Open the email sent to {email} to confirm, then sign in.",
   },
 
+  reconnaitre: {
+
+    question: "{nom} says they are your mum or dad.",
+
+    aide: "If you recognise them, you can say yes. If you do not, say no.",
+
+    oui: "Yes, I recognise them",
+
+    non: "No, I do not recognise them",
+
+    rassurance: "Nobody will know you said no. You will not upset anyone.",
+
+  },
+
   accueil: {
     bonjour: "Hello {prenom}",
     question: "What are we doing today?",
@@ -202,6 +216,15 @@ export const en: Dictionnaire = {
   parent: {
     bonjour: "Hello {prenom}",
     espace: "Parent area",
+    rattacher: {
+      titre: "Link a child who already has an account",
+      detail: "Write their login name. They will recognise you on their own screen — we will never ask you for their password.",
+      exemple: "their login name",
+      envoyer: "Ask",
+      envoyee: "Request sent. Your child will see it next time they sign in, and they will answer.",
+      nomTropCourt: "Write their login name.",
+      echec: "The request could not be sent. Try again in a moment.",
+    },
     trouverRepetiteur: "Find a tutor",
     compteRepetiteurs: {
       one: "{n} verified tutor so far.",
