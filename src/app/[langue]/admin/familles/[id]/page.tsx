@@ -1,4 +1,5 @@
 import Link from "next/link"
+import { BoutonAction } from "@/composants/bouton-action"
 
 import { desactiverCompte, reactiverCompte } from "@/actions/admin"
 import { EnteteAdmin, RienEncore } from "@/composants/admin/entete"
@@ -150,9 +151,9 @@ export default async function PageFamille({
                 <form action={reactiverCompte}>
                   <input type="hidden" name="langue" value={langue} />
                   <input type="hidden" name="compteId" value={parent.id} />
-                  <button type="submit" className="bt2">
+                  <BoutonAction className="bt2">
                     {d.adminPages.dossier.reactiver}
-                  </button>
+                  </BoutonAction>
                 </form>
               </div>
             ) : (
@@ -168,8 +169,7 @@ export default async function PageFamille({
                   placeholder={d.adminPages.dossier.motifDesactivation}
                   className="champ min-w-[220px] flex-1 px-3 py-2 text-[13px]"
                 />
-                <button
-                  type="submit"
+                <BoutonAction
                   className="bt2"
                   style={{
                     color: "var(--erreur-texte)",
@@ -177,7 +177,7 @@ export default async function PageFamille({
                   }}
                 >
                   {d.adminPages.dossier.desactiver}
-                </button>
+                </BoutonAction>
               </form>
             )}
           </div>

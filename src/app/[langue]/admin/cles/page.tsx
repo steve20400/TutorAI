@@ -3,6 +3,7 @@ import { EnteteAdmin } from "@/composants/admin/entete"
 import { dictionnaire, estLangue, LANGUE_PAR_DEFAUT, type Langue } from "@/langues"
 import { exigerAdmin } from "@/lib/admin"
 import { api } from "@/lib/api"
+import { BoutonAction } from "@/composants/bouton-action"
 
 type Cle = {
   nom: string
@@ -201,9 +202,9 @@ function CarteCle({
           placeholder={cle.nom === "carte_style" ? "https://…/style.json" : "—"}
           className="champ min-w-[200px] flex-1 px-3 py-2 text-[13px]"
         />
-        <button type="submit" className="bt1">
+        <BoutonAction className="bt1">
           {t.enregistrer}
-        </button>
+        </BoutonAction>
       </form>
     </section>
   )

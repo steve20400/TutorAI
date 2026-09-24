@@ -171,6 +171,46 @@ body {
   }
 }
 
+/* --- Le cercle d'attente ----------------------------------------------------
+   Render endort le service au bout de quinze minutes ; le reveil prend une
+   cinquantaine de secondes. Un bouton muet pendant ce temps-la est un bouton
+   casse : on reclique, et chaque clic renvoie une requete.
+
+   Le libelle ne disparait pas — on doit continuer de lire ce qu'on a demande.
+   Le cercle se glisse devant lui, et le bouton garde sa place : une largeur
+   qui saute au clic fait bouger les boutons voisins sous le doigt.
+
+   `currentColor` pour que le meme cercle serve sur un bouton plein comme sur
+   un bouton en creux, et sur le rouge du refus. */
+@keyframes tourne {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.cercle-attente {
+  width: 14px;
+  height: 14px;
+  flex: none;
+  border-radius: 50%;
+  border: 2px solid color-mix(in srgb, currentColor 25%, transparent);
+  border-top-color: currentColor;
+  animation: tourne 0.7s linear infinite;
+}
+
+/* Quelqu'un qui a demande moins d'animation la voit pulser au lieu de
+   tourner : l'information demeure, le mouvement disparait. */
+@media (prefers-reduced-motion: reduce) {
+  .cercle-attente {
+    animation: pulse-attente 1.4s ease-in-out infinite;
+  }
+  @keyframes pulse-attente {
+    50% {
+      opacity: 0.35;
+    }
+  }
+}
+
 /* --- Les ascenseurs ---------------------------------------------------------
    Le navigateur en dessine un gris système, identique partout. Sur l'encre de
    la barre latérale, qui reste sombre dans les quatre thèmes, cette barre

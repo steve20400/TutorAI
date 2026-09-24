@@ -1,4 +1,5 @@
 import Link from "next/link"
+import { BoutonAction } from "@/composants/bouton-action"
 
 import { EnteteAdmin, RienEncore } from "@/composants/admin/entete"
 import { Avatar } from "@/composants/avatar"
@@ -225,9 +226,9 @@ export default async function PageDossier({
           <form action={apposerCachet}>
             <input type="hidden" name="langue" value={langue} />
             <input type="hidden" name="repetiteurId" value={fiche.id} />
-            <button type="submit" className="bt1">
+            <BoutonAction className="bt1">
               {d.adminPages.dossiers.apposer}
-            </button>
+            </BoutonAction>
           </form>
 
           <form action={refuserDossier} className="flex flex-wrap items-start gap-2">
@@ -244,13 +245,12 @@ export default async function PageDossier({
                 {t.motifObligatoire}
               </span>
             </label>
-            <button
-              type="submit"
+            <BoutonAction
               className="bt2"
               style={{ color: "var(--erreur-texte)", borderColor: "var(--erreur-texte)" }}
             >
               {t.refuser}
-            </button>
+            </BoutonAction>
           </form>
         </div>
 
@@ -273,9 +273,9 @@ export default async function PageDossier({
               <form action={reactiverCompte}>
                 <input type="hidden" name="langue" value={langue} />
                 <input type="hidden" name="compteId" value={fiche.id} />
-                <button type="submit" className="bt2">
+                <BoutonAction className="bt2">
                   {t.reactiver}
-                </button>
+                </BoutonAction>
               </form>
             </div>
           ) : (
@@ -296,8 +296,7 @@ export default async function PageDossier({
                   {t.desactivationDetail}
                 </span>
               </label>
-              <button
-                type="submit"
+              <BoutonAction
                 className="bt2"
                 style={{
                   color: "var(--erreur-texte)",
@@ -305,7 +304,7 @@ export default async function PageDossier({
                 }}
               >
                 {t.desactiver}
-              </button>
+              </BoutonAction>
             </form>
           )}
         </div>

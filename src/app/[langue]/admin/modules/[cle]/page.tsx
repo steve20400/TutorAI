@@ -12,6 +12,7 @@ import { exigerAdmin } from "@/lib/admin"
 import { lireParametres } from "@/lib/parametres"
 import { basculerParametre, changerFournisseur, changerResolution } from "@/actions/admin"
 import { MODULES, type CleModule } from "@/lib/modules"
+import { BoutonAction } from "@/composants/bouton-action"
 
 /**
  * Modules qui ne peuvent pas s'allumer sans qu'une clé soit enregistrée.
@@ -93,15 +94,14 @@ export default async function PageModule({
             <form action={changerFournisseur} className="mt-3 flex flex-wrap gap-2">
               <input type="hidden" name="langue" value={langue} />
               {FOURNISSEURS.map((f) => (
-                <button
+                <BoutonAction
                   key={f.cle}
-                  type="submit"
-                  name="fournisseur"
-                  value={f.cle}
+                  nom="fournisseur"
+                  valeur={f.cle}
                   className={fournisseur === f.cle ? "bt1" : "bt2"}
                 >
                   {f.nom}
-                </button>
+                </BoutonAction>
               ))}
             </form>
           </section>
@@ -116,17 +116,14 @@ export default async function PageModule({
             <form action={changerResolution} className="mt-3 flex flex-wrap gap-2">
               <input type="hidden" name="langue" value={langue} />
               {RESOLUTIONS.map((r) => (
-                <button
+                <BoutonAction
                   key={r}
-                  type="submit"
-                  name="resolution"
-                  value={r}
-                  className={
-                    parametres.resolution_video === r ? "bt1" : "bt2"
-                  }
+                  nom="resolution"
+                  valeur={r}
+                  className={parametres.resolution_video === r ? "bt1" : "bt2"}
                 >
                   {r}
-                </button>
+                </BoutonAction>
               ))}
             </form>
           </section>
@@ -166,13 +163,12 @@ export default async function PageModule({
             ) : null}
           </div>
 
-          <button
-            type="submit"
-            disabled={cleManquante && !actif}
+          <BoutonAction
+            desactive={cleManquante && !actif}
             className={actif ? "bt2" : "bt1"}
           >
             {actif ? d.admin.eteindre : d.admin.activer}
-          </button>
+          </BoutonAction>
         </form>
 
         <p className="doux text-[12px] leading-relaxed">{d.admin.journal}</p>
