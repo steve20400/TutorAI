@@ -22,6 +22,7 @@ const RUBRIQUES = [
   { cle: "repetiteurs", route: "/admin/repetiteurs" },
   { cle: "familles", route: "/admin/familles" },
   { cle: "seances", route: "/admin/seances" },
+  { cle: "programmes", route: "/admin/programmes" },
   { cle: "facturation", route: "/admin/facturation" },
   { cle: "modules", route: "/admin/modules" },
   { cle: "cles", route: "/admin/cles" },
@@ -67,6 +68,16 @@ function Icone({ cle }: { cle: CleRubrique }) {
         <svg {...c}>
           <circle cx="10" cy="6.6" r="3.3" />
           <path d="M3.8 17c0-3.4 2.8-5.4 6.2-5.4s6.2 2 6.2 5.4" />
+        </svg>
+      )
+    case "programmes":
+      // Un cahier ouvert : ce que l'élève a devant lui, et ce que le tuteur
+      // doit connaître. Ni œil, ni triangle, ni compas.
+      return (
+        <svg {...c}>
+          <path d="M10 5.4C8.6 4.2 6.8 3.6 4.6 3.6H2.8v11h1.8c2.2 0 4 .6 5.4 1.8" />
+          <path d="M10 5.4c1.4-1.2 3.2-1.8 5.4-1.8h1.8v11h-1.8c-2.2 0-4 .6-5.4 1.8" />
+          <path d="M10 5.4v11" />
         </svg>
       )
     case "familles":
