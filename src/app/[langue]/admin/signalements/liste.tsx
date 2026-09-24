@@ -3,7 +3,11 @@
 import { useActionState, useState } from "react"
 
 import { dictionnaire, remplir, type Langue } from "@/langues"
-import { traiterSignalement, type EtatTraitement } from "@/actions/signalement"
+import {
+  marquerLue,
+  traiterSignalement,
+  type EtatTraitement,
+} from "@/actions/signalement"
 import { Message } from "../../(auth)/champs"
 
 type Personne = {
@@ -19,6 +23,7 @@ export type Signalement = {
   motif: string
   statut: string
   decision: string | null
+  lu_le: string | null
   traite_le: string | null
   cree_le: string
   seance_id: string | null
@@ -100,8 +105,14 @@ function Carte({
               « personne » se lirait comme une erreur. */}
           {auteur ? remplir(t.par, { nom: auteur }) : t.parLaPlateforme} · {quand}
         </span>
-        <span className={s.statut === "nouveau" ? "badge-eteint" : "badge-actif"}>
-          {s.statut === "nouveau" ? t.nouveau : t.traite}
+        <span
+          className={s.statut === "nouveau" ? "badge-eteint" : "badge-actif"}
+        >
+          {s.statut === "nouveau"
+            ? t.nouveau
+            : s.statut === "lu"
+              ? t.lu
+              : t.traite}
         </span>
       </div>
 
@@ -125,7 +136,20 @@ function Carte({
         </div>
       ) : null}
 
-      {s.statut === "nouveau" ? (
+      {s.lu_le && s.statut !== "nouveau" ? (
+        <div className="doux mt-2 text-[11.5px]">
+          {remplir(t.lueLe, {
+            date: new Date(s.lu_le).toLocaleString(langue, {
+              day: "2-digit",
+              month: "2-digit",
+              hour: "2-digit",
+              minute: "2-digit",
+            }),
+          })}
+        </div>
+      ) : null}
+
+      {s.statut !== "traite" ? (
         ouvert ? (
           <form action={action} className="mt-3 flex flex-col gap-2">
             <input type="hidden" name="langue" value={langue} />
@@ -159,13 +183,31 @@ function Carte({
             </div>
           </form>
         ) : (
-          <button
-            type="button"
-            onClick={() => setOuvert(true)}
-            className="bt2 mt-3 px-4 py-2"
-          >
-            {t.classer}
-          </button>
+          <div className="mt-3 flex flex-wrap gap-2">
+            {/* Un clic, sans rien écrire.
+
+                Lire n'est pas décider. Exiger un paragraphe pour dire « rien
+                à signaler » ferait qu'on ne les lit plus du tout — et la
+                friction chasserait la lecture, ce qui est le contraire du
+                but. */}
+            {s.statut === "nouveau" ? (
+              <form action={marquerLue}>
+                <input type="hidden" name="langue" value={langue} />
+                <input type="hidden" name="signalement" value={s.id} />
+                <button type="submit" className="bt1 px-4 py-2">
+                  {t.marquerLue}
+                </button>
+              </form>
+            ) : null}
+
+            <button
+              type="button"
+              onClick={() => setOuvert(true)}
+              className="bt2 px-4 py-2"
+            >
+              {t.classer}
+            </button>
+          </div>
         )
       ) : null}
     </section>

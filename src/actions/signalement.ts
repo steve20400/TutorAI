@@ -43,3 +43,27 @@ export async function traiterSignalement(
   revalidatePath("/", "layout")
   return { info: t.classe }
 }
+
+/**
+ * Marque une alerte comme lue. Un clic, sans rien écrire.
+ *
+ * Lire n'est pas décider. Exiger un paragraphe pour dire « rien à signaler »
+ * ferait qu'on ne les lit plus du tout — et la friction chasserait la lecture,
+ * ce qui est le contraire du but.
+ */
+export async function marquerLue(donnees: FormData): Promise<void> {
+  const langue = langueDeFormulaire(donnees)
+  const id = String(donnees.get("signalement") ?? "")
+  if (!id) return
+
+  await exigerAdmin(langue)
+
+  try {
+    await api(`/v1/admin/signalements/${id}/lu`, { methode: "POST" })
+  } catch {
+    // Un échec ne doit pas bloquer la lecture des suivantes : l'alerte
+    // restera « non lue » et reviendra.
+  }
+
+  revalidatePath("/", "layout")
+}
