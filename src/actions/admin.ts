@@ -1,6 +1,7 @@
 "use server"
 
 import { redirect } from "next/navigation"
+import { estUneCle } from "@/lib/cles"
 import { revalidatePath } from "next/cache"
 import { cookies } from "next/headers"
 
@@ -185,13 +186,7 @@ export async function refuserDossier(donnees: FormData): Promise<void> {
   await agir(`/v1/admin/dossiers/${cible}/refus`, { motif })
 }
 
-const CLES_CONNUES = [
-  "carte_style",
-  "carte_cle",
-  "anthropic",
-  "orange",
-  "mtn",
-] as const
+
 
 /**
  * Pose une clé d'accès.
@@ -204,7 +199,11 @@ export async function poserCle(donnees: FormData): Promise<void> {
   const langue = langueDeFormulaire(donnees)
   const nom = String(donnees.get("nom") ?? "")
   const valeur = String(donnees.get("valeur") ?? "").trim()
-  if (!(CLES_CONNUES as readonly string[]).includes(nom)) return
+  // Un nom inconnu ne ressort plus en silence : c'est ce silence qui avait
+  // laissé croire trois fois de suite qu'une clé venait d'être enregistrée.
+  if (!estUneCle(nom)) {
+    throw new Error(`Clé inconnue : « ${nom} ». À ajouter dans src/lib/cles.ts.`)
+  }
 
   await exigerSession(langue)
   await agir(`/v1/admin/cles/${nom}`, { valeur })

@@ -4,6 +4,7 @@ import { dictionnaire, estLangue, LANGUE_PAR_DEFAUT, type Langue } from "@/langu
 import { exigerAdmin } from "@/lib/admin"
 import { api } from "@/lib/api"
 import { BoutonAction } from "@/composants/bouton-action"
+import { CLES } from "@/lib/cles"
 
 type Cle = {
   nom: string
@@ -12,17 +13,7 @@ type Cle = {
   maj_le: string | null
 }
 
-/** Ordre d'affichage : la carte d'abord, elle est la seule déjà en service. */
-const ORDRE = [
-  "carte_style",
-  "carte_cle",
-  "anthropic",
-  "gemini",
-  "ia_compatible",
-  "ia_compatible_url",
-  "orange",
-  "mtn",
-]
+
 
 type EtatTuteur = {
   joignable: boolean
@@ -64,8 +55,9 @@ export default async function PageCles({
     etat = null
   }
 
+  const ordre = CLES as readonly string[]
   const cles = ((data ?? []) as Cle[]).sort(
-    (a, b) => ORDRE.indexOf(a.nom) - ORDRE.indexOf(b.nom),
+    (a, b) => ordre.indexOf(a.nom) - ordre.indexOf(b.nom),
   )
 
   return (
