@@ -317,6 +317,17 @@ select verifier('un eleve ne lit PAS le journal d''administration',
 
 -- Allumer le tuteur IA depuis un compte élève : l'écriture ne touche aucune
 -- ligne, la politique la rejette en silence.
+--
+-- On éteint d'abord, hors RLS. Sans cela le test lisait la valeur réelle de
+-- la production : le jour où l'administration a allumé le tuteur pour de
+-- vrai, il s'est mis à crier que la sécurité avait lâché. Un test qui ne
+-- passe que grâce à une valeur de production ne prouve rien.
+reset role;
+update parametres set valeur = 'false'::jsonb where cle = 'ia_active';
+
+set local role authenticated;
+set local "request.jwt.claims" = '{"sub":"11111111-1111-1111-1111-111111111111","role":"authenticated"}';
+
 update parametres set valeur = 'true'::jsonb where cle = 'ia_active';
 
 select verifier('un eleve ne peut PAS allumer un module',
@@ -836,6 +847,31 @@ set local "request.jwt.claims" = '{"sub":"33333333-3333-3333-3333-333333333333",
 select verifier('passe 48 h, le lien donne acces',
                 (select case when est_mon_enfant('22222222-2222-2222-2222-222222222222')
                              then 1 else 0 end), 1);
+
+reset role;
+set local "request.jwt.claims" = '';
+
+-- ── Un enfant seul ne peut pas etre engage aupres d'un adulte ───────────────
+-- C'est la promesse centrale du produit, et elle ne tient pas a un ecran
+-- masque : la politique d'insertion de `contrats` exige un lien PLEIN. Un
+-- enfant sans adulte n'a donc personne pour l'engager, et pendant les
+-- quarante-huit heures provisoires l'adulte rattache ne le peut pas non plus.
+set local role authenticated;
+set local "request.jwt.claims" = '{"sub":"33333333-3333-3333-3333-333333333333","role":"authenticated"}';
+
+do $$
+begin
+  insert into contrats (parent_id, eleve_id, repetiteur_id, statut)
+  values ('33333333-3333-3333-3333-333333333333',
+          '22222222-2222-2222-2222-222222222222',
+          '33333333-3333-3333-3333-333333333333', 'propose');
+exception when others then
+  null;
+end $$;
+
+select verifier('un lien provisoire ne permet PAS d''engager un repetiteur',
+                (select count(*)::int from contrats
+                  where eleve_id = '22222222-2222-2222-2222-222222222222'), 0);
 
 reset role;
 set local "request.jwt.claims" = '';
