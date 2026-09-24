@@ -70,7 +70,17 @@ export const config = {
      * Un Service Worker doit de plus être servi depuis la racine : sa portée
      * est limitée au dossier d'où il vient, et depuis /fr/ il ne verrait pas
      * les pages anglaises.
+     *
+     * La liste des extensions couvre désormais tout ce que `public/` peut
+     * contenir, et non les seules images. Le même piège s'est refermé une
+     * troisième fois avec `/carte/osm.json`, le style de la carte : redirigé
+     * vers `/fr/carte/osm.json`, il rendait une page HTML, MapLibre recevait
+     * du HTML au lieu d'un style, et la carte restait vide — sans qu'aucune
+     * erreur ne le dise.
+     *
+     * Une page n'a jamais d'extension. Tout ce qui en porte une est un
+     * fichier, et un fichier n'a pas de langue.
      */
-    "/((?!_next/static|_next/image|api/|sw\\.js|favicon.ico|manifest.webmanifest|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico)$).*)",
+    "/((?!_next/static|_next/image|api/|sw\\.js|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp|avif|ico|json|txt|xml|webmanifest|woff|woff2|ttf|otf|css|js|map|pdf|mp4|webm)$).*)",
   ],
 }
