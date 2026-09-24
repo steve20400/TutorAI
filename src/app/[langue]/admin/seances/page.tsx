@@ -87,7 +87,8 @@ export default async function PageSeances({
   if (seances.length === 0) {
     return (
       <>
-        <EnteteAdmin etiquette={t.etiquette} titre={t.vide} />
+        <EnteteAdmin
+        retourVers={chemin(langue, "/admin")} etiquette={t.etiquette} titre={t.vide} />
         <div className="px-5 sm:px-7">{rangee}</div>
         <RienEncore titre={t.vide} detail={t.videDetail} />
       </>

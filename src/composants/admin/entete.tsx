@@ -1,3 +1,5 @@
+import { RetourAdmin } from "./retour"
+
 /**
  * En-tête de page de l'administration.
  *
@@ -9,17 +11,26 @@
 export function EnteteAdmin({
   etiquette,
   titre,
+  retourVers,
   children,
 }: {
   etiquette: string
   titre: string
+  /**
+   * La page parente, pour le bouton de retour.
+   *
+   * Absente sur le tableau de bord, qui est la racine : un retour y serait un
+   * retour vers rien.
+   */
+  retourVers?: string
   /** Actions alignées à droite du titre. */
   children?: React.ReactNode
 }) {
   return (
     <header className="flex flex-wrap items-end justify-between gap-4 px-5 sm:px-7 pb-5 pt-7">
       <div className="min-w-0">
-        <div className="doux text-[11px] font-semibold uppercase tracking-[0.16em]">
+        {retourVers ? <RetourAdmin vers={retourVers} /> : null}
+        <div className="doux mt-1 text-[11px] font-semibold uppercase tracking-[0.16em]">
           {etiquette}
         </div>
         <h1 className="mt-1.5 text-[22px] font-semibold leading-tight tracking-[-0.01em]">

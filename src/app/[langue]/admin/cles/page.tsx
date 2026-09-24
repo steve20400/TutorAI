@@ -1,6 +1,7 @@
 import { poserCle } from "@/actions/admin"
 import { EnteteAdmin } from "@/composants/admin/entete"
-import { dictionnaire, estLangue, LANGUE_PAR_DEFAUT, type Langue } from "@/langues"
+import {
+  chemin, dictionnaire, estLangue, LANGUE_PAR_DEFAUT, type Langue } from "@/langues"
 import { exigerAdmin } from "@/lib/admin"
 import { api } from "@/lib/api"
 import { BoutonAction } from "@/composants/bouton-action"
@@ -63,7 +64,8 @@ export default async function PageCles({
 
   return (
     <>
-      <EnteteAdmin etiquette={t.etiquette} titre={d.adminNav.cles} />
+      <EnteteAdmin
+        retourVers={chemin(langue, "/admin")} etiquette={t.etiquette} titre={d.adminNav.cles} />
 
       <div className="max-w-2xl px-5 pb-7 sm:px-7">
         <p className="doux text-[13px] leading-relaxed">{t.intro}</p>

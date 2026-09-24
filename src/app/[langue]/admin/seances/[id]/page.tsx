@@ -71,7 +71,8 @@ export default async function PageSeance({
   if (!detail) {
     return (
       <>
-        <EnteteAdmin etiquette={t.etiquette} titre={t.seanceIntrouvable} />
+        <EnteteAdmin
+        retourVers={chemin(langue, "/admin/seances")} etiquette={t.etiquette} titre={t.seanceIntrouvable} />
         <RienEncore titre={t.seanceIntrouvable} />
       </>
     )

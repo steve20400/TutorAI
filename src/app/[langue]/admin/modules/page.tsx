@@ -26,7 +26,8 @@ export default async function PageModules({
 
   return (
     <>
-      <EnteteAdmin etiquette={t.etiquette} titre={d.admin.modules} />
+      <EnteteAdmin
+        retourVers={chemin(langue, "/admin")} etiquette={t.etiquette} titre={d.admin.modules} />
 
       <div className="px-5 sm:px-7 pb-7">
         {MODULES.map((cle) => {

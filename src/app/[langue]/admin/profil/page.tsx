@@ -1,5 +1,6 @@
 import { EnteteAdmin } from "@/composants/admin/entete"
-import { dictionnaire, estLangue, LANGUE_PAR_DEFAUT } from "@/langues"
+import {
+  chemin, dictionnaire, estLangue, LANGUE_PAR_DEFAUT } from "@/langues"
 import { exigerAdmin } from "@/lib/admin"
 import { api } from "@/lib/api"
 import { supabaseServeur } from "@/lib/supabase/server"
@@ -38,7 +39,8 @@ export default async function PageProfil({
 
   return (
     <>
-      <EnteteAdmin etiquette={t.etiquette} titre={t.titre} />
+      <EnteteAdmin
+        retourVers={chemin(langue, "/admin")} etiquette={t.etiquette} titre={t.titre} />
 
       <div className="px-5 pb-7 sm:px-7">
         <FormulairesCompte

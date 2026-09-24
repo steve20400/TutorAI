@@ -648,6 +648,7 @@ modeleEssai: "Served to those trying without an account",
   },
 
   admin: {
+    retour: "Back",
     titre: "Administration",
     eleves: "Students",
     parents: "Parents",

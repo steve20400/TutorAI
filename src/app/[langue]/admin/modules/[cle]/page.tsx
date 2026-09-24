@@ -82,16 +82,9 @@ export default async function PageModule({
 
   return (
     <>
-      <div className="px-5 sm:px-7 pt-7">
-        <Link
-          href={chemin(langue, "/admin/modules")}
-          className="doux text-[12px] hover:underline"
-        >
-          ‹ {t.retour}
-        </Link>
-      </div>
 
-      <EnteteAdmin etiquette={d.admin.modules} titre={textes.titre}>
+      <EnteteAdmin
+        retourVers={chemin(langue, "/admin/modules")} etiquette={d.admin.modules} titre={textes.titre}>
         <span className={actif ? "badge-verifie" : "badge-eteint"}>
           {actif ? t.enMarche : t.eteint}
         </span>

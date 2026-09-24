@@ -89,6 +89,7 @@ export default async function PageRepetiteurs({
   return (
     <>
       <EnteteAdmin
+        retourVers={chemin(langue, "/admin")}
         etiquette={t.etiquette}
         titre={remplir(pluriel(langue, visibles.length, t.fiches), {})}
       />

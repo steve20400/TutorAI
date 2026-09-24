@@ -1,5 +1,6 @@
 import { EnteteAdmin, RienEncore } from "@/composants/admin/entete"
-import { dictionnaire, estLangue, LANGUE_PAR_DEFAUT } from "@/langues"
+import {
+  chemin, dictionnaire, estLangue, LANGUE_PAR_DEFAUT } from "@/langues"
 import { exigerAdmin } from "@/lib/admin"
 import { api } from "@/lib/api"
 
@@ -39,7 +40,8 @@ export default async function PageRegistre({
   if (liste.length === 0) {
     return (
       <>
-        <EnteteAdmin etiquette={t.etiquette} titre={t.vide} />
+        <EnteteAdmin
+        retourVers={chemin(langue, "/admin")} etiquette={t.etiquette} titre={t.vide} />
         <RienEncore titre={t.vide} detail={t.videDetail} />
       </>
     )

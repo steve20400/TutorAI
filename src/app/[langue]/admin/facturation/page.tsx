@@ -1,6 +1,7 @@
 import { EnteteAdmin } from "@/composants/admin/entete"
 import { FormulaireFacturation } from "@/composants/admin/facturation"
-import { dictionnaire, estLangue, LANGUE_PAR_DEFAUT } from "@/langues"
+import {
+  chemin, dictionnaire, estLangue, LANGUE_PAR_DEFAUT } from "@/langues"
 import { exigerAdmin } from "@/lib/admin"
 import { api } from "@/lib/api"
 import { lireParametres } from "@/lib/parametres"
@@ -28,7 +29,8 @@ export default async function PageFacturation({
 
   return (
     <>
-      <EnteteAdmin etiquette={t.etiquette} titre={t.titre} />
+      <EnteteAdmin
+        retourVers={chemin(langue, "/admin")} etiquette={t.etiquette} titre={t.titre} />
 
       <div className="max-w-2xl px-5 sm:px-7 pb-7">
         <FormulaireFacturation

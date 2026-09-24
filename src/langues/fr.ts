@@ -661,6 +661,7 @@ modeleEssai: "Servi à qui essaie sans compte",
   },
 
   admin: {
+    retour: "Retour",
     titre: "Administration",
     eleves: "Élèves",
     parents: "Parents",

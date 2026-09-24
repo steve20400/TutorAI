@@ -50,7 +50,8 @@ export default async function PageFamilles({
   if (liste.length === 0) {
     return (
       <>
-        <EnteteAdmin etiquette={t.etiquette} titre={t.vide} />
+        <EnteteAdmin
+        retourVers={chemin(langue, "/admin")} etiquette={t.etiquette} titre={t.vide} />
         <RienEncore titre={t.vide} />
       </>
     )

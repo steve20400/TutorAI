@@ -93,7 +93,8 @@ export default async function PageDossier({
   if (!fiche) {
     return (
       <>
-        <EnteteAdmin etiquette={t.retour} titre={t.introuvable} />
+        <EnteteAdmin
+        retourVers={chemin(langue, "/admin/dossiers")} etiquette={t.retour} titre={t.introuvable} />
         <RienEncore titre={t.introuvable} />
       </>
     )
@@ -105,16 +106,12 @@ export default async function PageDossier({
 
   return (
     <>
-      <div className="px-5 sm:px-7 pt-7">
-        <Link
-          href={chemin(langue, "/admin/dossiers")}
-          className="doux text-[12px] hover:underline"
-        >
-          ‹ {t.retour}
-        </Link>
-      </div>
 
-      <EnteteAdmin etiquette={fiche.ville ?? "—"} titre={nom} />
+      <EnteteAdmin
+        retourVers={chemin(langue, "/admin/dossiers")}
+        etiquette={fiche.ville ?? "—"}
+        titre={nom}
+      />
 
       <div className="max-w-3xl px-5 sm:px-7 pb-7">
         {/* Le visage, ou les initiales en attendant.
