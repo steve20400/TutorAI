@@ -7,8 +7,12 @@ import { variableRequise } from "../env"
 /**
  * Routes accessibles sans être connecté, une fois le préfixe de langue retiré.
  * Tout le reste est protégé — fermé par défaut.
+ *
+ * `/essai` en fait partie, et c'est tout son propos : quelqu'un qui entend
+ * parler de TUTELA doit pouvoir voir le tuteur avant de donner quoi que ce
+ * soit. Son plafond de jetons vit dans le service, pas dans cette liste.
  */
-const ROUTES_PUBLIQUES = ["/connexion", "/inscription", "/auth"]
+const ROUTES_PUBLIQUES = ["/connexion", "/inscription", "/auth", "/essai"]
 
 /**
  * Rafraîchit la session à chaque requête et protège les routes.
