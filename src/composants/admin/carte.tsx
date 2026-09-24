@@ -114,9 +114,17 @@ export function CarteCouverture({
 
   return (
     <div className="carte-cadre relative">
+      {/* Posée sur le cadre plutôt qu'étirée dedans.
+
+          `h-full` ne marchait pas, et le défaut était invisible à la
+          relecture : le cadre mesure bien 230 px, mais cette hauteur vient de
+          `min-height`. Or `height: 100%` se calcule contre la hauteur `height`
+          du parent, qui vaut `auto` — donc zéro. MapLibre s'initialisait dans
+          un conteneur sans hauteur, dessinait ses onze pastilles, et personne
+          ne voyait rien. */}
       <div
         ref={cadre}
-        className="h-full w-full"
+        className="absolute inset-0"
         role="application"
         aria-label={etiquetteCarte}
       />
