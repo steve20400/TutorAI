@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react"
 
+import { Jauge } from "@/composants/jauge"
 import { TexteMathematique } from "@/composants/texte-mathematique"
 import { dictionnaire, type Langue } from "@/langues"
 
@@ -188,20 +189,6 @@ export function Essai({ langue }: { langue: Langue }) {
         </p>
       ) : null}
 
-      {/* La barre ne dit pas un nombre de jetons — qui ne veut rien dire pour
-          qui découvre — mais elle dit qu'il y a une fin, et où on en est. */}
-      {budget && !termine ? (
-        <div
-          className="mb-2 h-[3px] w-full overflow-hidden rounded-full"
-          style={{ background: "color-mix(in srgb, var(--texte) 8%, transparent)" }}
-        >
-          <div
-            className="h-full rounded-full transition-all duration-500"
-            style={{ width: `${part}%`, background: "var(--accent)" }}
-          />
-        </div>
-      ) : null}
-
       <form
         onSubmit={(e) => {
           e.preventDefault()
@@ -209,6 +196,21 @@ export function Essai({ langue }: { langue: Langue }) {
         }}
         className="mb-4 flex items-end gap-2"
       >
+        {/* La jauge à côté du champ, pas au-dessus.
+
+            Une barre horizontale nue ne disait rien : on ne savait pas si
+            c'était un ascenseur, un chargement ou une limite. Un anneau
+            intrigue sans gêner, et il s'ouvre sur une phrase quand on le
+            cherche. */}
+        {budget ? (
+          <Jauge
+            part={part}
+            titre={t.jaugeTitre}
+            description={termine ? t.jaugeFinie : t.jaugeDetail}
+            etiquette={t.jaugeEtiquette}
+          />
+        ) : null}
+
         <textarea
           value={saisie}
           onChange={(e) => setSaisie(e.target.value)}

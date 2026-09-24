@@ -70,6 +70,15 @@ export const en: Dictionnaire = {
     retour: "Back",
   },
 
+  jaugeEleve: {
+    titre: "Your sessions with the tutor",
+    detail: "The bar shows what is left. It goes down with each answer, and fills up when an adult in your family tops up your account.",
+    epuise: "There are no tokens left for now. Ask an adult in your family to top up your account.",
+    etiquette: "See what is left",
+    quiPaie: "Who carries your sessions",
+    enCours: "current",
+  },
+
   essai: {
     titre: "Try the tutor, right now.",
     sousTitre: "Ask it a question from your syllabus. It does not give answers: it makes you find them.",
@@ -87,6 +96,10 @@ export const en: Dictionnaire = {
       autre: "The tutor is not answering right now. Try again in a moment.",
       termine: "The trial is over.",
     },
+    jaugeTitre: "Your trial",
+    jaugeDetail: "This trial is limited. The bar shows what is left — it goes down with each answer. With an account there is no such limit, and your tutor remembers your work.",
+    jaugeFinie: "Your trial is over. Create an account to carry on.",
+    jaugeEtiquette: "See what is left of the trial",
     pied: "Nothing of this conversation is saved.",
     creerUnCompte: "Create an account",
   },

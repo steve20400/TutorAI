@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useRef, useState } from "react"
+import { JaugeEleve } from "@/composants/jauge-eleve"
 import { TexteMathematique } from "@/composants/texte-mathematique"
 
 import { useLangue } from "@/langues/contexte"
@@ -23,7 +24,7 @@ export function Conversation({
   seanceId: string
   messagesInitiaux: Bulle[]
 }) {
-  const { d } = useLangue()
+  const { langue, d } = useLangue()
   const [bulles, setBulles] = useState<Bulle[]>(messagesInitiaux)
   const [saisie, setSaisie] = useState("")
   const [enAttente, setEnAttente] = useState(false)
@@ -126,6 +127,11 @@ export function Conversation({
       )}
 
       <form onSubmit={envoyer} className="flex items-end gap-2 pb-4">
+        {/* À côté du champ, comme sur l'écran d'essai : au moment où la
+            question « est-ce que je peux continuer ? » se pose, et non dans
+            un écran de réglages qu'un enfant n'ouvrira jamais. */}
+        <JaugeEleve langue={langue} />
+
         <textarea
           value={saisie}
           onChange={(e) => setSaisie(e.target.value)}

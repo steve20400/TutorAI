@@ -69,6 +69,15 @@ export const fr = {
     retour: "Retour",
   },
 
+  jaugeEleve: {
+    titre: "Tes séances avec le tuteur",
+    detail: "La barre montre ce qu'il te reste. Elle baisse à chaque réponse du tuteur, et elle se remplit quand un adulte de ta famille recharge ton compte.",
+    epuise: "Il n'y a plus de jetons pour l'instant. Demande à un adulte de ta famille de recharger ton compte.",
+    etiquette: "Voir ce qu'il te reste",
+    quiPaie: "Qui porte tes séances",
+    enCours: "en cours",
+  },
+
   essai: {
     titre: "Essaie le tuteur, tout de suite.",
     sousTitre: "Pose-lui une question de ton programme. Il ne donne pas les réponses : il te fait chercher.",
@@ -86,6 +95,10 @@ export const fr = {
       autre: "Le tuteur ne répond pas pour l'instant. Réessaie dans un moment.",
       termine: "L'essai est terminé.",
     },
+    jaugeTitre: "Ton essai",
+    jaugeDetail: "Cet essai est limité. La barre montre ce qu'il te reste — elle baisse à chaque réponse du tuteur. Avec un compte, tu n'auras plus cette limite, et ton tuteur se souviendra de ton travail.",
+    jaugeFinie: "Ton essai est terminé. Crée un compte pour continuer.",
+    jaugeEtiquette: "Voir ce qu'il reste de l'essai",
     pied: "Rien de cette conversation n'est enregistré.",
     creerUnCompte: "Créer un compte",
   },
