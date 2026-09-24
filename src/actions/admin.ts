@@ -123,6 +123,27 @@ export async function changerFournisseur(donnees: FormData): Promise<void> {
   await agir("/v1/admin/parametres/ia_fournisseur", { valeur })
 }
 
+/**
+ * Nomme les modèles servis.
+ *
+ * Choisir un fournisseur pose déjà des noms de départ. Ceci sert aux cas que
+ * personne ne peut deviner : un modèle qu'on héberge chez soi porte le nom
+ * qu'on lui a donné, et le catalogue d'un fournisseur bouge sans prévenir.
+ *
+ * Un champ laissé vide n'efface pas : on ne perd pas un réglage en
+ * enregistrant l'autre par mégarde.
+ */
+export async function changerModeles(donnees: FormData): Promise<void> {
+  const langue = langueDeFormulaire(donnees)
+  const essai = String(donnees.get("modele_essai") ?? "").trim()
+  const compte = String(donnees.get("modele_compte") ?? "").trim()
+
+  await exigerSession(langue)
+
+  if (essai) await agir("/v1/admin/parametres/ia_modele_essai", { valeur: essai })
+  if (compte) await agir("/v1/admin/parametres/ia_modele_compte", { valeur: compte })
+}
+
 const MODES = ["par_eleve_actif", "pourcentage_gains"] as const
 
 /**

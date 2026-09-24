@@ -28,6 +28,15 @@ export type Parametres = {
    * aperçoive.
    */
   ia_fournisseur: "anthropic" | "gemini" | "compatible"
+  /**
+   * Deux modèles, parce que les deux publics ne coûtent pas la même chose :
+   * qui essaie sans compte, et qui en a un. Leurs noms viennent du
+   * fournisseur choisi, mais restent modifiables un par un — un modèle qu'on
+   * héberge soi-même porte le nom qu'on lui a donné, et personne ne peut le
+   * deviner à sa place.
+   */
+  ia_modele_essai: string
+  ia_modele_compte: string
 }
 
 const DEFAUTS: Parametres = {
@@ -39,6 +48,8 @@ const DEFAUTS: Parametres = {
   inscriptions_ouvertes: true,
   participants_max: 2,
   ia_fournisseur: "anthropic",
+  ia_modele_essai: "",
+  ia_modele_compte: "",
 }
 
 /**

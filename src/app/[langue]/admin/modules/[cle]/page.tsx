@@ -11,7 +11,12 @@ import {
 import { exigerAdmin } from "@/lib/admin"
 import { api } from "@/lib/api"
 import { lireParametres } from "@/lib/parametres"
-import { basculerParametre, changerFournisseur, changerResolution } from "@/actions/admin"
+import {
+  basculerParametre,
+  changerFournisseur,
+  changerModeles,
+  changerResolution,
+} from "@/actions/admin"
 import { MODULES, type CleModule } from "@/lib/modules"
 import { BoutonAction } from "@/composants/bouton-action"
 
@@ -113,6 +118,56 @@ export default async function PageModule({
                   {d.adminPages.cles[f as keyof typeof d.adminPages.cles] ?? f}
                 </BoutonAction>
               ))}
+            </form>
+
+            {/* Le nom du modèle.
+
+                Choisir un fournisseur en pose un de départ, mais il y a deux
+                cas que personne ne peut deviner : un modèle qu'on héberge
+                chez soi porte le nom qu'on lui a donné, et le catalogue d'un
+                fournisseur bouge sans prévenir. Sans ce champ, il faudrait
+                aller le changer en base — ce que cet espace existe
+                précisément pour éviter. */}
+            <form
+              action={changerModeles}
+              className="mt-5 border-t pt-4"
+              style={{ borderColor: "var(--bordure)" }}
+            >
+              <input type="hidden" name="langue" value={langue} />
+              <div className="text-[13px] font-medium">{t.modelesTitre}</div>
+              <p className="doux mt-1 text-[12px] leading-relaxed">
+                {t.modelesDetail}
+              </p>
+
+              <div className="mt-3 flex flex-col gap-2.5">
+                <label className="flex flex-col gap-1">
+                  <span className="doux text-[11.5px]">{t.modeleCompte}</span>
+                  <input
+                    name="modele_compte"
+                    defaultValue={parametres.ia_modele_compte}
+                    placeholder="—"
+                    spellCheck={false}
+                    autoComplete="off"
+                    className="champ px-3 py-2 font-mono text-[12.5px]"
+                  />
+                </label>
+
+                <label className="flex flex-col gap-1">
+                  <span className="doux text-[11.5px]">{t.modeleEssai}</span>
+                  <input
+                    name="modele_essai"
+                    defaultValue={parametres.ia_modele_essai}
+                    placeholder="—"
+                    spellCheck={false}
+                    autoComplete="off"
+                    className="champ px-3 py-2 font-mono text-[12.5px]"
+                  />
+                </label>
+              </div>
+
+              <BoutonAction className="bt1 mt-3">
+                {d.adminPages.cles.enregistrer}
+              </BoutonAction>
             </form>
           </section>
         ) : null}

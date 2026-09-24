@@ -534,6 +534,10 @@ export const fr = {
       revoquer: "Révoquer",
       jamaisRelue:
         "Chiffrée en base, jamais réaffichée en clair. Vous ne reverrez que ses quatre derniers caractères.",
+modelesTitre: "Les modèles servis",
+modelesDetail: "Choisir un fournisseur en pose un par défaut. Changez-les si le fournisseur a renommé le sien, ou si vous hébergez votre propre modèle — il porte alors le nom que vous lui avez donné.",
+modeleCompte: "Servi aux comptes",
+modeleEssai: "Servi à qui essaie sans compte",
       fournisseurTitre: "D'où vient le tuteur",
       fournisseurDetail: "Le contexte, le programme et la mémoire de l'élève sont les mêmes pour les trois. Seule la clé exigée change. Personne, côté élève, ne voit lequel est employé.",
       resolutionTitre: "Résolution des enregistrements",

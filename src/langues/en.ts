@@ -522,6 +522,10 @@ export const en: Dictionnaire = {
       revoquer: "Revoke",
       jamaisRelue:
         "Encrypted in the database, never shown again in clear. You will only see its last four characters.",
+modelesTitre: "Models served",
+modelesDetail: "Choosing a provider sets a default. Change them if the provider renamed theirs, or if you host your own model — it carries the name you gave it.",
+modeleCompte: "Served to accounts",
+modeleEssai: "Served to those trying without an account",
       fournisseurTitre: "Where the tutor comes from",
       fournisseurDetail: "Context, syllabus and the pupil's memory are the same for all three. Only the required key changes. No pupil ever sees which one is used.",
       resolutionTitre: "Recording quality",
