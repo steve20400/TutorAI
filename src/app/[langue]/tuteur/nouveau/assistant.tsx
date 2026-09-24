@@ -69,6 +69,16 @@ function ChampLibre({
           value={saisie}
           onChange={(e) => setSaisie(e.target.value)}
           list={identifiantListe}
+          onKeyDown={(e) => {
+            // Ceinture et bretelles. La soumission implicite par Entrée est
+            // le comportement normal d'un champ dans un formulaire, mais
+            // certains claviers de téléphone et certaines listes de
+            // suggestions l'avalent. `requestSubmit` passe par le même
+            // gestionnaire, donc par les mêmes contrôles.
+            if (e.key !== "Enter") return
+            e.preventDefault()
+            e.currentTarget.form?.requestSubmit()
+          }}
           maxLength={60}
           placeholder={exemple}
           className="champ min-w-0 flex-1 px-3 py-2 text-[14px]"
