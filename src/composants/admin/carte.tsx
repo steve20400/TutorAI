@@ -78,6 +78,13 @@ export function CarteCouverture({
     m.addControl(new maplibregl.ScaleControl({ unit: "metric" }), "bottom-left")
     m.addControl(new maplibregl.FullscreenControl(), "top-right")
 
+    // MapLibre mesure son conteneur à la création. Si le cadre s'est
+    // redimensionné entre-temps — le passage d'une colonne à deux sur grand
+    // écran le fait — la toile garde l'ancienne taille et la carte se retrouve
+    // décalée dans son cadre.
+    const suivre = new ResizeObserver(() => m.resize())
+    suivre.observe(cadre.current)
+
     for (const v of villes) {
       if (v.lon === null || v.lat === null) continue
       const n = comptes[v.nom] ?? 0
@@ -105,6 +112,7 @@ export function CarteCouverture({
     }
 
     return () => {
+      suivre.disconnect()
       m.remove()
       carte.current = null
     }
@@ -114,17 +122,26 @@ export function CarteCouverture({
 
   return (
     <div className="carte-cadre relative">
-      {/* Posée sur le cadre plutôt qu'étirée dedans.
+      {/* Le positionnement est en ligne, et ce n'est pas de la paresse.
 
-          `h-full` ne marchait pas, et le défaut était invisible à la
-          relecture : le cadre mesure bien 230 px, mais cette hauteur vient de
-          `min-height`. Or `height: 100%` se calcule contre la hauteur `height`
-          du parent, qui vaut `auto` — donc zéro. MapLibre s'initialisait dans
-          un conteneur sans hauteur, dessinait ses onze pastilles, et personne
-          ne voyait rien. */}
+          Deux pièges se sont succédé ici, et la carte est restée invisible
+          depuis le premier jour :
+
+          1. `h-full` — `height: 100%` se calcule contre la hauteur `height`
+             du parent. Celle du cadre vaut `auto` : ses 230 px viennent de
+             `min-height`. L'enfant mesurait donc zéro.
+
+          2. `absolute inset-0` — MapLibre ajoute sa propre classe
+             `.maplibregl-map`, qui impose `position: relative`. À égalité de
+             spécificité, c'est l'ordre des feuilles qui tranche, et la sienne
+             arrive après celle de Tailwind. Elle gagnait.
+
+          Un style en ligne ne peut être écrasé par aucune feuille. C'est le
+          seul endroit du projet où je m'y résous, et la raison est écrite
+          ici pour que personne ne le « nettoie » en classes plus tard. */}
       <div
         ref={cadre}
-        className="absolute inset-0"
+        style={{ position: "absolute", inset: 0 }}
         role="application"
         aria-label={etiquetteCarte}
       />
