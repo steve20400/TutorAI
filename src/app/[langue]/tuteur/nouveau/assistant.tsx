@@ -31,6 +31,7 @@ const uniques = (valeurs: string[]) => [...new Set(valeurs)]
 export function Assistant({
   options,
   catalogue,
+  niveaux,
 }: {
   options: OptionProgramme[]
   /**
@@ -42,6 +43,13 @@ export function Assistant({
    * catalogue pour l'élève suivant.
    */
   catalogue: string[]
+  /**
+   * Les classes du référentiel scolaire, de la sixième à la terminale.
+   *
+   * Elles ne dépendent d'aucun programme chargé : un élève de cinquième
+   * existe même si personne n'a encore saisi le programme de cinquième.
+   */
+  niveaux: string[]
 }) {
   const { langue, d } = useLangue()
 
@@ -72,17 +80,21 @@ export function Assistant({
       ? sousSystemesDisponibles[0]
       : sousSysteme
 
-  const niveauxDisponibles = useMemo(
-    () =>
-      uniques(
-        options
-          .filter(
-            (o) => o.pays === pays && o.sous_systeme === sousSystemeEffectif,
-          )
-          .map((o) => o.niveau),
-      ),
-    [options, pays, sousSystemeEffectif],
-  )
+  /**
+   * Les classes proposées : celles du référentiel, plus celles qu'un
+   * programme apporte et qui n'y figureraient pas — « Terminale D » n'est pas
+   * « Terminale ».
+   *
+   * Le référentiel d'abord, parce qu'il porte l'ordre scolaire ; les autres
+   * ensuite, dans l'ordre des programmes.
+   */
+  const niveauxDisponibles = useMemo(() => {
+    const desProgrammes = options
+      .filter((o) => o.pays === pays && o.sous_systeme === sousSystemeEffectif)
+      .map((o) => o.niveau)
+
+    return uniques([...niveaux, ...desProgrammes])
+  }, [niveaux, options, pays, sousSystemeEffectif])
 
   const matieresDisponibles = useMemo(
     () =>
@@ -310,7 +322,8 @@ export function Assistant({
           <div className="carte p-4 text-sm">
             <div className="font-medium">{d.tuteur.recapitulatif}</div>
             <div className="doux mt-1">
-              {d.tuteur.pays[pays] ?? pays} · {d.niveaux[niveau] ?? niveau}
+              {pays ? `${d.tuteur.pays[pays] ?? pays} · ` : ""}
+              {d.niveaux[niveau] ?? niveau}
             </div>
             <div className="doux">
               {[

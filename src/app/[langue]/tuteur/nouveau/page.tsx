@@ -40,39 +40,14 @@ export default async function PageNouveauTuteur({
 
   // Le catalogue complet, programme chargé ou non. Il ne sert qu'à suggérer :
   // l'élève reste libre d'écrire une matière que personne n'a encore demandée.
-  const { matieres: catalogue } = await lireReferentiel()
+  const { matieres: catalogue, niveaux } = await lireReferentiel()
 
-  // Sans AUCUN programme chargé, on ne peut proposer ni pays ni niveau, donc
-  // l'assistant n'a plus de première question. C'est le seul cas qui reste
-  // bloquant : dès qu'un programme existe, un élève peut nommer sa matière
-  // lui-même et travailler sans table des matières.
-  if (options.length === 0) {
-    return (
-      <main className="mx-auto flex min-h-dvh max-w-md flex-col justify-center gap-4 p-6">
-        <h1 className="text-xl font-medium">{d.tuteur.aucunProgrammeTitre}</h1>
-        <p className="doux text-sm">{d.tuteur.aucunProgrammeDetail}</p>
-        <p
-          className="rounded-lg px-3 py-2 text-sm"
-          style={{
-            background: "color-mix(in srgb, var(--voyant) 12%, transparent)",
-          }}
-        >
-          {/* Message de développement, pas d'interface : il ne s'adresse qu'à
-              celui qui installe la base, donc il reste en français. */}
-          Côté développement : insère un fichier de{" "}
-          <code className="font-mono text-xs">src/data/programmes/</code> dans
-          la table <code className="font-mono text-xs">programmes</code> avec{" "}
-          <code className="font-mono text-xs">publie = true</code>.
-        </p>
-        <Link
-          href={chemin(langue, "/")}
-          className="text-sm underline underline-offset-4"
-        >
-          {d.tuteur.revenirAccueil}
-        </Link>
-      </main>
-    )
-  }
+  // Aucun écran bloquant : même sans le moindre programme chargé, un élève
+  // choisit son niveau dans le référentiel et nomme sa matière lui-même. Il
+  // y avait ici un message destiné à celui qui installe la base — du texte de
+  // développement dans une interface d'élève, ce qui n'a jamais sa place.
 
-  return <Assistant options={options} catalogue={catalogue} />
+  return (
+    <Assistant options={options} catalogue={catalogue} niveaux={niveaux} />
+  )
 }
