@@ -102,7 +102,10 @@ export function Jauge({
 
       {ouvert ? (
         <div
-          className="absolute bottom-10 right-0 z-30 w-[min(19rem,calc(100vw-2.5rem))] rounded-[12px] p-4 shadow-lg"
+          // Ancré à GAUCHE, comme l'anneau qui l'ouvre : ancré à droite, il
+          // s'étendait vers l'extérieur de l'écran et se retrouvait coupé sur
+          // un téléphone étroit.
+          className="absolute bottom-10 left-0 z-30 w-[min(19rem,calc(100vw-2.5rem))] rounded-[12px] p-4 shadow-lg"
           style={{
             background: "var(--surface)",
             border: "1px solid var(--bordure)",
