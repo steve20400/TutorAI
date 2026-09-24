@@ -70,6 +70,27 @@ export const en: Dictionnaire = {
     retour: "Back",
   },
 
+  essai: {
+    titre: "Try the tutor, right now.",
+    sousTitre: "Ask it a question from your syllabus. It does not give answers: it makes you find them.",
+    avertissement: "No account, no email address. In exchange, this conversation disappears when you close this page — and the trial is short.",
+    placeholder: "Write your question…",
+    terminePlaceholder: "The trial is over.",
+    envoyer: "Send",
+    termine: "The trial is over. Create an account to carry on: your tutor will then remember your work from one session to the next.",
+    tropDEssais: "You have already tried several times today. Create an account to carry on.",
+    indisponible: "The tutor is not answering right now. Try again in a moment.",
+    pannes: {
+      surcharge: "The tutor is very busy right now. Wait a moment and send your message again.",
+      cle: "The tutor is not available at the moment.",
+      modele: "The tutor is not available at the moment.",
+      autre: "The tutor is not answering right now. Try again in a moment.",
+      termine: "The trial is over.",
+    },
+    pied: "Nothing of this conversation is saved.",
+    creerUnCompte: "Create an account",
+  },
+
   chargement: {
     aria: "Loading TUTELA",
     sloganLigne1: "A verified tutor.",

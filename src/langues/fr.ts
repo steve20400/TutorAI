@@ -69,6 +69,27 @@ export const fr = {
     retour: "Retour",
   },
 
+  essai: {
+    titre: "Essaie le tuteur, tout de suite.",
+    sousTitre: "Pose-lui une question de ton programme. Il ne donne pas les réponses : il te fait chercher.",
+    avertissement: "Pas de compte, pas d'adresse mail. En échange, cette conversation disparaît quand tu fermes cette page — et l'essai est court.",
+    placeholder: "Écris ta question…",
+    terminePlaceholder: "L'essai est terminé.",
+    envoyer: "Envoyer",
+    termine: "L'essai est terminé. Crée un compte pour continuer : ton tuteur se souviendra alors de ton travail d'une séance à l'autre.",
+    tropDEssais: "Tu as déjà essayé plusieurs fois aujourd'hui. Crée un compte pour continuer.",
+    indisponible: "Le tuteur ne répond pas pour l'instant. Réessaie dans un moment.",
+    pannes: {
+      surcharge: "Le tuteur est très demandé en ce moment. Attends quelques instants et renvoie ton message.",
+      cle: "Le tuteur n'est pas disponible pour le moment.",
+      modele: "Le tuteur n'est pas disponible pour le moment.",
+      autre: "Le tuteur ne répond pas pour l'instant. Réessaie dans un moment.",
+      termine: "L'essai est terminé.",
+    },
+    pied: "Rien de cette conversation n'est enregistré.",
+    creerUnCompte: "Créer un compte",
+  },
+
   chargement: {
     aria: "Chargement de TUTELA",
     sloganLigne1: "Un répétiteur vérifié.",
