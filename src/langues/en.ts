@@ -331,6 +331,8 @@ export const en: Dictionnaire = {
     quelleClasse: "Which class are you in?",
 choisisUneMatiere: "Pick at least one subject.",
 creationEchouee: "Creation failed. Try again.",
+autreClasse: "Your class is not in the list?",
+autreClassePlaceholder: "Write it — Year 6, First year, BTEC…",
 suitLeProgramme: "official syllabus",
 sansProgramme: "no syllabus",
 autreMatiere: "Your subject is not in the list?",

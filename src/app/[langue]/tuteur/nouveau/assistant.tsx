@@ -19,6 +19,77 @@ const ETAT_INITIAL: EtatCreation = {}
 
 const uniques = (valeurs: string[]) => [...new Set(valeurs)]
 
+/** Première lettre en majuscule, espaces en trop retirés. */
+const propre = (v: string) => {
+  const t = v.trim().replace(/\s+/g, " ")
+  return t.charAt(0).toUpperCase() + t.slice(1)
+}
+
+/**
+ * « Ce n'est pas dans la liste ? Écris-le. »
+ *
+ * Dans un vrai `<form>`, et non avec un écouteur de touche : la touche Entrée
+ * dans un champ de formulaire est gérée par le navigateur depuis toujours, et
+ * elle fonctionne même quand la liste de suggestions est ouverte — ce qui
+ * n'était pas le cas en écoutant `keydown` ou `keyup` à la main.
+ *
+ * Les suggestions viennent de ce que d'autres ont déjà saisi : on propose,
+ * on n'impose pas.
+ */
+function ChampLibre({
+  etiquette,
+  exemple,
+  suggestions,
+  identifiantListe,
+  ajouterLibelle,
+  onAjouter,
+}: {
+  etiquette: string
+  exemple: string
+  suggestions: string[]
+  identifiantListe: string
+  ajouterLibelle: string
+  onAjouter: (valeur: string) => void
+}) {
+  const [saisie, setSaisie] = useState("")
+
+  return (
+    <form
+      onSubmit={(e) => {
+        e.preventDefault()
+        if (saisie.trim().length < 1) return
+        onAjouter(propre(saisie))
+        setSaisie("")
+      }}
+      className="mt-1 flex flex-col gap-1.5"
+    >
+      <label className="doux text-[12px]">{etiquette}</label>
+      <div className="flex gap-2">
+        <input
+          value={saisie}
+          onChange={(e) => setSaisie(e.target.value)}
+          list={identifiantListe}
+          maxLength={60}
+          placeholder={exemple}
+          className="champ min-w-0 flex-1 px-3 py-2 text-[14px]"
+        />
+        <datalist id={identifiantListe}>
+          {suggestions.map((v) => (
+            <option key={v} value={v} />
+          ))}
+        </datalist>
+        <button
+          type="submit"
+          disabled={saisie.trim().length < 1}
+          className="bt2 shrink-0 px-3 py-2 text-[13px]"
+        >
+          {ajouterLibelle}
+        </button>
+      </div>
+    </form>
+  )
+}
+
 /**
  * Création du tuteur (docs/SPEC_APPLICATION.md §2.2).
  *
@@ -143,20 +214,19 @@ export function Assistant({
    * programme et l'autre sans, et ne comprendrait pas pourquoi l'un le suit
    * et pas l'autre.
    */
-  const ajouterLibre = () => {
-    const propre = saisieLibre.trim().replace(/\s+/g, " ")
-    if (propre.length < 2) return
+  const ajouterLibre = (matiere: string) => {
+    if (matiere.length < 2) return
 
+    // Un doublon de ce que le programme propose déjà est refusé : sinon un
+    // élève créerait deux tuteurs de mathématiques, l'un qui suit sa classe
+    // et l'autre non, sans comprendre la différence.
     const dejaProposee = matieresDisponibles.some(
-      (o) => o.matiere.toLowerCase() === propre.toLowerCase(),
+      (o) => o.matiere.toLowerCase() === matiere.toLowerCase(),
     )
-    if (dejaProposee || libres.some((m) => m.toLowerCase() === propre.toLowerCase())) {
-      setSaisieLibre("")
-      return
-    }
+    if (dejaProposee) return
+    if (libres.some((m) => m.toLowerCase() === matiere.toLowerCase())) return
 
-    setLibres((l) => [...l, propre.charAt(0).toUpperCase() + propre.slice(1)])
-    setSaisieLibre("")
+    setLibres((l) => [...l, matiere])
   }
 
   const basculerMatiere = (id: string) =>
@@ -228,6 +298,22 @@ export function Assistant({
               {d.niveaux[n] ?? n}
             </Choix>
           ))}
+
+          {/* Primaire, université, formation professionnelle : la liste ne peut
+              pas tout prévoir, et un adulte qui révise pour lui-même n'est dans
+              aucune de ces classes. */}
+          <ChampLibre
+            etiquette={d.tuteur.autreClasse}
+            exemple={d.tuteur.autreClassePlaceholder}
+            suggestions={niveaux}
+            identifiantListe="catalogue-niveaux"
+            ajouterLibelle={d.tuteur.continuer}
+            onAjouter={(v) => {
+              setNiveau(v)
+              setMatieres([])
+              suivant()
+            }}
+          />
         </Etape>
       )}
 
@@ -266,49 +352,14 @@ export function Assistant({
 
           {/* La porte de secours. Elle vient APRÈS les matières officielles,
               pour que celles-ci restent le chemin normal. */}
-          <div className="mt-1 flex flex-col gap-1.5">
-            <label className="doux text-[12px]">{d.tuteur.autreMatiere}</label>
-            <div className="flex gap-2">
-              <input
-                value={saisieLibre}
-                onChange={(e) => setSaisieLibre(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key !== "Enter") return
-                  // Sans ça, la touche remonte au formulaire de l'étape
-                  // suivante et crée le tuteur avant qu'on ait fini.
-                  e.preventDefault()
-                }}
-                onKeyUp={(e) => {
-                  // Au relâchement, et non à l'appui : quand la liste de
-                  // suggestions est ouverte, le navigateur s'en sert d'abord
-                  // pour valider le choix et n'a pas encore mis à jour le
-                  // champ au moment de l'appui.
-                  if (e.key !== "Enter") return
-                  e.preventDefault()
-                  ajouterLibre()
-                }}
-                list="catalogue-matieres"
-                maxLength={60}
-                placeholder={d.tuteur.autreMatierePlaceholder}
-                className="champ min-w-0 flex-1 px-3 py-2 text-[14px]"
-              />
-              {/* Ce que d'autres élèves ont déjà demandé : on propose sans
-                  imposer, et la liste s'enrichit d'elle-même. */}
-              <datalist id="catalogue-matieres">
-                {catalogue.map((m) => (
-                  <option key={m} value={m} />
-                ))}
-              </datalist>
-              <button
-                type="button"
-                onClick={ajouterLibre}
-                disabled={saisieLibre.trim().length < 2}
-                className="bt2 shrink-0 px-3 py-2 text-[13px]"
-              >
-                {d.tuteur.ajouter}
-              </button>
-            </div>
-          </div>
+          <ChampLibre
+            etiquette={d.tuteur.autreMatiere}
+            exemple={d.tuteur.autreMatierePlaceholder}
+            suggestions={catalogue}
+            identifiantListe="catalogue-matieres"
+            ajouterLibelle={d.tuteur.ajouter}
+            onAjouter={ajouterLibre}
+          />
 
           <button
             type="button"

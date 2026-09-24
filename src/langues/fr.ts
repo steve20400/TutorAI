@@ -343,6 +343,8 @@ export const fr = {
     quelleClasse: "Tu es en quelle classe ?",
 choisisUneMatiere: "Choisis au moins une matière.",
 creationEchouee: "La création a échoué. Réessaie.",
+autreClasse: "Ta classe n'est pas dans la liste ?",
+autreClassePlaceholder: "Écris-la — CM2, Licence 1, BTS…",
 suitLeProgramme: "programme officiel",
 sansProgramme: "sans programme",
 autreMatiere: "Ta matière n'est pas dans la liste ?",
