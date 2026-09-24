@@ -514,7 +514,7 @@ export const en: Dictionnaire = {
       allumer: "Turn the module on",
       eteindre: "Turn the module off",
       impossibleSansCle: "Not possible without a valid key",
-      cleAnthropique: "Anthropic key",
+      cleAnthropique: "Provider key",
       nonRenseignee: "not set",
       active: "active · ••••{fin}",
       enregistrerCle: "Save",
@@ -615,7 +615,7 @@ export const en: Dictionnaire = {
       ia_active: {
         titre: "AI tutor",
         detail:
-          "While it is off, the tutor setup screen does not appear and the route that calls the model refuses. Requires an Anthropic key.",
+          "While it is off, the tutor setup screen does not appear and the route that calls the model refuses. Choose a provider and save its key first.",
       },
       enregistrement_actif: {
         titre: "Lesson recording",

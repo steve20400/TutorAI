@@ -526,7 +526,7 @@ export const fr = {
       allumer: "Allumer le module",
       eteindre: "Éteindre le module",
       impossibleSansCle: "Impossible sans clé valide",
-      cleAnthropique: "Clé Anthropic",
+      cleAnthropique: "Clé du fournisseur",
       nonRenseignee: "non renseignée",
       active: "active · ••••{fin}",
       enregistrerCle: "Enregistrer",
@@ -628,7 +628,7 @@ export const fr = {
       ia_active: {
         titre: "Tuteur IA",
         detail:
-          "Tant qu'il est éteint, l'écran de création du tuteur n'apparaît pas et la route qui appelle le modèle refuse. Nécessite une clé Anthropic.",
+          "Tant qu'il est éteint, l'écran de création du tuteur n'apparaît pas et la route qui appelle le modèle refuse. Il faut d'abord choisir un fournisseur et enregistrer sa clé.",
       },
       enregistrement_actif: {
         titre: "Enregistrement des séances",
