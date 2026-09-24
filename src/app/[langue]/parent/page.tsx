@@ -1,4 +1,5 @@
 import { redirect } from "next/navigation"
+import Link from "next/link"
 import { ReglagesRapides } from "@/composants/reglages-rapides"
 
 import { BoutonDeconnexion } from "@/composants/deconnexion"
@@ -48,6 +49,19 @@ export default async function AccueilParent({
   // politique écarte déjà les non vérifiées, les impayées et les comptes
   // désactivés. Compter en direct donnerait un nombre plus grand que la liste
   // qui suit — et un écart entre les deux se lit comme un bug.
+  // Une demande de mot de passe rend un enfant dépendant de son parent : il
+  // ne peut rien faire d'autre qu'attendre, et elle ne vaut que dix minutes.
+  // Elle s'annonce donc en tête, pas au fond d'une rubrique.
+  let demandesMdp = 0
+  try {
+    const rep = await api<{ donnees: { fermee: boolean }[] }>(
+      "/v1/liens/mots-de-passe",
+    )
+    demandesMdp = (rep.donnees ?? []).filter((d) => !d.fermee).length
+  } catch {
+    demandesMdp = 0
+  }
+
   const { pagination } = await api<{ pagination: { total: number } }>(
     "/v1/repetiteurs?parPage=1",
   )
@@ -81,6 +95,19 @@ export default async function AccueilParent({
           <ReglagesRapides />
           <BoutonDeconnexion langue={langue} />
         </header>
+
+        {demandesMdp > 0 ? (
+          <Link
+            href={chemin(langue, "/parent/mots-de-passe")}
+            className="carte block p-5 transition hover:opacity-90"
+            style={{ borderColor: "var(--accent)" }}
+          >
+            <div className="font-medium">{d.recuperation.lienDepuisAccueil}</div>
+            <p className="doux mt-1 text-sm leading-relaxed">
+              {d.recuperation.pageDetail}
+            </p>
+          </Link>
+        ) : null}
 
         <section className="carte p-5">
           <div className="font-medium">{d.parent.trouverRepetiteur}</div>

@@ -12,7 +12,16 @@ import { variableRequise } from "../env"
  * parler de TUTELA doit pouvoir voir le tuteur avant de donner quoi que ce
  * soit. Son plafond de jetons vit dans le service, pas dans cette liste.
  */
-const ROUTES_PUBLIQUES = ["/connexion", "/inscription", "/auth", "/essai"]
+const ROUTES_PUBLIQUES = [
+  "/connexion",
+  "/inscription",
+  "/auth",
+  "/essai",
+  "/mot-de-passe-oublie",
+  // Celle-ci s'ouvre avec la session que le lien du courriel vient de créer,
+  // mais le middleware ne la voit pas encore au premier passage.
+  "/nouveau-mot-de-passe",
+]
 
 /**
  * Rafraîchit la session à chaque requête et protège les routes.

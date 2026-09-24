@@ -11,10 +11,24 @@ const COULEUR_ACTION: Record<string, string> = {
   desactivation: "var(--texte-doux)",
 }
 
+type Personne = {
+  id: string
+  prenom: string | null
+  nom: string | null
+  identifiant: string | null
+  role: string
+}
+
+/** Le nom qu'on affiche : prénom et nom, ou l'identifiant à défaut. */
+const nomDe = (p: Personne | null) =>
+  p ? [p.prenom, p.nom].filter(Boolean).join(" ") || p.identifiant : null
+
 type LigneRegistre = {
   id: number
   admin_id: string | null
   action: string
+  auteur: Personne | null
+  cible: Personne | null
   cible_type: string | null
   cible_id: string | null
   motif: string | null
@@ -55,9 +69,15 @@ export default async function PageRegistre({
       minute: "2-digit",
     })
 
+  const t2 = d.adminPages.actionsDuRegistre
+
   return (
     <>
-      <EnteteAdmin etiquette={t.etiquette} titre={d.adminNav.registre} />
+      <EnteteAdmin
+        retourVers={chemin(langue, "/admin")}
+        etiquette={t.etiquette}
+        titre={d.adminNav.registre}
+      />
 
       <div className="relative px-5 sm:px-7 pb-7 pl-9 sm:pl-12">
         <span
@@ -75,10 +95,25 @@ export default async function PageRegistre({
             <div className="doux font-mono text-[11px]">
               {quand(l.cree_le)}
             </div>
-            <div className="mt-0.5 text-[13px]">
-              <b>{l.action}</b>
-              {l.cible_id ? (
-                <span className="doux"> — {l.cible_type} {l.cible_id}</span>
+            {/* Une phrase, pas un code.
+
+                Le registre rendait « verification — repetiteur
+                a4a47918-bea7-… » : illisible, donc jamais lu. Et il ne disait
+                pas QUI avait agi, ce qui est pourtant sa seule raison d'être.
+
+                Une action inconnue tombe sur son propre code plutôt que de
+                disparaître : mieux vaut une ligne imparfaite qu'un trou dans
+                une trace. */}
+            <div className="mt-0.5 text-[13px] leading-relaxed">
+              <b>{nomDe(l.auteur) ?? t2.parLaPlateforme}</b>{" "}
+              {(t2 as Record<string, string>)[l.action] ?? l.action}
+              {l.cible ? (
+                <>
+                  {" "}
+                  <b>{nomDe(l.cible)}</b>
+                </>
+              ) : l.cible_id ? (
+                <span className="doux"> {t2.cibleAnonyme}</span>
               ) : null}
             </div>
             {l.motif ? (

@@ -1,0 +1,180 @@
+"use server"
+
+import { headers } from "next/headers"
+
+import { chemin, dictionnaire, langueDeFormulaire } from "@/langues"
+import { supabaseServeur } from "@/lib/supabase/server"
+import { api, ErreurApi } from "@/lib/api"
+import { revalidatePath } from "next/cache"
+
+export type EtatRecuperation = { erreur?: string; info?: string }
+
+/**
+ * Envoie un lien de réinitialisation.
+ *
+ * Réservé de fait aux adultes et aux répétiteurs : un enfant n'a pas
+ * d'adresse, et c'est voulu — une adresse serait un canal vers lui qui ne
+ * passe pas par la plateforme. Sa récupération à lui passera par celle de ses
+ * parents, le jour où le courrier sera branché.
+ *
+ * La réponse est TOUJOURS la même, que le compte existe ou non. Dire « cette
+ * adresse est inconnue » transformerait cet écran en vérificateur de comptes :
+ * on saurait qui est inscrit chez TUTELA, et pour un produit qui accueille des
+ * mineurs, c'est une information qu'on ne donne pas.
+ */
+export async function envoyerLeLien(
+  _precedent: EtatRecuperation,
+  donnees: FormData,
+): Promise<EtatRecuperation> {
+  const langue = langueDeFormulaire(donnees)
+  const d = dictionnaire(langue)
+  const t = d.recuperation
+
+  const email = String(donnees.get("email") ?? "").trim()
+  if (!email.includes("@")) return { erreur: t.adresseAttendue }
+
+  const supabase = await supabaseServeur()
+
+  // L'adresse de retour est construite depuis la requête et non écrite en
+  // dur : le site tourne sur tutela-kappa.vercel.app aujourd'hui, et sur le
+  // domaine de Steve demain.
+  const entetes = await headers()
+  const origine =
+    entetes.get("origin") ??
+    `https://${entetes.get("host") ?? "tutela-kappa.vercel.app"}`
+
+  // Le lien passe par `/auth/confirm`, qui échange le jeton du courriel
+  // contre une session avant de laisser entrer. Pointer directement sur la
+  // page de saisie ouvrirait celle-ci à n'importe qui.
+  const suite = chemin(langue, "/nouveau-mot-de-passe")
+  await supabase.auth.resetPasswordForEmail(email, {
+    redirectTo: `${origine}/auth/confirm?next=${encodeURIComponent(suite)}`,
+  })
+
+  // On n'inspecte pas l'erreur : le message est le même dans tous les cas.
+  return { info: t.envoye }
+}
+
+/**
+ * Pose le nouveau mot de passe.
+ *
+ * Le lien du courriel ouvre une session éphémère ; c'est elle qui autorise
+ * cette écriture. Sans elle, l'appel échoue — et c'est bien ce qu'on veut :
+ * personne ne change un mot de passe sans avoir prouvé l'accès à la boîte.
+ */
+export async function poserLeMotDePasse(
+  _precedent: EtatRecuperation,
+  donnees: FormData,
+): Promise<EtatRecuperation> {
+  const langue = langueDeFormulaire(donnees)
+  const d = dictionnaire(langue)
+  const t = d.recuperation
+
+  const motDePasse = String(donnees.get("motDePasse") ?? "")
+  if (motDePasse.length < 8) return { erreur: d.erreurs.motDePasseTropCourt }
+
+  const supabase = await supabaseServeur()
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+
+  if (!user) return { erreur: t.lienExpire }
+
+  const { error } = await supabase.auth.updateUser({ password: motDePasse })
+  if (error) return { erreur: t.echec }
+
+  return { info: t.change }
+}
+
+/**
+ * L'enfant demande un nouveau mot de passe.
+ *
+ * Il donne son nom de connexion, pas une adresse : il n'en a pas. La demande
+ * part chez tous ses adultes, par courriel et dans leur espace — la carte ne
+ * dépend d'aucun service d'envoi, donc l'enfant n'est jamais bloqué par le
+ * courrier.
+ *
+ * La réponse est toujours la même, compte existant ou non, adulte rattaché ou
+ * non. Autrement ce champ dirait qui est inscrit chez TUTELA, et lesquels sont
+ * seuls.
+ */
+export async function demanderPourUnEnfant(
+  _precedent: EtatRecuperation,
+  donnees: FormData,
+): Promise<EtatRecuperation> {
+  const langue = langueDeFormulaire(donnees)
+  const d = dictionnaire(langue)
+  const t = d.recuperation
+
+  const nom = String(donnees.get("nom") ?? "").trim()
+  if (nom.length < 2) return { erreur: t.nomAttendu }
+
+  try {
+    await api("/v1/recuperation/enfant", {
+      methode: "POST",
+      corps: { nom },
+      sansSession: true,
+    })
+  } catch {
+    // Même en cas d'échec, même message : le silence est la protection.
+  }
+
+  return { info: t.enfantEnvoye }
+}
+
+/**
+ * Un adulte pose le nouveau mot de passe de son enfant.
+ *
+ * La demande vaut dix minutes et ne sert qu'une fois — une demande qui traîne
+ * est une porte ouverte : quiconque met la main sur le téléphone du parent
+ * dans l'intervalle prend le compte de l'enfant.
+ */
+export async function poserPourSonEnfant(
+  _precedent: EtatRecuperation,
+  donnees: FormData,
+): Promise<EtatRecuperation> {
+  const langue = langueDeFormulaire(donnees)
+  const d = dictionnaire(langue)
+  const t = d.recuperation
+
+  const demande = String(donnees.get("demande") ?? "")
+  const motDePasse = String(donnees.get("motDePasse") ?? "")
+
+  if (!demande) return { erreur: t.echec }
+  if (motDePasse.length < 6) return { erreur: t.enfantTropCourt }
+
+  try {
+    await api(`/v1/liens/mots-de-passe/${demande}`, {
+      methode: "POST",
+      corps: { motDePasse },
+    })
+  } catch (e: unknown) {
+    return { erreur: e instanceof ErreurApi ? e.message : t.echec }
+  }
+
+  revalidatePath("/", "layout")
+  return { info: t.enfantPose }
+}
+
+/**
+ * Renvoie la demande, quand les dix minutes ont passé.
+ *
+ * La précédente se ferme à la seconde : deux demandes vivantes, ce serait deux
+ * liens valables pour un seul besoin — et le plus ancien traînerait dans une
+ * boîte de courriel longtemps après avoir été oublié.
+ */
+export async function renvoyerLaDemande(donnees: FormData): Promise<void> {
+  const langue = langueDeFormulaire(donnees)
+  const eleve = String(donnees.get("eleve") ?? "")
+  if (!eleve) return
+
+  try {
+    await api(`/v1/liens/mots-de-passe/${eleve}/renvoyer`, { methode: "POST" })
+  } catch {
+    // Un échec laisse la demande en l'état : elle reste affichée, et le
+    // bouton se represse.
+  }
+
+  revalidatePath("/", "layout")
+}

@@ -57,6 +57,15 @@ function Formulaire() {
         <Bouton enCours={enCours}>{d.connexion.valider}</Bouton>
       </form>
 
+      {/* Sous le bouton, là où l'on regarde après un échec de connexion —
+          et non en petit au-dessus, où personne ne le cherche. */}
+      <Link
+        href={chemin(langue, "/mot-de-passe-oublie")}
+        className="doux -mt-1 text-sm underline underline-offset-4"
+      >
+        {d.recuperation.lien}
+      </Link>
+
       <p className="doux text-sm">
         {d.connexion.pasDeCompte}{" "}
         <Link
