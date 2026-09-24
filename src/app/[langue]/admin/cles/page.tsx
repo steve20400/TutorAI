@@ -26,6 +26,8 @@ const ORDRE = [
 type EtatTuteur = {
   joignable: boolean
   clePosee: boolean
+  modeleNomme: boolean
+  modeleCoherent: boolean
   moduleAllume: boolean
   fournisseur: string
   modele: string
@@ -99,6 +101,12 @@ function EtatDuTuteur({ etat }: { etat: EtatTuteur }) {
   const lignes: Array<[boolean, string]> = [
     [etat.joignable, "Le service joint la base avec son laissez-passer"],
     [etat.clePosee, `Une clé est posée pour « ${etat.fournisseur} »`],
+    [
+      etat.modeleNomme && etat.modeleCoherent,
+      etat.modeleNomme && !etat.modeleCoherent
+        ? `Le modèle « ${etat.modele} » n'est pas de chez « ${etat.fournisseur} »`
+        : `Un modèle est nommé${etat.modeleNomme ? ` : ${etat.modele}` : ""}`,
+    ],
     [etat.moduleAllume, "Le module du tuteur est allumé"],
   ]
 
