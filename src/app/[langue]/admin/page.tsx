@@ -33,6 +33,7 @@ export default async function TableauDeBord({
     aVerifier: number
     familles: number
     seancesEnCours: number
+    alertes: number
     villes: { nom: string; lon: number | null; lat: number | null }[]
     comptes: Record<string, number>
     styleCarte: string
@@ -41,6 +42,7 @@ export default async function TableauDeBord({
   const aVerifier = tb.aVerifier
   const nbFamilles = tb.familles
   const nbEnCours = tb.seancesEnCours
+  const alertes = tb.alertes ?? 0
   const ouvertes = tb.villes
   const comptes = tb.comptes
   const styleCarte = tb.styleCarte
@@ -91,6 +93,36 @@ export default async function TableauDeBord({
         </section>
 
         <div className="flex flex-col gap-4">
+          {/* Les alertes AVANT les dossiers.
+
+              Un dossier qui attend fait perdre un répétiteur ; un signalement
+              qu'on ne lit pas peut laisser un enfant seul avec quelqu'un. Ce
+              n'est pas le même ordre d'urgence, et l'écran doit le dire. */}
+          {alertes > 0 ? (
+            <section
+              className="carte p-5"
+              style={{ borderColor: "var(--erreur-texte)" }}
+            >
+              <div className="flex items-baseline gap-3">
+                <span
+                  className="text-[38px] font-light leading-none tracking-[-0.04em]"
+                  style={{ color: "var(--erreur-texte)" }}
+                >
+                  {alertes}
+                </span>
+                <span className="text-[14px] leading-snug">
+                  {pluriel(langue, alertes, d.adminPages.signalements.titreAttend)}
+                </span>
+              </div>
+              <Link
+                href={chemin(langue, "/admin/signalements")}
+                className="bt1 mt-4 w-full"
+              >
+                {d.adminPages.signalements.classer}
+              </Link>
+            </section>
+          ) : null}
+
           <section className="carte p-5">
             <div className="flex items-baseline gap-3">
               <span className="text-[38px] font-light leading-none tracking-[-0.04em]">

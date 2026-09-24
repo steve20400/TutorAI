@@ -19,6 +19,7 @@ import { BasculeMode } from "@/composants/theme"
 const RUBRIQUES = [
   { cle: "tableauDeBord", route: "/admin", fin: true },
   { cle: "dossiers", route: "/admin/dossiers" },
+  { cle: "signalements", route: "/admin/signalements" },
   { cle: "repetiteurs", route: "/admin/repetiteurs" },
   { cle: "familles", route: "/admin/familles" },
   { cle: "seances", route: "/admin/seances" },
@@ -61,6 +62,16 @@ function Icone({ cle }: { cle: CleRubrique }) {
       return (
         <svg {...c}>
           <path d="M2.5 5.5a2 2 0 0 1 2-2h3.3l1.8 2.2h6a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2h-11a2 2 0 0 1-2-2z" />
+        </svg>
+      )
+    case "signalements":
+      // Une cloche. Ni œil, ni triangle, ni compas — et rien qui ressemble à
+      // un point d'exclamation dans un triangle, qui est précisément la forme
+      // dont on ne veut pas.
+      return (
+        <svg {...c}>
+          <path d="M5.4 8.4a4.6 4.6 0 0 1 9.2 0c0 3.4.9 4.8 1.6 5.6H3.8c.7-.8 1.6-2.2 1.6-5.6z" />
+          <path d="M8.3 16.5a1.9 1.9 0 0 0 3.4 0" />
         </svg>
       )
     case "repetiteurs":
