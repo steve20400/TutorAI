@@ -42,12 +42,26 @@ export default async function PageNouveauTuteur({
   // l'élève reste libre d'écrire une matière que personne n'a encore demandée.
   const { matieres: catalogue, niveaux } = await lireReferentiel()
 
+  // Le pays de l'élève, et non celui du seul programme chargé. Junior est
+  // camerounais ; lui annoncer « Côte d'Ivoire » parce que le seul programme
+  // en base est ivoirien n'a aucun sens de son point de vue.
+  const { data: profil } = await supabase
+    .from("profils")
+    .select("pays")
+    .eq("id", user.id)
+    .maybeSingle()
+
   // Aucun écran bloquant : même sans le moindre programme chargé, un élève
   // choisit son niveau dans le référentiel et nomme sa matière lui-même. Il
   // y avait ici un message destiné à celui qui installe la base — du texte de
   // développement dans une interface d'élève, ce qui n'a jamais sa place.
 
   return (
-    <Assistant options={options} catalogue={catalogue} niveaux={niveaux} />
+    <Assistant
+      options={options}
+      catalogue={catalogue}
+      niveaux={niveaux}
+      paysEleve={(profil?.pays as string) ?? ""}
+    />
   )
 }

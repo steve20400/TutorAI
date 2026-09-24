@@ -32,6 +32,7 @@ export function Assistant({
   options,
   catalogue,
   niveaux,
+  paysEleve,
 }: {
   options: OptionProgramme[]
   /**
@@ -50,6 +51,14 @@ export function Assistant({
    * existe même si personne n'a encore saisi le programme de cinquième.
    */
   niveaux: string[]
+  /**
+   * Le pays de l'élève, lu sur son profil.
+   *
+   * Il sert au récapitulatif et au choix par défaut. Le pays d'un programme
+   * est autre chose : quand les deux diffèrent, on le dit au lieu de faire
+   * croire à l'élève qu'il a changé de pays.
+   */
+  paysEleve: string
 }) {
   const { langue, d } = useLangue()
 
@@ -58,9 +67,12 @@ export function Assistant({
     [options],
   )
 
-  const [pays, setPays] = useState(
-    paysDisponibles.length === 1 ? paysDisponibles[0] : "",
-  )
+  const [pays, setPays] = useState(() => {
+    // Son pays d'abord, s'il porte des programmes. Sinon le seul disponible,
+    // en le signalant plus bas sur chaque matière.
+    if (paysEleve && paysDisponibles.includes(paysEleve)) return paysEleve
+    return paysDisponibles.length === 1 ? paysDisponibles[0] : ""
+  })
   const [sousSysteme, setSousSysteme] = useState("")
   const [niveau, setNiveau] = useState("")
   const [matieres, setMatieres] = useState<string[]>([])
@@ -233,6 +245,9 @@ export function Assistant({
                     robot bavard : quand il est là, on le dit. */}
                 <span className="badge-verifie shrink-0 text-[10px]">
                   {d.tuteur.suitLeProgramme}
+                  {paysEleve && o.pays !== paysEleve
+                    ? ` · ${d.tuteur.pays[o.pays] ?? o.pays}`
+                    : ""}
                 </span>
               </span>
             </Choix>
@@ -258,6 +273,16 @@ export function Assistant({
                 value={saisieLibre}
                 onChange={(e) => setSaisieLibre(e.target.value)}
                 onKeyDown={(e) => {
+                  if (e.key !== "Enter") return
+                  // Sans ça, la touche remonte au formulaire de l'étape
+                  // suivante et crée le tuteur avant qu'on ait fini.
+                  e.preventDefault()
+                }}
+                onKeyUp={(e) => {
+                  // Au relâchement, et non à l'appui : quand la liste de
+                  // suggestions est ouverte, le navigateur s'en sert d'abord
+                  // pour valider le choix et n'a pas encore mis à jour le
+                  // champ au moment de l'appui.
                   if (e.key !== "Enter") return
                   e.preventDefault()
                   ajouterLibre()
@@ -322,7 +347,7 @@ export function Assistant({
           <div className="carte p-4 text-sm">
             <div className="font-medium">{d.tuteur.recapitulatif}</div>
             <div className="doux mt-1">
-              {pays ? `${d.tuteur.pays[pays] ?? pays} · ` : ""}
+              {paysEleve ? `${d.tuteur.pays[paysEleve] ?? paysEleve} · ` : ""}
               {d.niveaux[niveau] ?? niveau}
             </div>
             <div className="doux">
