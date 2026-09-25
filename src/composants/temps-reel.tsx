@@ -8,24 +8,29 @@ import { supabaseNavigateur } from "@/lib/supabase/client"
 /**
  * Écouter la base, et rafraîchir l'écran quand elle bouge.
  *
- * Jusqu'ici, une demande de rattachement n'apparaissait qu'au chargement
- * suivant. Un enfant connecté ne voyait rien arriver ; un adulte ne voyait pas
- * l'acceptation. Il fallait se déconnecter ou recharger pour découvrir ce qui
- * s'était passé — c'est-à-dire deviner qu'il s'était passé quelque chose.
- *
- * Supabase publie les changements de table en direct, par-dessus WebSocket, et
- * la RLS s'y applique : chacun ne reçoit que les lignes qu'il a déjà le droit
- * de lire. Pas de serveur à tenir nous-mêmes, pas de second chemin d'accès aux
- * données à sécuriser.
+ * Supabase publie les changements de table sur un WebSocket permanent, et la
+ * RLS s'y applique : chacun ne reçoit que les lignes qu'il a déjà le droit de
+ * lire. C'est aussi un composant libre de la pile Supabase, présent dans
+ * l'auto-hébergement — le jour du VPS, ce fichier ne changera pas.
  *
  * On ne transporte pas la donnée reçue jusqu'à l'écran : on appelle
  * `router.refresh()`, et les composants serveur refont leur travail avec les
  * mêmes requêtes qu'au premier rendu. Une seule source de vérité, et rien à
  * garder d'accord entre le rendu initial et les mises à jour.
  *
- * Le rafraîchissement est retardé d'un instant : une acceptation écrit dans
- * deux tables à la suite, et rafraîchir deux fois de suite afficherait un état
- * intermédiaire avant le bon.
+ * ── Le jeton, et pourquoi la première version ne marchait pas ──
+ *
+ * S'abonner dès le montage ouvrait le canal AVANT que le client ait fini de
+ * lire la session dans les témoins. Le socket se connectait donc en anonyme,
+ * et comme la RLS s'applique au canal, un anonyme ne reçoit aucune ligne :
+ * tout paraissait branché, rien n'arrivait, et il fallait recharger la page —
+ * c'est-à-dire exactement ce qu'on voulait supprimer.
+ *
+ * On attend donc la session, on pose le jeton sur le canal, et on la repose à
+ * chaque renouvellement : un jeton d'accès vit une heure, et le socket d'une
+ * séance de travail vit plus longtemps que ça.
+ *
+ * Et on lit le résultat de `subscribe()`. Un abonnement refusé se taisait.
  */
 export function TempsReel({
   tables,
@@ -47,24 +52,64 @@ export function TempsReel({
 
   useEffect(() => {
     const supabase = supabaseNavigateur()
-    const canal = supabase.channel(`temps-reel:${cle}:${filtre ?? "tout"}`)
+    let vivant = true
+    let canal: ReturnType<typeof supabase.channel> | null = null
 
-    for (const table of cle.split(",")) {
-      canal.on(
-        "postgres_changes",
-        { event: "*", schema: "public", table, ...(filtre ? { filter: filtre } : {}) },
-        () => {
-          if (minuterie.current) clearTimeout(minuterie.current)
-          minuterie.current = setTimeout(() => router.refresh(), delai)
-        },
-      )
-    }
+    // Le jeton suit ses renouvellements. Sans cela, le canal continue de
+    // tourner avec un jeton périmé et cesse de recevoir, en silence, au bout
+    // d'une heure.
+    const { data: veille } = supabase.auth.onAuthStateChange((_e, session) => {
+      if (session?.access_token) supabase.realtime.setAuth(session.access_token)
+    })
 
-    canal.subscribe()
+    void (async () => {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession()
+      if (!vivant) return
+
+      // Un visiteur sans session n'a rien à écouter : la RLS ne lui rendrait
+      // aucune ligne, et le canal ne servirait qu'à tenir un socket ouvert.
+      if (!session?.access_token) return
+      supabase.realtime.setAuth(session.access_token)
+
+      canal = supabase.channel(`temps-reel:${cle}:${filtre ?? "tout"}`)
+
+      for (const table of cle.split(",")) {
+        canal.on(
+          "postgres_changes",
+          {
+            event: "*",
+            schema: "public",
+            table,
+            ...(filtre ? { filter: filtre } : {}),
+          },
+          () => {
+            if (minuterie.current) clearTimeout(minuterie.current)
+            minuterie.current = setTimeout(() => router.refresh(), delai)
+          },
+        )
+      }
+
+      canal.subscribe((statut, erreur) => {
+        if (statut === "SUBSCRIBED") return
+        // Bruyant, et c'est voulu : un abonnement refusé rend l'écran
+        // silencieusement figé, ce qui ressemble à une application qui marche.
+        console.error(
+          "[temps-reel] abonnement",
+          statut,
+          "sur",
+          cle,
+          erreur?.message ?? "",
+        )
+      })
+    })()
 
     return () => {
+      vivant = false
+      veille.subscription.unsubscribe()
       if (minuterie.current) clearTimeout(minuterie.current)
-      void supabase.removeChannel(canal)
+      if (canal) void supabase.removeChannel(canal)
     }
   }, [cle, filtre, delai, router])
 
