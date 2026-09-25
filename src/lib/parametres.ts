@@ -45,6 +45,16 @@ export type Parametres = {
    * Supabase, hors de cette application.
    */
   duree_demande_mot_de_passe_minutes: number
+
+  /**
+   * Le délai avant qu'un rattachement accepté donne ses pleins droits.
+   *
+   * Zéro, et ce n'est pas un oubli : le délai laissait aux autres adultes le
+   * temps de s'opposer, mais quand l'adulte est le seul rattaché, personne ne
+   * s'oppose — il ne restait qu'un enfant incapable de récupérer son mot de
+   * passe pendant deux jours, et incapable aussi de couper le rattachement.
+   */
+  delai_rattachement_heures: number
 }
 
 const DEFAUTS: Parametres = {
@@ -59,6 +69,7 @@ const DEFAUTS: Parametres = {
   ia_modele_essai: "",
   ia_modele_compte: "",
   duree_demande_mot_de_passe_minutes: 60,
+  delai_rattachement_heures: 0,
 }
 
 /**

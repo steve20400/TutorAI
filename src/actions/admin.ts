@@ -152,6 +152,30 @@ export async function changerModeles(donnees: FormData): Promise<void> {
  * Supabase, hors de cette application : l'écran le dit, plutôt que de laisser
  * croire qu'un seul champ suffit.
  */
+/**
+ * Le délai avant qu'un rattachement accepté devienne plein.
+ *
+ * Zéro est une valeur légitime, et c'est la valeur par défaut : dès que
+ * l'enfant a reconnu l'adulte, le lien est plein. Le délai servait à laisser
+ * aux autres adultes le temps de s'opposer — mais quand l'adulte est le seul
+ * rattaché, il n'y a personne pour s'opposer, et il ne restait qu'un enfant
+ * bloqué deux jours sans recours.
+ *
+ * La borne haute est une semaine. Au-delà, ce n'est plus un délai de
+ * vérification, c'est un rattachement qui ne se fait pas.
+ */
+export async function changerDelaiRattachement(donnees: FormData): Promise<void> {
+  const langue = langueDeFormulaire(donnees)
+  const heures = Number(donnees.get("heures") ?? -1)
+
+  if (!Number.isInteger(heures) || heures < 0 || heures > 168) return
+
+  await exigerSession(langue)
+  await agir("/v1/admin/parametres/delai_rattachement_heures", {
+    valeur: heures,
+  })
+}
+
 export async function changerDuree(donnees: FormData): Promise<void> {
   const langue = langueDeFormulaire(donnees)
   const minutes = Number(donnees.get("minutes") ?? 0)

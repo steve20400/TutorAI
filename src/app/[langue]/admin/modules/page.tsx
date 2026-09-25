@@ -10,7 +10,7 @@ import {
 import { exigerAdmin } from "@/lib/admin"
 import { lireParametres } from "@/lib/parametres"
 import { MODULES } from "@/lib/modules"
-import { changerDuree } from "@/actions/admin"
+import { changerDuree, changerDelaiRattachement } from "@/actions/admin"
 import { BoutonAction } from "@/composants/bouton-action"
 
 export default async function PageModules({
@@ -110,6 +110,34 @@ export default async function PageModules({
           >
             {t.dureeCourriel}
           </p>
+        </section>
+
+        {/* Les quarante-huit heures de rattachement vivaient en dur dans une
+            migration. Elles sont ici maintenant, et à zéro. */}
+        <section className="carte mt-4 p-5">
+          <div className="text-[14px] font-medium">{t.delaiTitre}</div>
+          <p className="doux mt-1 text-[12px] leading-relaxed">
+            {t.delaiDetail}
+          </p>
+
+          <form
+            action={changerDelaiRattachement}
+            className="mt-3 flex flex-wrap items-center gap-2"
+          >
+            <input type="hidden" name="langue" value={langue} />
+            <input
+              name="heures"
+              type="number"
+              min={0}
+              max={168}
+              defaultValue={parametres.delai_rattachement_heures ?? 0}
+              className="champ w-28 px-3 py-2 text-[14px]"
+            />
+            <span className="doux text-[12px]">{t.delaiHeures}</span>
+            <BoutonAction className="bt1 px-4 py-2">
+              {d.adminPages.cles.enregistrer}
+            </BoutonAction>
+          </form>
         </section>
       </div>
     </>

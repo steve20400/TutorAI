@@ -99,19 +99,13 @@ export const fr = {
     enfantLien: "Ton compte n'a pas d'adresse mail ?",
     enfantNom: "Ton nom de connexion",
     enfantDemander: "Prévenir mes parents",
-    // La phrase promettait plus que ce qui se passe. Un rattachement est
-    // provisoire pendant quarante-huit heures — le temps qu'un autre adulte
-    // de la famille puisse s'y opposer — et pendant ce délai l'adulte ne peut
-    // pas poser le mot de passe de l'enfant : ce serait prendre son compte,
-    // c'est-à-dire exactement le pouvoir que le délai protège. Rien ne part
-    // donc, et l'enfant lisait pourtant « il vient d'être prévenu ».
-    //
-    // On ne peut pas lui dire lequel des cas est le sien : cet écran répond
-    // la même chose à tout le monde, sinon il dirait à n'importe qui quels
-    // enfants sont inscrits et avec quels adultes. La phrase énonce donc la
-    // règle, et laisse l'enfant reconnaître sa situation.
+    // Vraie depuis que le délai de rattachement vaut zéro (migration 053) :
+    // un adulte reconnu est plein tout de suite, donc il est vraiment prévenu.
+    // Si ce délai remonte un jour depuis l'espace d'administration, cette
+    // phrase redeviendra fausse pour les rattachements tout neufs — c'est le
+    // seul endroit à relire ce jour-là.
     enfantEnvoye:
-      "Si un adulte est rattaché à ton compte depuis plus de deux jours, il vient d'être prévenu — par mail et dans son espace. Demande-lui de t'aider : la demande ne dure qu'un moment, et ne sert qu'une fois.\n\nSi ton rattachement est tout neuf, il faut attendre qu'il soit confirmé. C'est ce délai qui empêche un inconnu de prendre ton compte en se faisant passer pour un parent.",
+      "Si un adulte est rattaché à ton compte, il vient d'être prévenu — par mail et dans son espace. Demande-lui de t'aider : la demande ne dure qu'un moment, et ne sert qu'une fois.",
     nomAttendu: "Écris ton nom de connexion.",
     enfantTropCourt: "Six caractères au moins.",
     enfantPose: "C'est fait. Ton enfant peut se connecter avec ce mot de passe.",
@@ -668,6 +662,10 @@ ajouter: "Ajouter",
     },
     modules: {
       etiquette: "Modules — cliquez pour ouvrir",
+      delaiTitre: "Délai avant qu'un rattachement soit plein",
+      delaiDetail:
+        "Quand un enfant reconnaît un adulte, le lien peut attendre avant de donner ses pleins droits — de quoi laisser aux autres adultes de la famille le temps de s'y opposer. À zéro, le rattachement est immédiat : c'est le réglage actuel, parce qu'un enfant dont l'adulte est le seul rattaché n'a personne pour s'opposer, et ne pouvait plus récupérer son mot de passe pendant ce temps-là.",
+      delaiHeures: "heures",
       dureeTitre: "Durée d'une demande de mot de passe",
       dureeDetail: "En minutes. C'est le temps dont dispose un adulte pour redonner un mot de passe à son enfant, depuis son espace.",
       dureeCourriel: "Le lien envoyé par courriel, lui, expire selon un réglage de Supabase — Authentication → Email → Email OTP Expiration. Sur votre propre serveur, ce sera la variable GOTRUE_MAILER_OTP_EXP, en secondes. Gardez les deux d'accord : deux canaux qui expirent à des moments différents, c'est une confusion garantie.",

@@ -98,7 +98,7 @@ export const en: Dictionnaire = {
     enfantNom: "Your login name",
     enfantDemander: "Tell my parents",
     enfantEnvoye:
-      "If an adult has been linked to your account for more than two days, they have just been told — by email and in their space. Ask them to help you: the request lasts a short while, and works only once.\n\nIf your link is brand new, you need to wait until it is confirmed. That delay is what stops a stranger from taking your account by posing as a parent.",
+      "If an adult is linked to your account, they have just been told — by email and in their space. Ask them to help you: the request lasts a short while, and works only once.",
     nomAttendu: "Write your login name.",
     enfantTropCourt: "Six characters at least.",
     enfantPose: "Done. Your child can sign in with this password.",
@@ -636,6 +636,10 @@ ajouter: "Add",
     },
     modules: {
       etiquette: "Modules — click to open",
+      delaiTitre: "Delay before a link becomes full",
+      delaiDetail:
+        "When a child recognises an adult, the link can wait before granting full rights — time for the family's other adults to object. At zero the link is immediate: that is the current setting, because a child whose only adult is that one has nobody to object, and could not recover their password in the meantime.",
+      delaiHeures: "hours",
       dureeTitre: "How long a password request lasts",
       dureeDetail: "In minutes. This is how long an adult has to give their child a new password, from their own space.",
       dureeCourriel: "The link sent by email expires according to a Supabase setting — Authentication → Email → Email OTP Expiration. On your own server it will be the GOTRUE_MAILER_OTP_EXP variable, in seconds. Keep both in step: two channels expiring at different times is guaranteed confusion.",
