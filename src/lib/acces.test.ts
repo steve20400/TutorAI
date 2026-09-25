@@ -1,7 +1,7 @@
 import { test } from "node:test"
 import assert from "node:assert/strict"
 
-import { decisionDeRoute } from "./acces.ts"
+import { decisionDeRoute, porteUnTemoinDeSession } from "./acces.ts"
 
 /**
  * La règle d'accès, lue à voix haute.
@@ -48,5 +48,37 @@ const CAS: Array<[string, boolean, string]> = [
 for (const [chemin, connecte, attendu] of CAS) {
   test(`${connecte ? "connecté" : "visiteur"} sur ${chemin} → ${attendu}`, () => {
     assert.equal(decisionDeRoute(chemin, connecte), attendu)
+  })
+}
+
+
+/**
+ * Le raccourci qui évite un aller-retour réseau avant chaque page.
+ *
+ * Il ne doit jamais rater un vrai témoin : un utilisateur connecté que le
+ * middleware croirait anonyme serait renvoyé vers la connexion à chaque clic.
+ */
+const AVEC_SESSION: Array<[string, string[]]> = [
+  ["témoin simple", ["sb-abcdefgh-auth-token"]],
+  ["témoin découpé", ["sb-abcdefgh-auth-token.0", "sb-abcdefgh-auth-token.1"]],
+  ["parmi d'autres", ["tutela-langue", "sb-xyz-auth-token", "theme"]],
+]
+
+const SANS_SESSION: Array<[string, string[]]> = [
+  ["aucun témoin", []],
+  ["seulement les nôtres", ["tutela-langue", "tutela-theme"]],
+  ["un témoin Supabase sans jeton", ["sb-abcdefgh-provider-token-hint"]],
+  ["un nom qui ressemble", ["auth-token"]],
+]
+
+for (const [nom, temoins] of AVEC_SESSION) {
+  test(`session à vérifier : ${nom}`, () => {
+    assert.equal(porteUnTemoinDeSession(temoins), true)
+  })
+}
+
+for (const [nom, temoins] of SANS_SESSION) {
+  test(`rien à vérifier : ${nom}`, () => {
+    assert.equal(porteUnTemoinDeSession(temoins), false)
   })
 }

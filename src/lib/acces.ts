@@ -89,3 +89,24 @@ export function decisionDeRoute(chemin: string, connecte: boolean): Decision {
 
   return "laisser"
 }
+
+
+/**
+ * Y a-t-il seulement un témoin de session à vérifier ?
+ *
+ * Le middleware demandait « qui est-ce ? » à Supabase avant chaque page, y
+ * compris pour un visiteur qui lit l'écran de connexion et n'a évidemment
+ * personne à nommer. Un aller-retour à l'autre bout du monde, à chaque
+ * navigation, pour une question dont la réponse est écrite dans la requête.
+ *
+ * Ce raccourci n'accorde jamais rien : il constate une absence. Un témoin
+ * présent fait toujours l'appel, et c'est lui qui décide — un témoin périmé
+ * ou fabriqué ne passe pas `getUser()`.
+ *
+ * `@supabase/ssr` nomme ses témoins `sb-<projet>-auth-token`, et les découpe
+ * en `.0`, `.1` quand ils dépassent la taille d'un témoin. D'où la recherche
+ * par fragment plutôt que par nom exact.
+ */
+export function porteUnTemoinDeSession(noms: readonly string[]): boolean {
+  return noms.some((n) => n.startsWith("sb-") && n.includes("auth-token"))
+}

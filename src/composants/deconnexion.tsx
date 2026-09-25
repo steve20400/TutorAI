@@ -1,4 +1,5 @@
 import { seDeconnecter } from "@/actions/authentification"
+import { BoutonAction } from "@/composants/bouton-action"
 import { dictionnaire, type Langue } from "@/langues"
 
 /**
@@ -7,6 +8,11 @@ import { dictionnaire, type Langue } from "@/langues"
  * Il existe comme composant parce que l'action a besoin de la langue pour
  * savoir sur quelle page de connexion renvoyer : un champ caché oublié sur une
  * seule page renverrait cet utilisateur-là en français quoi qu'il arrive.
+ *
+ * `BoutonAction` et non un `<button>` nu : se déconnecter ferme la session
+ * auprès de Supabase, ce qui prend un aller-retour. Le bouton restait muet
+ * pendant ce temps, on le croyait mort et on recliquait — c'est ce que Steve
+ * a rencontré dans l'administration.
  */
 export function BoutonDeconnexion({
   langue,
@@ -21,12 +27,9 @@ export function BoutonDeconnexion({
   return (
     <form action={seDeconnecter}>
       <input type="hidden" name="langue" value={langue} />
-      <button
-        type="submit"
-        className="doux text-sm underline underline-offset-4 transition hover:opacity-70"
-      >
+      <BoutonAction className="doux text-sm underline underline-offset-4 transition hover:opacity-70">
         {libelle ?? d.commun.seDeconnecter}
-      </button>
+      </BoutonAction>
     </form>
   )
 }

@@ -9,6 +9,7 @@ import { useLangue } from "@/langues/contexte"
 import { CadreAuth } from "../cadre"
 import { Bouton, Champ, Message } from "../champs"
 import { seConnecter, type EtatFormulaire } from "@/actions/authentification"
+import { AttenteLien } from "@/composants/attente-lien"
 
 const ETAT_INITIAL: EtatFormulaire = {}
 
@@ -64,6 +65,7 @@ function Formulaire() {
         className="doux -mt-1 text-sm underline underline-offset-4"
       >
         {d.recuperation.lien}
+        <AttenteLien />
       </Link>
 
       <p className="doux text-sm">
@@ -74,6 +76,7 @@ function Formulaire() {
           style={{ color: "var(--texte)" }}
         >
           {d.connexion.creerCompte}
+          <AttenteLien />
         </Link>
       </p>
     </CadreAuth>

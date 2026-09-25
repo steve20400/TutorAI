@@ -3,6 +3,7 @@ import Link from "next/link"
 import { chemin, dictionnaire, estLangue, LANGUE_PAR_DEFAUT } from "@/langues"
 import { lireParametres } from "@/lib/parametres"
 import { CadreAuth } from "../cadre"
+import { AttenteLien } from "@/composants/attente-lien"
 
 /**
  * Choix du rôle — la première question posée à qui arrive sur l'application.
@@ -105,6 +106,7 @@ export default async function ChoixDuRole({
             </span>
             <span className="doux mt-0.5 block text-sm">
               {d.inscription.roles[cle].detail}
+              <AttenteLien />
             </span>
           </Link>
         ))}
@@ -118,6 +120,7 @@ export default async function ChoixDuRole({
           style={{ color: "var(--texte)" }}
         >
           {d.inscription.seConnecter}
+          <AttenteLien />
         </Link>
       </p>
     </CadreAuth>
