@@ -52,7 +52,15 @@ type Famille = {
    *
    * C'est l'information qui décide, quand on arrive ici depuis une alerte.
    */
-  tentatives?: { refusees: number; acceptees: number; en_attente: number }
+  tentatives?: {
+    refusees: number
+    acceptees: number
+    en_attente: number
+    /** Des enfants distincts qui l'ont retiré après l'avoir accepté. */
+    detaches_par_enfant: number
+    /** Des enfants dont il s'est retiré lui-même. */
+    detaches_par_adulte: number
+  }
   contrats: Contrat[]
 }
 
@@ -210,6 +218,31 @@ export default async function PageFamille({
             </p>
             <p className="doux mt-2 text-[12px] leading-relaxed">
               {t.rattachementsAide}
+            </p>
+          </section>
+        ) : null}
+
+        {/* Les rattachements défaits.
+
+            Un bloc à part, et sans bordure d'alerte : un détachement n'est
+            pas un refus. Affiché dès qu'il y en a un dans un sens ou dans
+            l'autre — contrairement aux refus, un seul se lit déjà, parce
+            qu'il dit quelque chose du lien plutôt que de l'insistance. */}
+        {tentatives &&
+        (tentatives.detaches_par_enfant > 0 ||
+          tentatives.detaches_par_adulte > 0) ? (
+          <section className="carte mt-4 p-5">
+            <div className="doux text-[10px] font-semibold uppercase tracking-[0.14em]">
+              {t.detachements}
+            </div>
+            <p className="mt-2 text-[13.5px] leading-relaxed">
+              {remplir(t.detachementsDetail, {
+                parEnfant: tentatives.detaches_par_enfant,
+                parAdulte: tentatives.detaches_par_adulte,
+              })}
+            </p>
+            <p className="doux mt-2 text-[12px] leading-relaxed">
+              {t.detachementsAide}
             </p>
           </section>
         ) : null}

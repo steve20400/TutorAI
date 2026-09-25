@@ -581,6 +581,11 @@ ajouter: "Add",
       rattachements: "Link attempts",
       rattachementsDetail: "{refusees} requests refused by children, for {acceptees} accepted.",
       rattachementsAide: "An adult nobody has ever recognised who keeps trying is not looking for their child. A parent other children have recognised probably got the name wrong.",
+      detachements: "Links undone",
+      detachementsDetail:
+        "{parEnfant} children removed them after accepting them. They removed themselves from {parAdulte}.",
+      detachementsAide:
+        "Detaching is not refusing, and no detachment raises an alert: families change, names get mistaken. What deserves a look is the first figure — children who recognised this adult, then wanted it to stop.",
       lesEnfants: "Children",
       lesContrats: "Tutors engaged",
       aucunContrat:

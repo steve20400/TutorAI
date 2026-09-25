@@ -607,6 +607,11 @@ ajouter: "Ajouter",
       rattachements: "Tentatives de rattachement",
       rattachementsDetail: "{refusees} demandes refusées par des enfants, pour {acceptees} acceptées.",
       rattachementsAide: "Un adulte que personne n'a jamais reconnu et qui insiste ne cherche pas son enfant. Un parent que d'autres enfants ont reconnu s'est probablement trompé de nom.",
+      detachements: "Rattachements défaits",
+      detachementsDetail:
+        "{parEnfant} enfants l'ont retiré après l'avoir accepté. Il s'est retiré lui-même de {parAdulte}.",
+      detachementsAide:
+        "Se détacher n'est pas refuser, et un détachement ne déclenche aucune alerte : les familles changent, on se trompe de nom. Ce qui se regarde, c'est la première colonne — des enfants qui ont reconnu cet adulte, puis ont voulu que ça cesse.",
       lesEnfants: "Les enfants",
       lesContrats: "Répétiteurs engagés",
       aucunContrat:
