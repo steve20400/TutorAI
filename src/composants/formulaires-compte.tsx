@@ -24,11 +24,20 @@ export type Compte = {
 }
 
 /**
- * Son propre compte.
+ * Son propre compte : identité, photo, mot de passe.
  *
  * Deux formulaires séparés et non un seul : changer son prénom et changer son
  * mot de passe n'engagent pas la même chose, et les mêler ferait redemander le
  * mot de passe actuel pour corriger une faute de frappe dans un nom.
+ *
+ * Il vivait sous `admin/profil` et ne servait qu'à l'administration. Il est
+ * ici parce qu'un adulte a exactement les mêmes besoins — mettre sa photo,
+ * corriger son nom, changer son mot de passe — et que son espace n'offrait
+ * rien de tout cela : la page existait, plus rien n'y menait. Écrire une
+ * deuxième version aurait fait deux formulaires à corriger au lieu d'un.
+ *
+ * Les libellés viennent de `adminPages.profil` : c'est là qu'ils ont été
+ * écrits, et ils ne disent rien qui soit propre à l'administration.
  */
 export function FormulairesCompte({
   langue,

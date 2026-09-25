@@ -12,6 +12,7 @@ import { AVATARS, type Avatar as AvatarChoisi } from "@/lib/avatars"
 import { supabaseServeur } from "@/lib/supabase/server"
 import { TempsReel } from "@/composants/temps-reel"
 import { MesAdultes, type AdulteRattache } from "./mes-adultes"
+import { FormulairesCompte } from "@/composants/formulaires-compte"
 
 import { ChoixCompte } from "./choix"
 
@@ -101,17 +102,33 @@ export default async function PageCompte({
         </Link>
       </header>
 
-      <ChoixCompte
-        langue={langue}
-        d={d}
-        prenom={compte.prenom}
-        nom={compte.nom}
-        identifiant={compte.identifiant}
-        photoUrl={compte.photo_url}
-        avatars={avatars}
-      />
+      {/* Deux publics, deux formulaires.
 
-      {compte.identifiant ? (
+          L'enfant choisit un dessin parmi cinquante et ne met pas de photo :
+          c'est une règle du produit, pas une limite technique. L'adulte, lui,
+          téléverse la sienne, corrige son nom et change son mot de passe —
+          exactement ce que l'administration offrait déjà, et que son espace
+          ne proposait nulle part. */}
+      {adulte ? (
+        <FormulairesCompte
+          langue={langue}
+          d={d}
+          compte={compte}
+          adresse={user.email ?? null}
+        />
+      ) : (
+        <ChoixCompte
+          langue={langue}
+          d={d}
+          prenom={compte.prenom}
+          nom={compte.nom}
+          identifiant={compte.identifiant}
+          photoUrl={compte.photo_url}
+          avatars={avatars}
+        />
+      )}
+
+      {!adulte && compte.identifiant ? (
         <p className="doux text-[11.5px] leading-relaxed">
           {t.identifiant} : <b className="font-mono">{compte.identifiant}</b> —{" "}
           {t.identifiantFige}

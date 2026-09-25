@@ -5,7 +5,10 @@ import { exigerAdmin } from "@/lib/admin"
 import { api } from "@/lib/api"
 import { supabaseServeur } from "@/lib/supabase/server"
 
-import { FormulairesCompte, type Compte } from "./formulaires"
+import {
+  FormulairesCompte,
+  type Compte,
+} from "@/composants/formulaires-compte"
 
 /**
  * Le compte de l'administrateur.

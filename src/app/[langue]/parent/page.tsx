@@ -17,6 +17,7 @@ import { Enfants, type Enfant } from "./enfants"
 import { Rattacher } from "./rattacher"
 import { supabaseServeur } from "@/lib/supabase/server"
 import { TempsReel } from "@/composants/temps-reel"
+import { Avatar } from "@/composants/avatar"
 
 /**
  * Accueil parent — volontairement minimal à ce stade.
@@ -42,7 +43,11 @@ export default async function AccueilParent({
 
   if (!user) redirect(chemin(langue, "/connexion"))
 
-  const profil = await api<{ prenom: string | null; role: string }>("/v1/moi")
+  const profil = await api<{
+    prenom: string | null
+    role: string
+    photo_url: string | null
+  }>("/v1/moi")
 
   if (profil.role !== "parent") redirect(chemin(langue, "/"))
 
@@ -96,6 +101,21 @@ export default async function AccueilParent({
             </h1>
             <p className="doux mt-0.5 text-sm">{d.parent.espace}</p>
           </div>
+          {/* L'avatar mène au compte, comme chez l'enfant. La page existait
+              déjà et gérait le cas adulte ; rien n'y menait depuis ici, donc
+              un adulte ne pouvait ni poser sa photo, ni changer son mot de
+              passe. */}
+          <Link
+            href={chemin(langue, "/compte")}
+            title={d.compte.titreAdulte}
+            className="transition hover:opacity-80"
+          >
+            <Avatar
+              nom={profil.prenom ?? ""}
+              photoUrl={profil.photo_url}
+              taille={32}
+            />
+          </Link>
           <ReglagesRapides />
           <BoutonDeconnexion langue={langue} />
         </header>
