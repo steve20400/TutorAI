@@ -40,11 +40,31 @@ export async function envoyerLeLien(
   // contre une session avant de laisser entrer. Pointer directement sur la
   // page de saisie ouvrirait celle-ci à n'importe qui.
   const suite = chemin(langue, "/nouveau-mot-de-passe")
-  await supabase.auth.resetPasswordForEmail(email, {
+  const { error } = await supabase.auth.resetPasswordForEmail(email, {
     redirectTo: `${origine}/auth/confirm?next=${encodeURIComponent(suite)}`,
   })
 
-  // On n'inspecte pas l'erreur : le message est le même dans tous les cas.
+  // L'écran, lui, ne dira jamais rien de plus : le message est le même dans
+  // tous les cas, et c'est ce qui empêche cet écran de devenir un annuaire
+  // des inscrits.
+  //
+  // Mais nous, nous devons savoir. Supabase ne signale pas « ce compte
+  // n'existe pas » — il répond succès dans ce cas. Une erreur ici veut donc
+  // dire que l'envoi lui-même a échoué : SMTP refusé, quota dépassé, clé
+  // périmée. Sans cette ligne, ces pannes-là sont invisibles jusqu'au jour
+  // où un parent téléphone.
+  //
+  // L'adresse n'est pas journalisée : le journal n'a pas à devenir la liste
+  // que l'écran refuse de donner.
+  if (error) {
+    console.error(
+      "[recuperation] l'envoi du lien a échoué :",
+      error.code ?? error.name,
+      "—",
+      error.message,
+    )
+  }
+
   return { info: t.envoye }
 }
 
