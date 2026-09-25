@@ -2,26 +2,8 @@ import { createServerClient } from "@supabase/ssr"
 import { NextResponse, type NextRequest } from "next/server"
 
 import type { Langue } from "@/langues"
+import { decisionDeRoute } from "../acces"
 import { variableRequise } from "../env"
-
-/**
- * Routes accessibles sans être connecté, une fois le préfixe de langue retiré.
- * Tout le reste est protégé — fermé par défaut.
- *
- * `/essai` en fait partie, et c'est tout son propos : quelqu'un qui entend
- * parler de TUTELA doit pouvoir voir le tuteur avant de donner quoi que ce
- * soit. Son plafond de jetons vit dans le service, pas dans cette liste.
- */
-const ROUTES_PUBLIQUES = [
-  "/connexion",
-  "/inscription",
-  "/auth",
-  "/essai",
-  "/mot-de-passe-oublie",
-  // Celle-ci s'ouvre avec la session que le lien du courriel vient de créer,
-  // mais le middleware ne la voit pas encore au premier passage.
-  "/nouveau-mot-de-passe",
-]
 
 /**
  * Rafraîchit la session à chaque requête et protège les routes.
@@ -63,43 +45,29 @@ export async function actualiserSession(
 
   const chemin = requete.nextUrl.pathname
   const sansLangue = chemin.slice(`/${langue}`.length) || "/"
-  const estPublique = ROUTES_PUBLIQUES.some((r) => sansLangue.startsWith(r))
 
-  if (!user && !estPublique) {
-    const url = requete.nextUrl.clone()
-
-    // Deux situations, deux portes.
-    //
-    // À la racine, personne ne « revient » : on ouvre l'application, ou on
-    // suit un lien partagé dans un groupe. La quasi-totalité de ces gens n'ont
-    // pas de compte, et la connexion est une porte fermée en guise d'accueil.
-    // Celui qui en a un traverse l'inscription d'un clic.
-    //
-    // Sur une adresse précise — une séance, un dossier — c'est l'inverse : on
-    // ne tombe pas dessus par hasard, on y revient. La connexion garde alors
-    // `suite`, pour y ramener tel quel une fois la session ouverte.
-    //
-    // C'est ici que la décision se prend, et nulle part ailleurs : le
-    // middleware s'exécute AVANT la page, donc une redirection posée dans
-    // `[langue]/page.tsx` n'était jamais atteinte.
-    if (sansLangue === "/") {
+  switch (decisionDeRoute(sansLangue, Boolean(user))) {
+    case "versInscription": {
+      const url = requete.nextUrl.clone()
       url.pathname = `/${langue}/inscription`
       url.search = ""
-    } else {
+      return NextResponse.redirect(url)
+    }
+    case "versConnexion": {
+      const url = requete.nextUrl.clone()
       url.pathname = `/${langue}/connexion`
       // `suite` garde la langue : on doit pouvoir y revenir tel quel après
       // la connexion.
       url.searchParams.set("suite", chemin)
+      return NextResponse.redirect(url)
     }
-    return NextResponse.redirect(url)
+    case "versAccueil": {
+      const url = requete.nextUrl.clone()
+      url.pathname = `/${langue}`
+      url.search = ""
+      return NextResponse.redirect(url)
+    }
+    default:
+      return reponse
   }
-
-  if (user && estPublique) {
-    const url = requete.nextUrl.clone()
-    url.pathname = `/${langue}`
-    url.search = ""
-    return NextResponse.redirect(url)
-  }
-
-  return reponse
 }

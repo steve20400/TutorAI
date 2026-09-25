@@ -95,7 +95,19 @@ export async function poserLeMotDePasse(
   if (!user) return { erreur: t.lienExpire }
 
   const { error } = await supabase.auth.updateUser({ password: motDePasse })
-  if (error) return { erreur: t.echec }
+  if (error) {
+    // Ici, contrairement à l'écran de demande, il n'y a rien à protéger : la
+    // personne a prouvé l'accès à sa boîte, elle a le droit de savoir
+    // pourquoi son mot de passe est refusé — trop court pour la politique du
+    // projet, déjà utilisé, signalé comme divulgué.
+    console.error(
+      "[recuperation] mot de passe refusé :",
+      error.code ?? error.name,
+      "—",
+      error.message,
+    )
+    return { erreur: t.echec }
+  }
 
   return { info: t.change }
 }

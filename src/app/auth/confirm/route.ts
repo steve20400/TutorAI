@@ -28,7 +28,23 @@ export async function GET(requete: NextRequest) {
 
   // Un lien périmé ou déjà utilisé renvoie vers la demande, avec un témoin
   // que la page lit : « ce lien n'est plus valable, demandez-en un autre ».
-  if (error) redirect(`${suite}?lien=perime`)
+  //
+  // L'écran ne dira jamais mieux — il n'a rien à apprendre à qui n'est pas
+  // le destinataire du courriel. Mais nous devons savoir laquelle des deux
+  // causes s'est produite, et il y en a d'autres : jeton d'un autre type,
+  // quota atteint, horloge décalée. Toutes finissaient ici sous le même mot,
+  // et cherchaient longtemps.
+  if (error) {
+    console.error(
+      "[auth/confirm] jeton refusé :",
+      error.code ?? error.name,
+      "— type",
+      type,
+      "—",
+      error.message,
+    )
+    redirect(`${suite}?lien=perime`)
+  }
 
   redirect(suite)
 }
