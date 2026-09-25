@@ -109,6 +109,7 @@ export const en: Dictionnaire = {
     carteTitre: "{prenom} forgot their password",
     carteDetail: "Choose a new one with them. This request expires at {heure}.",
     carteChamp: "New password",
+    renvoyerDans: "Resend in {n} s",
     renvoyer: "Send the request again",
     carteValider: "Save",
     enfantTitre: "Your account has no email address",

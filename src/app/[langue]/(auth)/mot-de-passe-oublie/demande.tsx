@@ -1,9 +1,9 @@
 "use client"
 
 import Link from "next/link"
-import { useActionState, useState } from "react"
+import { useActionState, useEffect, useState } from "react"
 
-import { chemin } from "@/langues"
+import { chemin, remplir } from "@/langues"
 import { useLangue } from "@/langues/contexte"
 import { Bouton, Champ, Message } from "../champs"
 import {
@@ -13,6 +13,22 @@ import {
 } from "@/actions/recuperation"
 
 const ETAT_INITIAL: EtatRecuperation = {}
+
+/**
+ * Le temps pendant lequel un renvoi est refusé, en secondes.
+ *
+ * Ce n'est pas un chiffre de notre choix : Supabase refuse une deuxième
+ * demande pour la même personne avant soixante secondes. Nous, nous ne
+ * pouvions pas le dire — l'action ignore l'erreur volontairement, sinon
+ * l'écran répondrait différemment selon que le compte existe ou non, et
+ * deviendrait un annuaire des inscrits.
+ *
+ * Résultat : on pouvait appuyer sur « Renvoyer » autant qu'on voulait, et
+ * l'écran répondait à chaque fois « le lien vient de partir » alors que rien
+ * ne partait. Le compte à rebours dit la vérité sans rien révéler : il
+ * tourne pareil pour tout le monde, compte inscrit ou non.
+ */
+const DELAI_RENVOI = 60
 
 export function Demande() {
   const { langue, d } = useLangue()
@@ -24,6 +40,21 @@ export function Demande() {
   // d'attendre.
   const [adresse, setAdresse] = useState("")
   const envoye = Boolean(etat.info)
+
+  // `etat` est un objet neuf à chaque envoi accepté : c'est lui, et non le
+  // texte qu'il contient, qui dit qu'un nouveau message vient de partir.
+  const [restant, setRestant] = useState(0)
+
+  useEffect(() => {
+    if (!etat.info) return
+    setRestant(DELAI_RENVOI)
+  }, [etat])
+
+  useEffect(() => {
+    if (restant <= 0) return
+    const minuterie = setTimeout(() => setRestant((n) => n - 1), 1000)
+    return () => clearTimeout(minuterie)
+  }, [restant])
   const [etatEnfant, actionEnfant, enfantEnCours] = useActionState(
     demanderPourUnEnfant,
     ETAT_INITIAL,
@@ -50,7 +81,11 @@ export function Demande() {
           <form action={action}>
             <input type="hidden" name="langue" value={langue} />
             <input type="hidden" name="email" value={adresse} />
-            <Bouton enCours={enCours}>{t.renvoyer}</Bouton>
+            <Bouton enCours={enCours} desactive={restant > 0}>
+              {restant > 0
+                ? remplir(t.renvoyerDans, { n: restant })
+                : t.renvoyer}
+            </Bouton>
           </form>
         </div>
       ) : (

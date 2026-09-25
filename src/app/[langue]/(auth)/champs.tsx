@@ -60,9 +60,12 @@ export function Champ({
 
 export function Bouton({
   enCours,
+  desactive = false,
   children,
 }: {
   enCours: boolean
+  /** Indisponible pour une autre raison qu'un envoi en cours. */
+  desactive?: boolean
   children: React.ReactNode
 }) {
   const { d } = useLangue()
@@ -70,7 +73,7 @@ export function Bouton({
   return (
     <button
       type="submit"
-      disabled={enCours}
+      disabled={enCours || desactive}
       className="bouton mt-1 w-full px-4 py-3.5 text-[15px]"
     >
       {enCours ? d.commun.enCours : children}

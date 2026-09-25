@@ -111,6 +111,7 @@ export const fr = {
     carteTitre: "{prenom} a oublié son mot de passe",
     carteDetail: "Choisissez-en un nouveau avec lui. Cette demande expire à {heure}.",
     carteChamp: "Nouveau mot de passe",
+    renvoyerDans: "Renvoyer dans {n} s",
     renvoyer: "Renvoyer la demande",
     carteValider: "Enregistrer",
     enfantTitre: "Ton compte n'a pas d'adresse mail",
