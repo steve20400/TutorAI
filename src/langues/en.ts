@@ -66,6 +66,14 @@ export const en: Dictionnaire = {
     identifiant: "Sign-in username",
     identifiantFige:
       "This is what you sign in with. It was chosen when your account was created and does not change.",
+    mesAdultes: "My adults",
+    mesAdultesDetail:
+      "These are the adults linked to your account. They can see your work and help you if you lose your password. If someone is here who should not be, tell an adult you trust.",
+    mesAdultesAucun:
+      "No adult is linked to your account. Nobody sees your work — and nobody will be able to recover your password if you forget it.",
+    mesAdultesPaie: "pays for your sessions",
+    mesAdultesProvisoire: "link pending",
+    mesAdultesMuet: "The list could not be loaded. Try again in a moment.",
     avatar: "Choose your picture",
     avatarAide:
       "You do not put a photo here. Pick a drawing, or keep your initials.",

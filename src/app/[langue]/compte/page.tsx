@@ -10,6 +10,8 @@ import {
 import { api } from "@/lib/api"
 import { AVATARS, type Avatar as AvatarChoisi } from "@/lib/avatars"
 import { supabaseServeur } from "@/lib/supabase/server"
+import { Avatar } from "@/composants/avatar"
+import { TempsReel } from "@/composants/temps-reel"
 
 import { ChoixCompte } from "./choix"
 
@@ -29,6 +31,15 @@ type Compte = {
  * L'administration a le sien sous `/admin/profil`, avec le mot de passe et
  * l'identifiant : ce sont des réglages qu'on ne met pas devant un enfant.
  */
+type AdulteRattache = {
+  id: string
+  prenom: string | null
+  photo_url: string | null
+  porte: boolean
+  fournit: boolean
+  provisoire: boolean
+}
+
 export default async function PageCompte({
   params,
 }: {
@@ -46,6 +57,7 @@ export default async function PageCompte({
   if (!user) redirect(chemin(langue, "/connexion"))
 
   const compte = await api<Compte>("/v1/compte")
+  let payeur: string | null = null
 
   // Les cinquante avatars viennent de la base ; ceux du code servent de repli.
   // Un écran de choix vide est un écran dont on ne sort pas.
@@ -60,6 +72,29 @@ export default async function PageCompte({
   }
 
   const adulte = compte.role !== "eleve"
+
+  // Qui a du pouvoir sur ce compte.
+  //
+  // Un enfant ne pouvait le voir nulle part. Pour une application dont la
+  // promesse tient en un enfant jamais seul avec un adulte, ne pas lui dire
+  // quels adultes sont rattachés à lui était un angle mort — il subissait un
+  // rattachement qu'il avait pourtant accepté lui-même, sans jamais pouvoir le
+  // relire.
+  //
+  // Ni adresse ni téléphone, comme partout ailleurs : cet écran ne doit pas
+  // devenir un moyen d'apprendre comment joindre un adulte hors d'ici.
+  let mesAdultes: AdulteRattache[] | null = adulte ? [] : null
+  if (!adulte) {
+    try {
+      const rep = await api<{ donnees: AdulteRattache[]; payeur: string | null }>(
+        "/v1/liens/mes-parents",
+      )
+      mesAdultes = rep.donnees
+      payeur = rep.payeur
+    } catch {
+      mesAdultes = null
+    }
+  }
 
   return (
     <main className="mx-auto flex min-h-dvh max-w-md flex-col gap-5 p-6">
@@ -90,6 +125,53 @@ export default async function PageCompte({
           {t.identifiant} : <b className="font-mono">{compte.identifiant}</b> —{" "}
           {t.identifiantFige}
         </p>
+      ) : null}
+
+      {!adulte ? (
+        <section className="carte p-5">
+          {/* Un rattachement accepté à l'instant doit apparaître ici sans
+              rechargement : l'enfant vient peut-être de dire oui. */}
+          <TempsReel tables={["liens_familiaux"]} />
+
+          <div className="text-[14px] font-medium">{t.mesAdultes}</div>
+
+          {mesAdultes === null ? (
+            <p className="doux mt-2 text-[12px] leading-relaxed">
+              {t.mesAdultesMuet}
+            </p>
+          ) : mesAdultes.length === 0 ? (
+            <p className="doux mt-2 text-[12px] leading-relaxed">
+              {t.mesAdultesAucun}
+            </p>
+          ) : (
+            <>
+              <ul className="mt-3 flex flex-col gap-2">
+                {mesAdultes.map((a) => (
+                  <li key={a.id} className="flex items-center gap-2.5">
+                    <Avatar
+                      nom={a.prenom ?? "?"}
+                      photoUrl={a.photo_url}
+                      taille={30}
+                    />
+                    <span className="flex-1 text-sm">{a.prenom}</span>
+                    {a.provisoire ? (
+                      <span className="badge-eteint text-[10px]">
+                        {t.mesAdultesProvisoire}
+                      </span>
+                    ) : payeur === a.id ? (
+                      <span className="doux text-[10.5px]">
+                        {t.mesAdultesPaie}
+                      </span>
+                    ) : null}
+                  </li>
+                ))}
+              </ul>
+              <p className="doux mt-3 text-[11.5px] leading-relaxed">
+                {t.mesAdultesDetail}
+              </p>
+            </>
+          )}
+        </section>
       ) : null}
     </main>
   )

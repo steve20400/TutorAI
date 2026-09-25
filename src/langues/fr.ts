@@ -68,6 +68,14 @@ export const fr = {
     identifiant: "Identifiant de connexion",
     identifiantFige:
       "C'est avec lui que tu te connectes. Il a été choisi à la création de ton compte et ne change pas.",
+    mesAdultes: "Mes adultes",
+    mesAdultesDetail:
+      "Ce sont les adultes rattachés à ton compte. Ils voient ton travail et peuvent t'aider si tu perds ton mot de passe. Si quelqu'un est là et ne devrait pas y être, parle-en à un adulte de confiance.",
+    mesAdultesAucun:
+      "Aucun adulte n'est rattaché à ton compte. Personne ne voit ton travail — et personne ne pourra retrouver ton mot de passe si tu l'oublies.",
+    mesAdultesPaie: "paie tes séances",
+    mesAdultesProvisoire: "rattachement en cours",
+    mesAdultesMuet: "La liste n'a pas pu être chargée. Réessaie dans un moment.",
     avatar: "Choisis ton image",
     avatarAide:
       "Tu ne mets pas de photo ici. Choisis un dessin, ou garde tes initiales.",
