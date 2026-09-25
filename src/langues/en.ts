@@ -76,7 +76,7 @@ export const en: Dictionnaire = {
     mesAdultesMuet: "The list could not be loaded. Try again in a moment.",
     couper: "Remove",
     couperConfirme:
-      "{nom} will no longer see your work and will not be able to help you. This person will never be able to ask to be linked to you again.",
+      "{nom} will no longer see your work and will not be able to help you. If this was a mistake, they can ask you again later — and it will still be your call.",
     couperDernier:
       "This is your only adult. If you remove them, nobody will be able to recover your password if you forget it — you would need a new account.",
     couperOui: "Yes, remove them",

@@ -95,11 +95,14 @@ export async function seDetacher(
 /**
  * L'enfant coupe un rattachement.
  *
- * Le miroir de `seDetacher`, mais les deux portes ne s'ouvrent pas pareil.
- * Quand l'adulte se retire, il pourra redemander — il est parti de lui-même.
- * Quand l'enfant coupe, cet adulte ne pourra plus jamais lui envoyer de
- * demande, et son écran n'en dira rien : c'est ce qui rend le « non » d'un
- * enfant définitif sans qu'il ait à le répéter.
+ * Le miroir exact de `seDetacher`. Dans les deux sens, la demande acceptée
+ * est effacée et le rattachement peut se refaire par la procédure normale :
+ * l'adulte demande, l'enfant reconnaît.
+ *
+ * Se détacher n'est pas refuser. Refuser une demande qu'on n'a jamais
+ * acceptée reste définitif et muet ; défaire un lien qu'on avait accepté en
+ * connaissance de cause ne l'est pas — les raisons sont souvent banales, et
+ * une main qui glisse ne doit pas obliger à passer par l'administration.
  */
 export async function couperRattachement(
   _precedent: EtatDetachement,
