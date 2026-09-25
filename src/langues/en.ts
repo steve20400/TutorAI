@@ -118,7 +118,10 @@ export const en: Dictionnaire = {
     nouveauSousTitre: "It will sign you in as soon as it is saved.",
     motDePasse: "New password",
     poser: "Save",
-    change: "Done. You can sign in with this password.",
+    change: "Done. You are signed in, and this is your password from now on.",
+    changeAutresSessions:
+      "Any other session open on your account has just been closed: if someone was in there, they are out.",
+    continuer: "Continue",
     lienExpire: "This link is no longer valid. Ask for a new one.",
     echec: "The change did not go through. Try again.",
   },

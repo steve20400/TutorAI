@@ -109,6 +109,28 @@ export async function poserLeMotDePasse(
     return { erreur: t.echec }
   }
 
+  // Supabase ne ferme pas les autres sessions quand le mot de passe change :
+  // il faut le demander. Sans cela, la réinitialisation ne protège de rien —
+  // or c'est souvent la raison même de la faire. Quelqu'un a pu ouvrir la
+  // session d'un parent sur un téléphone prêté, un ordinateur de cybercafé,
+  // un appareil resté chez un répétiteur. Changer le mot de passe le laissait
+  // dedans, indéfiniment.
+  //
+  // `others` et non `global` : celle d'ici reste ouverte, sinon la personne
+  // se retrouverait dehors juste après avoir prouvé qui elle est.
+  const { error: erreurSessions } = await supabase.auth.signOut({
+    scope: "others",
+  })
+  if (erreurSessions) {
+    // On ne le dit pas à l'écran : le mot de passe, lui, a bien changé, et
+    // annoncer un demi-échec ferait recommencer pour rien. Mais si cela
+    // arrive, quelqu'un est peut-être encore dans le compte.
+    console.error(
+      "[recuperation] les autres sessions n'ont pas pu être fermées :",
+      erreurSessions.message,
+    )
+  }
+
   return { info: t.change }
 }
 

@@ -120,7 +120,11 @@ export const fr = {
     nouveauSousTitre: "Il vous connectera dès qu'il sera enregistré.",
     motDePasse: "Nouveau mot de passe",
     poser: "Enregistrer",
-    change: "C'est fait. Vous pouvez vous connecter avec ce mot de passe.",
+    change:
+      "C'est fait. Vous êtes connecté, et ce mot de passe est le bon désormais.",
+    changeAutresSessions:
+      "Toute autre session ouverte sur votre compte vient d'être fermée : si quelqu'un y était, il en est sorti.",
+    continuer: "Continuer",
     lienExpire: "Ce lien n'est plus valable. Demandez-en un nouveau.",
     echec: "Le changement n'a pas abouti. Réessayez.",
   },

@@ -15,6 +15,37 @@ export function Nouveau({ perime }: { perime: boolean }) {
   const t = d.recuperation
   const [etat, action, enCours] = useActionState(poserLeMotDePasse, ETAT_INITIAL)
 
+  // Une fois le mot de passe posé, le formulaire disparaît.
+  //
+  // Il restait à l'écran et restait soumettable : on pouvait le réenregistrer
+  // dix fois de suite. Rien de dangereux — la session est ouverte, et
+  // quiconque est connecté peut changer son mot de passe — mais l'écran
+  // laissait croire que le lien du courriel servait encore, alors qu'il était
+  // consommé depuis longtemps. Un état final lève le doute.
+  if (etat.info) {
+    return (
+      <div className="flex flex-col gap-3">
+        <p
+          className="rounded-[10px] px-3.5 py-3 text-[13px] leading-relaxed"
+          style={{
+            background: "color-mix(in srgb, var(--texte) 5%, var(--fond))",
+          }}
+        >
+          {etat.info}
+        </p>
+        <p className="doux px-1 text-xs leading-relaxed">
+          {t.changeAutresSessions}
+        </p>
+        <Link
+          href={chemin(langue, "/")}
+          className="bouton mt-1 w-full px-4 py-3.5 text-center text-[15px]"
+        >
+          {t.continuer}
+        </Link>
+      </div>
+    )
+  }
+
   return (
     <>
       <form action={action} className="flex flex-col gap-3">
@@ -29,10 +60,7 @@ export function Nouveau({ perime }: { perime: boolean }) {
           required
         />
 
-        <Message
-          erreur={perime ? t.lienExpire : etat.erreur}
-          info={etat.info}
-        />
+        <Message erreur={perime ? t.lienExpire : etat.erreur} />
 
         <Bouton enCours={enCours}>{t.poser}</Bouton>
       </form>
