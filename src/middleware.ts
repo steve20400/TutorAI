@@ -80,7 +80,20 @@ export const config = {
      *
      * Une page n'a jamais d'extension. Tout ce qui en porte une est un
      * fichier, et un fichier n'a pas de langue.
+     *
+     * `auth/` s'ajoute pour la quatrième occurrence du même piège, et c'est
+     * la plus grave. `/auth/confirm` est la porte du lien reçu par courriel :
+     * elle échange le jeton contre une session. Le middleware la redirigeait
+     * vers `/fr/auth/confirm`, qui n'existe pas — 404. Autrement dit, chaque
+     * parent cliquant son lien de réinitialisation serait tombé sur une page
+     * introuvable, et rien dans nos journaux ne l'aurait dit.
+     *
+     * Comme `api/`, cette route n'a pas de langue : elle la reçoit dans son
+     * paramètre `next` et redirige elle-même vers la bonne.
+     *
+     * `middleware.test.ts`, à côté, vérifie maintenant cette liste. Quatre
+     * fois, c'est assez.
      */
-    "/((?!_next/static|_next/image|api/|sw\\.js|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp|avif|ico|json|txt|xml|webmanifest|woff|woff2|ttf|otf|css|js|map|pdf|mp4|webm)$).*)",
+    "/((?!_next/static|_next/image|api/|auth/|sw\\.js|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp|avif|ico|json|txt|xml|webmanifest|woff|woff2|ttf|otf|css|js|map|pdf|mp4|webm)$).*)",
   ],
 }
