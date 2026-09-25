@@ -4,6 +4,7 @@ import { useActionState } from "react"
 
 import { creerEnfant, type EtatEnfant } from "@/actions/famille"
 import { remplir, type Dictionnaire, type Langue } from "@/langues"
+import { EntreeMotDePasse } from "@/composants/mot-de-passe"
 
 const ETAT_INITIAL: EtatEnfant = {}
 
@@ -114,9 +115,8 @@ export function Enfants({
           />
         </div>
 
-        <input
+        <EntreeMotDePasse
           name="motDePasse"
-          type="password"
           required
           minLength={6}
           autoComplete="new-password"

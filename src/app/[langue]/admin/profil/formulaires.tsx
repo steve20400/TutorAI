@@ -8,6 +8,7 @@ import {
   type EtatCompte,
 } from "@/actions/compte"
 import { PhotoProfil } from "@/composants/photo-profil"
+import { EntreeMotDePasse } from "@/composants/mot-de-passe"
 import type { Dictionnaire, Langue } from "@/langues"
 
 const VIDE: EtatCompte = {}
@@ -169,9 +170,8 @@ export function FormulairesCompte({
               <span className="doux block text-[11.5px]">
                 {t.motDePasseActuel}
               </span>
-              <input
+              <EntreeMotDePasse
                 name="actuel"
-                type="password"
                 required
                 autoComplete="current-password"
                 className="champ mt-1 w-full px-3 py-2 text-[13px]"
@@ -181,9 +181,8 @@ export function FormulairesCompte({
               <span className="doux block text-[11.5px]">
                 {t.motDePasseNouveau}
               </span>
-              <input
+              <EntreeMotDePasse
                 name="nouveau"
-                type="password"
                 required
                 minLength={8}
                 autoComplete="new-password"

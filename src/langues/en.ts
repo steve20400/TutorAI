@@ -38,6 +38,11 @@ export const en: Dictionnaire = {
     seDeconnecter: "Sign out",
     quitter: "Leave",
     enCours: "One moment…",
+
+    voir: "Show",
+    cacher: "Hide",
+    voirMotDePasse: "Show password",
+    cacherMotDePasse: "Hide password",
     affichageClair: "Switch to light display",
     affichageSombre: "Switch to dark display",
     changerAffichage: "Change display",
@@ -288,7 +293,7 @@ export const en: Dictionnaire = {
 
   parent: {
     bonjour: "Hello {prenom}",
-    espace: "Parent area",
+    espace: "Adult area",
     rattacher: {
       titre: "Link a child who already has an account",
       detail: "Write their login name. They will recognise you on their own screen — we will never ask you for their password.",

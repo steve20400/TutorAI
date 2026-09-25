@@ -1,6 +1,7 @@
 "use client"
 
 import { useLangue } from "@/langues/contexte"
+import { BoutonVoir, useVisibilite } from "@/composants/mot-de-passe"
 
 /**
  * Composants de formulaire partagés par connexion et inscription.
@@ -26,12 +27,32 @@ export function Champ({
   label: string
   aide?: string
 }) {
+  const { visible, basculer, type } = useVisibilite()
+  const motDePasse = props.type === "password"
+
   return (
     <div className="flex flex-col gap-1.5">
-      <label className="champ-flottant">
-        <input {...props} placeholder=" " />
-        <span>{label}</span>
-      </label>
+      {/* Le bouton est hors du <label> mais dans un parent positionné : à
+          l'intérieur, tout clic dessus rendrait aussi le focus au champ, et
+          un bouton dans une étiquette se lit mal aux lecteurs d'écran.
+
+          L'ordre input → span est intouchable : c'est `input + span` qui
+          fait monter l'étiquette flottante. Un élément glissé entre les deux
+          la laisserait par-dessus ce qu'on saisit. */}
+      <div className="relative">
+        <label className="champ-flottant">
+          <input
+            {...props}
+            type={motDePasse ? type : props.type}
+            className={motDePasse ? "avec-bascule" : undefined}
+            placeholder=" "
+          />
+          <span>{label}</span>
+        </label>
+        {motDePasse ? (
+          <BoutonVoir visible={visible} basculer={basculer} />
+        ) : null}
+      </div>
       {aide ? <span className="doux px-1 text-xs">{aide}</span> : null}
     </div>
   )

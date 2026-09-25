@@ -304,6 +304,57 @@ body {
   border-color: var(--accent);
 }
 
+/* --- Montrer le mot de passe ---------------------------------------------
+   Le bouton est du texte, pas une icône : voir composants/mot-de-passe.tsx.
+   Le champ lui réserve sa place à droite, sinon un mot de passe long passe
+   dessous et on ne lit plus ce qu'on vient d'écrire — ce qui est exactement
+   le problème qu'on voulait régler.                                        */
+
+.zone-mot-de-passe {
+  position: relative;
+  display: block;
+}
+
+/* L'enveloppe prend la place du champ dans la mise en page ; c'est à elle
+   que la largeur revient, et le champ la remplit. */
+.zone-mot-de-passe input {
+  width: 100%;
+}
+
+.bascule-mot-de-passe {
+  position: absolute;
+  top: 50%;
+  right: 8px;
+  transform: translateY(-50%);
+  padding: 5px 9px;
+  border-radius: var(--rayon-petit);
+  background: transparent;
+  color: var(--texte-doux);
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.14s, color 0.14s;
+}
+
+.bascule-mot-de-passe:hover {
+  background: color-mix(in srgb, var(--texte) 8%, transparent);
+  color: var(--texte);
+}
+
+.bascule-mot-de-passe:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
+/* Deux sélecteurs et non un seul : `.champ-flottant input` pose un `padding`
+   raccourci, à spécificité égale et écrit plus bas dans le fichier. Il
+   l'emportait, et le bouton se retrouvait par-dessus le mot de passe — le
+   bouton était bien là, il ne servait simplement à rien. */
+.champ-flottant input.avec-bascule,
+input.avec-bascule {
+  padding-right: 74px;
+}
+
 .badge-verifie {
   background: var(--accent-doux);
   color: var(--accent-doux-texte);

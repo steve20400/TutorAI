@@ -37,6 +37,14 @@ export const fr = {
     seDeconnecter: "Se déconnecter",
     quitter: "Quitter",
     enCours: "Un instant…",
+
+    // Le bouton qui montre le mot de passe pendant qu'on le tape. En toutes
+    // lettres et non en icône : l'œil, symbole habituel ailleurs, évoque au
+    // Cameroun tout autre chose que la lecture d'un formulaire.
+    voir: "Voir",
+    cacher: "Cacher",
+    voirMotDePasse: "Afficher le mot de passe",
+    cacherMotDePasse: "Masquer le mot de passe",
     affichageClair: "Passer en affichage clair",
     affichageSombre: "Passer en affichage sombre",
     changerAffichage: "Changer l'affichage",
@@ -291,7 +299,12 @@ export const fr = {
 
   parent: {
     bonjour: "Bonjour {prenom}",
-    espace: "Espace parent",
+
+    // « Adulte » et non « parent », pour la même raison qu'à l'inscription :
+    // ce compte sert aussi bien à une tante, un grand frère ou un tuteur
+    // légal. C'était le dernier écran à dire « parent » alors que la porte
+    // d'entrée disait « adulte ».
+    espace: "Espace adulte",
     rattacher: {
       titre: "Rattacher un enfant déjà inscrit",
       detail: "Écrivez son nom de connexion. C'est lui qui vous reconnaîtra sur son propre écran — nous ne vous demanderons jamais son mot de passe.",
