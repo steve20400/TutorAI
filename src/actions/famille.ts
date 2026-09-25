@@ -55,3 +55,39 @@ export async function creerEnfant(
     return { erreur: d.parent.creationImpossible }
   }
 }
+
+export type EtatDetachement = { erreur?: string }
+
+/**
+ * L'adulte se retire d'un enfant.
+ *
+ * Il n'y avait aucune sortie : un nom de connexion tapé de travers, un enfant
+ * qui reconnaît un prénom ressemblant au sien, et deux comptes restaient liés
+ * pour toujours — avec un enfant capable de dépenser les jetons d'un inconnu.
+ *
+ * Le sens de la porte compte. L'adulte se retire, il ne retire pas l'enfant :
+ * il n'agit que sur son propre lien. Les séances de l'enfant, son registre et
+ * son compte lui restent.
+ */
+export async function seDetacher(
+  _precedent: EtatDetachement,
+  donnees: FormData,
+): Promise<EtatDetachement> {
+  const langue = langueDeFormulaire(donnees)
+  const d = dictionnaire(langue)
+  const enfant = String(donnees.get("enfant") ?? "")
+
+  if (!enfant) return { erreur: d.parent.detacherEchec }
+
+  try {
+    await api(`/v1/liens/enfants/${enfant}/detacher`, { methode: "POST" })
+  } catch (erreur) {
+    return {
+      erreur:
+        erreur instanceof ErreurApi ? erreur.message : d.parent.detacherEchec,
+    }
+  }
+
+  revalidatePath("/", "layout")
+  return {}
+}

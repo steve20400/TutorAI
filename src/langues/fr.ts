@@ -325,6 +325,13 @@ export const fr = {
       nomTropCourt: "Écrivez son nom de connexion.",
       echec: "La demande n'a pas pu être envoyée. Réessayez dans un moment.",
     },
+    detacher: "Me détacher",
+    detacherConfirme:
+      "Vous ne verrez plus le travail de {nom} et vous ne pourrez plus lui reposer son mot de passe. Son compte, ses séances et son registre lui restent. Vous pourrez redemander un rattachement plus tard — c'est lui qui décidera.",
+    detacherOui: "Oui, me détacher",
+    detacherNon: "Annuler",
+    detacherEchec:
+      "Le détachement n'a pas pu se faire. Réessayez dans un moment — rien n'a changé.",
     trouverRepetiteur: "Trouver un répétiteur",
     compteRepetiteurs: {
       one: "{n} répétiteur vérifié pour l'instant.",

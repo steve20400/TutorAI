@@ -1,8 +1,13 @@
 "use client"
 
-import { useActionState } from "react"
+import { useActionState, useState } from "react"
 
-import { creerEnfant, type EtatEnfant } from "@/actions/famille"
+import {
+  creerEnfant,
+  seDetacher,
+  type EtatDetachement,
+  type EtatEnfant,
+} from "@/actions/famille"
 import { remplir, type Dictionnaire, type Langue } from "@/langues"
 import { EntreeMotDePasse } from "@/composants/mot-de-passe"
 
@@ -77,6 +82,7 @@ export function Enfants({
                 <span className="doux font-mono text-xs">
                   {t.identifiantDe} : {e.identifiant}
                 </span>
+                <Detacher enfant={e.id} nom={e.prenom ?? ""} langue={langue} d={d} />
               </span>
             </li>
           ))}
@@ -138,5 +144,83 @@ export function Enfants({
         <p className="doux text-xs leading-relaxed">{t.pasDEmail}</p>
       </form>
     </section>
+  )
+}
+
+const DETACHEMENT_INITIAL: EtatDetachement = {}
+
+/**
+ * Se détacher, en deux temps.
+ *
+ * Un seul bouton suffirait, et c'est bien le problème : défaire un lien
+ * familial d'un clic malheureux se paie d'un nouveau tour complet — demander,
+ * attendre que l'enfant reconnaisse, espérer qu'il accepte. Le deuxième temps
+ * dit ce qui part et ce qui reste, plutôt que de demander « êtes-vous sûr ? »
+ * à quelqu'un qui n'a aucun moyen d'en être sûr.
+ */
+function Detacher({
+  enfant,
+  nom,
+  langue,
+  d,
+}: {
+  enfant: string
+  nom: string
+  langue: Langue
+  d: Dictionnaire
+}) {
+  const t = d.parent
+  const [demande, setDemande] = useState(false)
+  const [etat, action, enCours] = useActionState(seDetacher, DETACHEMENT_INITIAL)
+
+  if (!demande) {
+    return (
+      <button
+        type="button"
+        onClick={() => setDemande(true)}
+        className="doux text-xs underline underline-offset-4"
+      >
+        {t.detacher}
+      </button>
+    )
+  }
+
+  return (
+    <form action={action} className="basis-full">
+      <input type="hidden" name="langue" value={langue} />
+      <input type="hidden" name="enfant" value={enfant} />
+
+      <div
+        className="mt-1 rounded-[9px] p-3"
+        style={{ background: "color-mix(in srgb, var(--texte) 5%, var(--fond))" }}
+      >
+        <p className="text-xs leading-relaxed">
+          {remplir(t.detacherConfirme, { nom })}
+        </p>
+
+        {etat.erreur ? (
+          <p className="mt-2 text-xs" style={{ color: "var(--erreur-texte)" }}>
+            {etat.erreur}
+          </p>
+        ) : null}
+
+        <div className="mt-2.5 flex flex-wrap gap-2">
+          <button
+            type="submit"
+            disabled={enCours}
+            className="bt3 px-3 py-1.5 text-xs"
+          >
+            {enCours ? d.commun.enCours : t.detacherOui}
+          </button>
+          <button
+            type="button"
+            onClick={() => setDemande(false)}
+            className="doux text-xs underline underline-offset-4"
+          >
+            {t.detacherNon}
+          </button>
+        </div>
+      </div>
+    </form>
   )
 }

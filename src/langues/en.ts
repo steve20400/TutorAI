@@ -308,6 +308,13 @@ export const en: Dictionnaire = {
       nomTropCourt: "Write their login name.",
       echec: "The request could not be sent. Try again in a moment.",
     },
+    detacher: "Detach me",
+    detacherConfirme:
+      "You will no longer see {nom}'s work and will not be able to reset their password. Their account, sessions and record stay theirs. You can ask to be linked again later — it will be their decision.",
+    detacherOui: "Yes, detach me",
+    detacherNon: "Cancel",
+    detacherEchec:
+      "The detachment did not go through. Try again in a moment — nothing has changed.",
     trouverRepetiteur: "Find a tutor",
     compteRepetiteurs: {
       one: "{n} verified tutor so far.",
