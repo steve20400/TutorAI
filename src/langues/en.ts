@@ -672,6 +672,11 @@ modeleEssai: "Served to those trying without an account",
       orange: "Orange Money",
       mtn: "MTN MoMo",
       identifiantMarchand: "Merchant ID",
+      courrier_cle: "Email — sending service key",
+      courrier_expediteur: "Email — sender address",
+      courrier_expediteur_nom: "Email — display name",
+      courrierDetail:
+        "These three are for the messages TUTELA sends itself: the alert to a parent when their child asks for a new password. Sign-up and reset emails come from Supabase and are configured there. With no key here, the request still shows in the parent's space, but no email goes out.",
       carte_style: "Base map — style URL",
       carte_cle: "Base map — provider key",
       carteDetail:

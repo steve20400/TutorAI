@@ -693,6 +693,11 @@ modeleEssai: "Servi à qui essaie sans compte",
       orange: "Orange Money",
       mtn: "MTN MoMo",
       identifiantMarchand: "Identifiant marchand",
+      courrier_cle: "Courrier — clé du service d'envoi",
+      courrier_expediteur: "Courrier — adresse d'expédition",
+      courrier_expediteur_nom: "Courrier — nom affiché",
+      courrierDetail:
+        "Ces trois-là servent aux messages que TUTELA envoie lui-même : l'alerte à un parent quand son enfant demande un nouveau mot de passe. Les courriels d'inscription et de réinitialisation, eux, partent de Supabase et se règlent là-bas. Sans clé ici, la demande reste visible dans l'espace du parent, mais aucun courriel ne part.",
       carte_style: "Fond de carte — adresse du style",
       carte_cle: "Fond de carte — clé du fournisseur",
       carteDetail:
