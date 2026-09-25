@@ -14,6 +14,7 @@ import {
 } from "@/langues"
 import { api, ErreurApi } from "@/lib/api"
 import { supabaseServeur } from "@/lib/supabase/server"
+import { origineDuSite } from "@/lib/origine"
 
 export type EtatFormulaire = {
   erreur?: string
@@ -258,10 +259,20 @@ export async function sInscrire(
 
   // `data` alimente le déclencheur `sur_nouvel_utilisateur` du schéma, qui
   // crée la ligne dans `profils`. Les clés doivent correspondre exactement.
+  // Le lien de confirmation repasse par `/auth/confirm`, qui échange le jeton
+  // contre une session. Le `next` porte la langue : sans lui, un inscrit
+  // anglophone atterrirait sur un écran français. C'est aussi cette adresse
+  // que le modèle de courriel lit sous le nom `{{ .RedirectTo }}` — elle doit
+  // figurer dans Authentication → URL Configuration, sinon Supabase la
+  // remplace sans le dire.
+  const origine = await origineDuSite()
+  const suite = chemin(langue, ACCUEIL_PAR_ROLE[role])
+
   const { data, error } = await supabase.auth.signUp({
     email,
     password: motDePasse,
     options: {
+      emailRedirectTo: `${origine}/auth/confirm?next=${encodeURIComponent(suite)}`,
       data: {
         prenom,
         nom: nom || null,

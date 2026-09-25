@@ -1,9 +1,8 @@
 "use server"
 
-import { headers } from "next/headers"
-
 import { chemin, dictionnaire, langueDeFormulaire } from "@/langues"
 import { supabaseServeur } from "@/lib/supabase/server"
+import { origineDuSite } from "@/lib/origine"
 import { api, ErreurApi } from "@/lib/api"
 import { revalidatePath } from "next/cache"
 
@@ -35,13 +34,7 @@ export async function envoyerLeLien(
 
   const supabase = await supabaseServeur()
 
-  // L'adresse de retour est construite depuis la requête et non écrite en
-  // dur : le site tourne sur tutela-kappa.vercel.app aujourd'hui, et sur le
-  // domaine de Steve demain.
-  const entetes = await headers()
-  const origine =
-    entetes.get("origin") ??
-    `https://${entetes.get("host") ?? "tutela-kappa.vercel.app"}`
+  const origine = await origineDuSite()
 
   // Le lien passe par `/auth/confirm`, qui échange le jeton du courriel
   // contre une session avant de laisser entrer. Pointer directement sur la
