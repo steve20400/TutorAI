@@ -99,7 +99,19 @@ export const fr = {
     enfantLien: "Ton compte n'a pas d'adresse mail ?",
     enfantNom: "Ton nom de connexion",
     enfantDemander: "Prévenir mes parents",
-    enfantEnvoye: "Si un adulte est rattaché à ton compte, il vient d'être prévenu — par mail et dans son espace. Demande-lui de t'aider : la demande ne dure qu'un moment, et ne sert qu'une fois.",
+    // La phrase promettait plus que ce qui se passe. Un rattachement est
+    // provisoire pendant quarante-huit heures — le temps qu'un autre adulte
+    // de la famille puisse s'y opposer — et pendant ce délai l'adulte ne peut
+    // pas poser le mot de passe de l'enfant : ce serait prendre son compte,
+    // c'est-à-dire exactement le pouvoir que le délai protège. Rien ne part
+    // donc, et l'enfant lisait pourtant « il vient d'être prévenu ».
+    //
+    // On ne peut pas lui dire lequel des cas est le sien : cet écran répond
+    // la même chose à tout le monde, sinon il dirait à n'importe qui quels
+    // enfants sont inscrits et avec quels adultes. La phrase énonce donc la
+    // règle, et laisse l'enfant reconnaître sa situation.
+    enfantEnvoye:
+      "Si un adulte est rattaché à ton compte depuis plus de deux jours, il vient d'être prévenu — par mail et dans son espace. Demande-lui de t'aider : la demande ne dure qu'un moment, et ne sert qu'une fois.\n\nSi ton rattachement est tout neuf, il faut attendre qu'il soit confirmé. C'est ce délai qui empêche un inconnu de prendre ton compte en se faisant passer pour un parent.",
     nomAttendu: "Écris ton nom de connexion.",
     enfantTropCourt: "Six caractères au moins.",
     enfantPose: "C'est fait. Ton enfant peut se connecter avec ce mot de passe.",

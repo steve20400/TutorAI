@@ -89,7 +89,11 @@ export function Message({ erreur, info }: { erreur?: string; info?: string }) {
   return (
     <p
       role="status"
-      className="rounded-lg px-3.5 py-2.5 text-sm"
+      // `whitespace-pre-line` : certains de ces messages tiennent en deux
+      // paragraphes — celui de l'enfant dit ce qui vient de se passer, puis
+      // pourquoi il faut parfois attendre. Sans cela les deux se collent en
+      // un bloc illisible.
+      className="whitespace-pre-line rounded-lg px-3.5 py-2.5 text-sm leading-relaxed"
       style={
         erreur
           ? { background: "rgb(220 38 38 / 0.10)", color: "var(--erreur-texte)" }

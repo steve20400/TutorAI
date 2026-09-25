@@ -97,7 +97,8 @@ export const en: Dictionnaire = {
     enfantLien: "Your account has no email address?",
     enfantNom: "Your login name",
     enfantDemander: "Tell my parents",
-    enfantEnvoye: "If an adult is linked to your account, they have just been told — by email and in their space. Ask them to help you: the request lasts a short while, and works only once.",
+    enfantEnvoye:
+      "If an adult has been linked to your account for more than two days, they have just been told — by email and in their space. Ask them to help you: the request lasts a short while, and works only once.\n\nIf your link is brand new, you need to wait until it is confirmed. That delay is what stops a stranger from taking your account by posing as a parent.",
     nomAttendu: "Write your login name.",
     enfantTropCourt: "Six characters at least.",
     enfantPose: "Done. Your child can sign in with this password.",
