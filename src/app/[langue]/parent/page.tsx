@@ -59,11 +59,24 @@ export default async function AccueilParent({
   // ne peut rien faire d'autre qu'attendre, et elle ne vaut que dix minutes.
   // Elle s'annonce donc en tête, pas au fond d'une rubrique.
   let demandesMdp = 0
+
+  // La plus proche des échéances ouvertes. Une expiration n'écrit rien en
+  // base, donc rien ne part en temps réel : sans elle, la carte resterait
+  // affichée après l'heure et mènerait à une zone verrouillée.
+  let prochaineEcheance: string | null = null
+
   try {
-    const rep = await api<{ donnees: { fermee: boolean }[] }>(
-      "/v1/liens/mots-de-passe",
-    )
-    demandesMdp = (rep.donnees ?? []).filter((d) => !d.fermee).length
+    const rep = await api<{
+      donnees: { fermee: boolean; expire_le: string }[]
+    }>("/v1/liens/mots-de-passe")
+
+    const ouvertes = (rep.donnees ?? []).filter((d) => !d.fermee)
+    demandesMdp = ouvertes.length
+    prochaineEcheance =
+      ouvertes
+        .map((d) => d.expire_le)
+        .sort()
+        .at(0) ?? null
   } catch {
     demandesMdp = 0
   }
@@ -92,7 +105,10 @@ export default async function AccueilParent({
     <Registre>
       {/* L'enfant accepte le rattachement, ou demande son mot de passe :
           les deux doivent se voir sans rechargement. */}
-      <TempsReel tables={["liens_familiaux", "demandes_mot_de_passe"]} />
+      <TempsReel
+        tables={["liens_familiaux", "demandes_mot_de_passe"]}
+        echeance={prochaineEcheance}
+      />
       <main className="mx-auto flex max-w-lg flex-col gap-6 p-6">
         <header className="flex items-baseline justify-between pt-6">
           <div>

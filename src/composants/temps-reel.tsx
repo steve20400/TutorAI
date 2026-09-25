@@ -35,12 +35,22 @@ import { supabaseNavigateur } from "@/lib/supabase/client"
 export function TempsReel({
   tables,
   filtre,
+  echeance,
   delai = 250,
 }: {
   /** Les tables à écouter. */
   tables: string[]
   /** Par exemple `eleve_id=eq.<uuid>` — la RLS reste le vrai garde-fou. */
   filtre?: string
+  /**
+   * Un instant à partir duquel l'écran dira quelque chose de faux.
+   *
+   * Une expiration n'est pas une écriture : aucun événement ne part de la
+   * base quand une demande de mot de passe cesse d'être valable. La carte
+   * restait donc affichée après l'heure, et menait à une zone verrouillée.
+   * On pose une minuterie sur l'échéance, et on relit à ce moment-là.
+   */
+  echeance?: string | null
   delai?: number
 }) {
   const router = useRouter()
@@ -112,6 +122,26 @@ export function TempsReel({
       if (canal) void supabase.removeChannel(canal)
     }
   }, [cle, filtre, delai, router])
+
+  useEffect(() => {
+    if (!echeance) return
+
+    // Une seconde de marge : la base compare à `now()`, et deux horloges ne
+    // tombent jamais exactement d'accord.
+    const dans = new Date(echeance).getTime() - Date.now() + 1000
+    if (dans <= 0) {
+      router.refresh()
+      return
+    }
+
+    // `setTimeout` plafonne à environ vingt-cinq jours ; au-delà, il se
+    // déclenche immédiatement et en boucle. Aucune de nos échéances n'en est
+    // là, mais une borne coûte une ligne.
+    if (dans > 2_000_000_000) return
+
+    const minuterie = setTimeout(() => router.refresh(), dans)
+    return () => clearTimeout(minuterie)
+  }, [echeance, router])
 
   return null
 }
