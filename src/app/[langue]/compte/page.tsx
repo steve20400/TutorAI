@@ -10,8 +10,8 @@ import {
 import { api } from "@/lib/api"
 import { AVATARS, type Avatar as AvatarChoisi } from "@/lib/avatars"
 import { supabaseServeur } from "@/lib/supabase/server"
-import { Avatar } from "@/composants/avatar"
 import { TempsReel } from "@/composants/temps-reel"
+import { MesAdultes, type AdulteRattache } from "./mes-adultes"
 
 import { ChoixCompte } from "./choix"
 
@@ -31,15 +31,6 @@ type Compte = {
  * L'administration a le sien sous `/admin/profil`, avec le mot de passe et
  * l'identifiant : ce sont des réglages qu'on ne met pas devant un enfant.
  */
-type AdulteRattache = {
-  id: string
-  prenom: string | null
-  photo_url: string | null
-  porte: boolean
-  fournit: boolean
-  provisoire: boolean
-}
-
 export default async function PageCompte({
   params,
 }: {
@@ -144,32 +135,12 @@ export default async function PageCompte({
               {t.mesAdultesAucun}
             </p>
           ) : (
-            <>
-              <ul className="mt-3 flex flex-col gap-2">
-                {mesAdultes.map((a) => (
-                  <li key={a.id} className="flex items-center gap-2.5">
-                    <Avatar
-                      nom={a.prenom ?? "?"}
-                      photoUrl={a.photo_url}
-                      taille={30}
-                    />
-                    <span className="flex-1 text-sm">{a.prenom}</span>
-                    {a.provisoire ? (
-                      <span className="badge-eteint text-[10px]">
-                        {t.mesAdultesProvisoire}
-                      </span>
-                    ) : payeur === a.id ? (
-                      <span className="doux text-[10.5px]">
-                        {t.mesAdultesPaie}
-                      </span>
-                    ) : null}
-                  </li>
-                ))}
-              </ul>
-              <p className="doux mt-3 text-[11.5px] leading-relaxed">
-                {t.mesAdultesDetail}
-              </p>
-            </>
+            <MesAdultes
+              adultes={mesAdultes}
+              payeur={payeur}
+              langue={langue}
+              d={d}
+            />
           )}
         </section>
       ) : null}

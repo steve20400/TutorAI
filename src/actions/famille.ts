@@ -91,3 +91,35 @@ export async function seDetacher(
   revalidatePath("/", "layout")
   return {}
 }
+
+/**
+ * L'enfant coupe un rattachement.
+ *
+ * Le miroir de `seDetacher`, mais les deux portes ne s'ouvrent pas pareil.
+ * Quand l'adulte se retire, il pourra redemander — il est parti de lui-même.
+ * Quand l'enfant coupe, cet adulte ne pourra plus jamais lui envoyer de
+ * demande, et son écran n'en dira rien : c'est ce qui rend le « non » d'un
+ * enfant définitif sans qu'il ait à le répéter.
+ */
+export async function couperRattachement(
+  _precedent: EtatDetachement,
+  donnees: FormData,
+): Promise<EtatDetachement> {
+  const langue = langueDeFormulaire(donnees)
+  const d = dictionnaire(langue)
+  const adulte = String(donnees.get("adulte") ?? "")
+
+  if (!adulte) return { erreur: d.compte.couperEchec }
+
+  try {
+    await api(`/v1/liens/adultes/${adulte}/couper`, { methode: "POST" })
+  } catch (erreur) {
+    return {
+      erreur:
+        erreur instanceof ErreurApi ? erreur.message : d.compte.couperEchec,
+    }
+  }
+
+  revalidatePath("/", "layout")
+  return {}
+}

@@ -76,6 +76,14 @@ export const fr = {
     mesAdultesPaie: "paie tes séances",
     mesAdultesProvisoire: "rattachement en cours",
     mesAdultesMuet: "La liste n'a pas pu être chargée. Réessaie dans un moment.",
+    couper: "Retirer",
+    couperConfirme:
+      "{nom} ne verra plus ton travail et ne pourra plus t'aider. Cette personne ne pourra plus jamais demander à être rattachée à toi.",
+    couperDernier:
+      "C'est ton seul adulte. Si tu le retires, plus personne ne pourra retrouver ton mot de passe si tu l'oublies — il faudra créer un nouveau compte.",
+    couperOui: "Oui, le retirer",
+    couperNon: "Annuler",
+    couperEchec: "Ça n'a pas marché. Réessaie dans un moment — rien n'a changé.",
     avatar: "Choisis ton image",
     avatarAide:
       "Tu ne mets pas de photo ici. Choisis un dessin, ou garde tes initiales.",

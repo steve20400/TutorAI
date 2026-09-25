@@ -74,6 +74,14 @@ export const en: Dictionnaire = {
     mesAdultesPaie: "pays for your sessions",
     mesAdultesProvisoire: "link pending",
     mesAdultesMuet: "The list could not be loaded. Try again in a moment.",
+    couper: "Remove",
+    couperConfirme:
+      "{nom} will no longer see your work and will not be able to help you. This person will never be able to ask to be linked to you again.",
+    couperDernier:
+      "This is your only adult. If you remove them, nobody will be able to recover your password if you forget it — you would need a new account.",
+    couperOui: "Yes, remove them",
+    couperNon: "Cancel",
+    couperEchec: "That did not work. Try again in a moment — nothing changed.",
     avatar: "Choose your picture",
     avatarAide:
       "You do not put a photo here. Pick a drawing, or keep your initials.",
