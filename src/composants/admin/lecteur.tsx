@@ -57,7 +57,9 @@ export function LecteurPiece({
     <>
       <button
         type="button"
-        onClick={ouvrir}
+        onClick={() => {
+          void ouvrir()
+        }}
         disabled={enCours}
         className="bt3"
       >
@@ -160,7 +162,13 @@ function VueLecteur({
         className="flex flex-wrap items-center justify-center gap-2.5"
         onClick={(e) => e.stopPropagation()}
       >
-        <button type="button" onClick={telecharger} className="bt1">
+        <button
+          type="button"
+          onClick={() => {
+            void telecharger()
+          }}
+          className="bt1"
+        >
           {t.telecharger}
         </button>
         <button type="button" onClick={fermer} className="bt3">

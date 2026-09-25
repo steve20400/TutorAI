@@ -2,7 +2,6 @@
 
 import { revalidatePath } from "next/cache"
 
-import { langueDeFormulaire } from "@/langues"
 import { api, ErreurApi } from "@/lib/api"
 
 export type EtatCompte = { erreur?: string; info?: string }
@@ -17,7 +16,6 @@ export async function enregistrerCompte(
   _precedent: EtatCompte,
   donnees: FormData,
 ): Promise<EtatCompte> {
-  const langue = langueDeFormulaire(donnees)
   const texte = (cle: string) => String(donnees.get(cle) ?? "").trim()
 
   try {

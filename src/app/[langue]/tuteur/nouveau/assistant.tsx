@@ -159,7 +159,6 @@ export function Assistant({
   const [matieres, setMatieres] = useState<string[]>([])
   /** Matières nommées par l'élève, faute de programme officiel. */
   const [libres, setLibres] = useState<string[]>([])
-  const [saisieLibre, setSaisieLibre] = useState("")
 
   const sousSystemesDisponibles = useMemo(
     () => uniques(options.filter((o) => o.pays === pays).map((o) => o.sous_systeme)),

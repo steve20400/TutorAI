@@ -244,7 +244,13 @@ function VuePhoto({
         className="flex flex-wrap items-center justify-center gap-2.5"
         onClick={(e) => e.stopPropagation()}
       >
-        <button type="button" onClick={telecharger} className="bt1">
+        <button
+          type="button"
+          onClick={() => {
+            void telecharger()
+          }}
+          className="bt1"
+        >
           {d.commun.telechargerLaPhoto}
         </button>
         <button type="button" onClick={fermer} className="bt3">

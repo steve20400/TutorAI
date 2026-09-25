@@ -1,7 +1,6 @@
-import Link from "next/link"
 import { redirect } from "next/navigation"
 
-import { chemin, dictionnaire, estLangue, LANGUE_PAR_DEFAUT } from "@/langues"
+import { chemin, estLangue, LANGUE_PAR_DEFAUT } from "@/langues"
 import { exigerModulePage } from "@/lib/parametres"
 import { api } from "@/lib/api"
 import { lireReferentiel } from "@/lib/referentiel"
@@ -20,7 +19,6 @@ export default async function PageNouveauTuteur({
   // qu'il est éteint, cette page n'existe pas — le middleware ne peut pas le
   // savoir, il ne lit pas la base.
   await exigerModulePage("ia_active", langue)
-  const d = dictionnaire(langue)
 
   const supabase = await supabaseServeur()
 

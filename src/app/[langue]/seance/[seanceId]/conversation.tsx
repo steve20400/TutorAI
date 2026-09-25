@@ -126,7 +126,12 @@ export function Conversation({
         </p>
       )}
 
-      <form onSubmit={envoyer} className="flex items-end gap-2 pb-4">
+      <form
+        onSubmit={(e) => {
+          void envoyer(e)
+        }}
+        className="flex items-end gap-2 pb-4"
+      >
         {/* À côté du champ, comme sur l'écran d'essai : au moment où la
             question « est-ce que je peux continuer ? » se pose, et non dans
             un écran de réglages qu'un enfant n'ouvrira jamais. */}

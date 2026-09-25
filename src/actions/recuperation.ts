@@ -158,7 +158,6 @@ export async function poserPourSonEnfant(
  * boîte de courriel longtemps après avoir été oublié.
  */
 export async function renvoyerLaDemande(donnees: FormData): Promise<void> {
-  const langue = langueDeFormulaire(donnees)
   const eleve = String(donnees.get("eleve") ?? "")
   if (!eleve) return
 

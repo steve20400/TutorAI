@@ -99,6 +99,12 @@ export async function api<T>(
       "service_injoignable",
       "Le service est injoignable.",
     )
+  } finally {
+    // Sans cela, chaque appel laissait derrière lui une minuterie vivante
+    // pendant une minute, qui tenait en mémoire le contrôleur et la réponse
+    // et qui finissait par annuler une requête déjà terminée. `apiFlux`, dix
+    // lignes plus bas, le faisait déjà : c'est ici que ça manquait.
+    clearTimeout(minuterie)
   }
 }
 

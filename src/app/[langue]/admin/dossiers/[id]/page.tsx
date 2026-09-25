@@ -1,4 +1,3 @@
-import Link from "next/link"
 import { BoutonAction } from "@/composants/bouton-action"
 
 import { EnteteAdmin, RienEncore } from "@/composants/admin/entete"

@@ -1,4 +1,3 @@
-import Link from "next/link"
 import { notFound } from "next/navigation"
 
 import { EnteteAdmin } from "@/composants/admin/entete"
