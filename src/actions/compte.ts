@@ -19,13 +19,24 @@ export async function enregistrerCompte(
   const texte = (cle: string) => String(donnees.get(cle) ?? "").trim()
 
   try {
+    // L'identifiant n'est envoyé que si le formulaire le portait.
+    //
+    // Celui de l'enfant ne l'affiche pas — il est figé à la création — donc
+    // le champ partait vide et la requête était refusée avant d'arriver au
+    // service. Un formulaire qui ne montre pas un champ n'a pas à l'envoyer
+    // vide : ce serait dire « efface-le », ce que personne n'a demandé.
+    //
+    // `nom` et `telephone` partent même vides, eux : les vider est une
+    // modification légitime, et l'écran les montre.
+    const identifiant = texte("identifiant")
+
     await api("/v1/compte", {
       methode: "POST",
       corps: {
         prenom: texte("prenom"),
         nom: texte("nom"),
         telephone: texte("telephone"),
-        identifiant: texte("identifiant"),
+        ...(identifiant ? { identifiant } : {}),
         photo_url: texte("photo_url"),
       },
     })
