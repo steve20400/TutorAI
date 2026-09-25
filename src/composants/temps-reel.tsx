@@ -59,7 +59,7 @@ export function TempsReel({
     // tourner avec un jeton périmé et cesse de recevoir, en silence, au bout
     // d'une heure.
     const { data: veille } = supabase.auth.onAuthStateChange((_e, session) => {
-      if (session?.access_token) supabase.realtime.setAuth(session.access_token)
+      if (session?.access_token) void supabase.realtime.setAuth(session.access_token)
     })
 
     void (async () => {
@@ -71,7 +71,7 @@ export function TempsReel({
       // Un visiteur sans session n'a rien à écouter : la RLS ne lui rendrait
       // aucune ligne, et le canal ne servirait qu'à tenir un socket ouvert.
       if (!session?.access_token) return
-      supabase.realtime.setAuth(session.access_token)
+      void supabase.realtime.setAuth(session.access_token)
 
       canal = supabase.channel(`temps-reel:${cle}:${filtre ?? "tout"}`)
 
