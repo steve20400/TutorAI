@@ -16,6 +16,7 @@ import { api } from "@/lib/api"
 import { Enfants, type Enfant } from "./enfants"
 import { Rattacher } from "./rattacher"
 import { supabaseServeur } from "@/lib/supabase/server"
+import { TempsReel } from "@/composants/temps-reel"
 
 /**
  * Accueil parent — volontairement minimal à ce stade.
@@ -84,6 +85,9 @@ export default async function AccueilParent({
 
   return (
     <Registre>
+      {/* L'enfant accepte le rattachement, ou demande son mot de passe :
+          les deux doivent se voir sans rechargement. */}
+      <TempsReel tables={["liens_familiaux", "demandes_mot_de_passe"]} />
       <main className="mx-auto flex max-w-lg flex-col gap-6 p-6">
         <header className="flex items-baseline justify-between pt-6">
           <div>

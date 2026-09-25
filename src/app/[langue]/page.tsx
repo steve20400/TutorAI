@@ -1,6 +1,7 @@
 import Link from "next/link"
 import { ReglagesRapides } from "@/composants/reglages-rapides"
 import { Reconnaitre, type DemandeARecconnaitre } from "./reconnaitre"
+import { TempsReel } from "@/composants/temps-reel"
 import { redirect } from "next/navigation"
 
 import { Avatar } from "@/composants/avatar"
@@ -126,6 +127,11 @@ export default async function Accueil({
           <BoutonDeconnexion langue={langue} libelle={d.commun.quitter} />
         </span>
       </header>
+
+      {/* La demande d'un adulte arrive pendant que l'enfant est sur cet
+          écran : il ne doit pas avoir à recharger pour la découvrir. */}
+
+      <TempsReel tables={["demandes_rattachement"]} />
 
       <Reconnaitre demandes={aReconnaitre} langue={langue} />
 
