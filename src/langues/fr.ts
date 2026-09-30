@@ -324,6 +324,32 @@ export const fr = {
     creerTuteur: "Créer ton tuteur en 4 étapes",
   },
 
+  annuaire: {
+    etiquette: "Annuaire",
+    titre: "Répétiteurs",
+    // Le nombre vient de la base. « contrôlés » et non « inscrits » : c'est
+    // la vérification qui fait la promesse, pas l'inscription.
+    controles: { one: "{n} contrôlé", other: "{n} contrôlés" },
+    aucun:
+      "Aucun répétiteur ne correspond. Retirez un filtre pour élargir la recherche.",
+    aucunDuTout:
+      "Aucun répétiteur n'est encore contrôlé. Cet écran se remplira à mesure que les dossiers passent la vérification.",
+    muet:
+      "L'annuaire n'a pas pu être chargé. Réessayez dans un moment.",
+    filtres: "Filtres",
+    tousLesFiltres: "Tout afficher",
+    verifie: "Identité, casier, diplôme",
+    ans: { one: "{n} an", other: "{n} ans" },
+    parMois: "/mois",
+    sansTarif: "Tarif à convenir",
+    // La frontière, dite honnêtement plutôt que cachée derrière un bouton
+    // qui ne ferait rien.
+    suiteTitre: "Et ensuite ?",
+    suiteDetail:
+      "Écrire à un répétiteur et réserver une séance arrivent bientôt. Pour l'instant, cet écran sert à voir qui a été contrôlé, et sur quoi.",
+    retour: "Retour",
+  },
+
   parent: {
     bonjour: "Bonjour {prenom}",
 
@@ -355,7 +381,6 @@ export const fr = {
     },
     aucunRepetiteur:
       "Aucun répétiteur vérifié pour l'instant. L'annuaire ouvrira dès que les premiers profils auront passé la vérification.",
-    annuaireEtape: "Annuaire — étape 3",
     serviceMuet:
       "La liste de vos enfants n'a pas pu être chargée. Réessayez dans un instant — vos comptes ne sont pas perdus.",
     creationImpossible:

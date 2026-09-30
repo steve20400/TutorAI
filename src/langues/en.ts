@@ -312,6 +312,26 @@ export const en: Dictionnaire = {
     creerTuteur: "Set up your AI tutor in 4 steps",
   },
 
+  annuaire: {
+    etiquette: "Directory",
+    titre: "Tutors",
+    controles: { one: "{n} checked", other: "{n} checked" },
+    aucun: "No tutor matches. Remove a filter to widen the search.",
+    aucunDuTout:
+      "No tutor has been checked yet. This screen fills up as applications pass verification.",
+    muet: "The directory could not be loaded. Try again in a moment.",
+    filtres: "Filters",
+    tousLesFiltres: "Show all",
+    verifie: "Identity, record, diploma",
+    ans: { one: "{n} year", other: "{n} years" },
+    parMois: "/month",
+    sansTarif: "Rate to be agreed",
+    suiteTitre: "What comes next?",
+    suiteDetail:
+      "Writing to a tutor and booking a session are coming. For now, this screen shows who has been checked, and on what.",
+    retour: "Back",
+  },
+
   parent: {
     bonjour: "Hello {prenom}",
     espace: "Adult area",
@@ -338,7 +358,6 @@ export const en: Dictionnaire = {
     },
     aucunRepetiteur:
       "No verified tutor yet. The directory opens as soon as the first profiles pass the checks.",
-    annuaireEtape: "Directory — step 3",
     serviceMuet:
       "Your children's list could not be loaded. Try again in a moment — the accounts are not lost.",
     creationImpossible:

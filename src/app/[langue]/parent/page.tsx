@@ -149,17 +149,22 @@ export default async function AccueilParent({
           </Link>
         ) : null}
 
-        <section className="carte p-5">
+        {/* L'annuaire existe maintenant : c'est un lien, plus une pancarte.
+
+            Elle affichait « Annuaire — étape 3 », qui désignait l'étape de la
+            feuille de route et non une étape de l'écran. Steve a essayé de
+            cliquer dessus, et il avait raison d'essayer. */}
+        <Link
+          href={chemin(langue, "/annuaire")}
+          className="carte block p-5 transition hover:opacity-90"
+        >
           <div className="font-medium">{d.parent.trouverRepetiteur}</div>
           <p className="doux mt-1 text-sm leading-relaxed">
             {verifies > 0
               ? pluriel(langue, verifies, d.parent.compteRepetiteurs)
               : d.parent.aucunRepetiteur}
           </p>
-          <div className="doux mt-3 text-xs uppercase tracking-wide">
-            {d.parent.annuaireEtape}
-          </div>
-        </section>
+        </Link>
 
         <Rattacher />
 
