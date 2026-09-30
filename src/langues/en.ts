@@ -330,6 +330,25 @@ export const en: Dictionnaire = {
     suiteDetail:
       "Writing to a tutor and booking a session are coming. For now, this screen shows who has been checked, and on what.",
     retour: "Back",
+    dossier: {
+      etiquette: "File",
+      controleLe: "Checked on {date}",
+      controle: "What was checked",
+      controleAucun: "No document can be shown for this file yet.",
+      facon: "How they work",
+      enseigne: "What they teach",
+      niveauxDe: "From {premier} to {dernier}",
+      libre: "When they are free",
+      libreInconnu: "Not stated.",
+      parMois: "per month, for one pupil",
+      proposer: "Propose a session",
+      question: "Ask a question",
+      bientot:
+        "These two buttons do not work yet. Proposing a session and writing to a tutor arrive with the classroom.",
+      salle:
+        "The session takes place in TUTELA's room, and it is recorded. Your child is never alone with them.",
+      absent: "This file does not exist, or is no longer published.",
+    },
   },
 
   parent: {

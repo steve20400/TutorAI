@@ -179,7 +179,13 @@ export default async function PageAnnuaire({
           </p>
         ) : (
           reponse.donnees.map((r) => (
-            <Fiche key={r.id} r={r} langue={langue} d={d} />
+            <Link
+              key={r.id}
+              href={chemin(langue, `/annuaire/${r.id}`)}
+              className="block transition hover:opacity-90"
+            >
+              <Fiche r={r} langue={langue} d={d} />
+            </Link>
           ))
         )}
       </div>

@@ -348,6 +348,28 @@ export const fr = {
     suiteDetail:
       "Écrire à un répétiteur et réserver une séance arrivent bientôt. Pour l'instant, cet écran sert à voir qui a été contrôlé, et sur quoi.",
     retour: "Retour",
+    dossier: {
+      etiquette: "Dossier",
+      controleLe: "Contrôlé le {date}",
+      controle: "Ce qui a été contrôlé",
+      // Une pièce déposée mais pas encore examinée n'apparaît pas : elle n'a
+      // rien prouvé. Une pièce refusée non plus — ce jugement appartient à
+      // l'administration et à celui qui l'a déposée.
+      controleAucun: "Aucune pièce n'est encore affichable pour ce dossier.",
+      facon: "Sa façon de travailler",
+      enseigne: "Ce qu'il enseigne",
+      niveauxDe: "De {premier} à {dernier}",
+      libre: "Quand il est libre",
+      libreInconnu: "Non précisé.",
+      parMois: "par mois, pour un élève",
+      proposer: "Proposer une séance",
+      question: "Poser une question",
+      bientot:
+        "Ces deux boutons ne marchent pas encore. Proposer une séance et écrire à un répétiteur arrivent avec la salle de cours.",
+      salle:
+        "La séance se tient dans la salle de TUTELA, elle est enregistrée. Votre enfant n'est jamais seul avec lui.",
+      absent: "Ce dossier n'existe pas, ou n'est plus publié.",
+    },
   },
 
   parent: {
