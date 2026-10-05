@@ -9,6 +9,7 @@ import { BoutonAction } from "@/composants/bouton-action"
 import { BasculeLangue } from "@/composants/langue"
 import { BasculeMode } from "@/composants/theme"
 import { useSortie } from "@/composants/sortie"
+import { consommerMenuOuvert, memoriserMenuOuvert } from "./memoire-menu"
 import { type Dictionnaire, type Langue } from "@/langues"
 
 export type Entree = { href: string; titre: string; detail: string; icone: Icone }
@@ -86,6 +87,16 @@ export function MenuCompte({
     setGlisse(1000)
     window.setTimeout(fermer, 190)
   }
+
+  // Rouvrir après un changement de langue, et seulement après celui-là.
+  //
+  // Ouvert dans un effet plutôt que dans l'état initial : lire
+  // `sessionStorage` au premier rendu donnerait au serveur et au navigateur
+  // deux réponses différentes, et React s'en plaindrait à juste titre. Un
+  // battement de rendu, invisible puisque la page vient d'être remontée.
+  useEffect(() => {
+    if (consommerMenuOuvert()) setOuvert(true)
+  }, [])
 
   // Fermer en cliquant ailleurs et sur Échap : un menu qui ne se ferme que
   // par son propre bouton se laisse ouvert, et masque la page dessous.
@@ -178,7 +189,7 @@ export function MenuCompte({
             style={{ background: "var(--bordure)" }}
           />
           <div className="flex items-center gap-2 px-3.5 pb-1.5 pt-1">
-            <BasculeLangue />
+            <BasculeLangue avant={memoriserMenuOuvert} />
             <BasculeMode />
           </div>
           <form
@@ -295,7 +306,7 @@ export function MenuCompte({
             </div>
 
             <div className="flex items-center gap-2 px-[18px] py-3">
-              <BasculeLangue />
+              <BasculeLangue avant={memoriserMenuOuvert} />
               <BasculeMode />
             </div>
 

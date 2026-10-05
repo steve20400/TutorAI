@@ -120,17 +120,27 @@ export default async function PageAnnuaire({
       <Coque langue={langue} villeActive={etat.ville} recherche={etat.q} />
 
       <div className="flex flex-1 gap-9 px-3 pb-10 pt-3.5 lg:px-[30px] lg:pt-[26px]">
-        {/* La barre de filtres : grand écran seulement. */}
+        {/* La barre de filtres : grand écran seulement, et elle ne défile pas.
+            Elle suivait la liste. Avec quarante répétiteurs on descendait
+            loin, et il fallait tout remonter pour changer un filtre — alors
+            que c'est en lisant les fiches qu'on se dit « finalement, plutôt
+            Douala ». Elle reste donc en place, et seule la liste défile.
+
+            Bornée en hauteur et défilante pour elle-même : sur un portable de
+            720 points, la barre entière ne tient pas, et une barre figée dont
+            le bas est inatteignable est pire qu'une barre qui défile. */}
         <div className="hidden lg:block">
-          <Filtres
-            etat={etat}
-            villes={villes}
-            matieres={referentiel.matieres}
-            niveaux={referentiel.niveaux}
-            bornes={{ min: bornes.bas, max: bornes.haut }}
-            langue={langue}
-            d={d}
-          />
+          <div className="sticky top-[26px] max-h-[calc(100dvh-52px)] overflow-y-auto overscroll-contain pr-1">
+            <Filtres
+              etat={etat}
+              villes={villes}
+              matieres={referentiel.matieres}
+              niveaux={referentiel.niveaux}
+              bornes={{ min: bornes.bas, max: bornes.haut }}
+              langue={langue}
+              d={d}
+            />
+          </div>
         </div>
 
         <div className="min-w-0 flex-1">

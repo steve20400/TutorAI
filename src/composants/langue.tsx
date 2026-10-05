@@ -44,7 +44,17 @@ import { useLangue } from "@/langues/contexte"
  * envoyait sur `/en/annuaire` — ville, recherche et prix effacés, sans un
  * mot. On lit donc la requête réelle du navigateur, à l'instant du clic.
  */
-export function BasculeLangue() {
+export function BasculeLangue({
+  avant,
+}: {
+  /**
+   * Appelé juste avant de partir. Le menu du compte s'en sert pour laisser
+   * un mot à celui qui va renaître : changer de langue remonte tout l'arbre,
+   * et il se refermait sous le doigt alors que la bascule du thème, elle, le
+   * laisse ouvert.
+   */
+  avant?: () => void
+} = {}) {
   const { langue, d } = useLangue()
   const chemin = usePathname()
   const router = useRouter()
@@ -65,6 +75,7 @@ export function BasculeLangue() {
   }, [langue, chemin, router])
 
   function basculer(cible: string) {
+    avant?.()
     demarrer(() => {
       router.replace(versLangue(cible))
     })

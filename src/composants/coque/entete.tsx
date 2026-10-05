@@ -1,8 +1,13 @@
+"use client"
+
 import Link from "next/link"
+import { useState } from "react"
 
 import { Marque } from "@/composants/marque"
 import { MenuCompte, type Entree } from "./menu-compte"
-import { Recherche } from "./recherche"
+import { BoutonLoupe, RechercheBureau, RechercheTelephone } from "./recherche"
+import { ChoixVille } from "./ville"
+import { ENCRE, ENCRE_DOUX, ENCRE_TEXTE } from "./encre"
 import { chemin, type Dictionnaire, type Langue } from "@/langues"
 
 /**
@@ -12,6 +17,17 @@ import { chemin, type Dictionnaire, type Langue } from "@/langues"
  * champ de recherche de 290 px, la ville, puis le compte — et de
  * `AnnuaireTel.dc.html` pour le téléphone, où elle tombe à 56 px et où la
  * recherche se replie derrière son pictogramme.
+ *
+ * Sur téléphone, elle a deux lignes au lieu d'une, et c'est tout le propos de
+ * sa réécriture. Le champ de recherche se dépliait PAR-DESSUS la barre : il
+ * recouvrait le nom de l'application d'un côté, la photo de profil de
+ * l'autre. On cherchait en ayant effacé l'en-tête. Il ouvre maintenant une
+ * seconde ligne en dessous — la barre grandit, rien ne se recouvre, et le
+ * champ a toute la largeur plutôt qu'un tiers.
+ *
+ * C'est aussi pour cela que ce composant est passé au navigateur : l'état
+ * « la recherche est ouverte » décide de la hauteur de la barre, donc il ne
+ * peut plus vivre dans le champ lui-même.
  *
  * L'encre ne suit pas le thème. C'est la même règle que pour la barre latérale
  * de l'administration et pour le bandeau du dossier : du texte clair y est
@@ -23,9 +39,7 @@ import { chemin, type Dictionnaire, type Langue } from "@/langues"
  * le seul endroit où chercher a un sens, et un champ qui ne chercherait que
  * sur la page courante tromperait partout ailleurs.
  */
-export const ENCRE = "#14203a"
-export const ENCRE_TEXTE = "#eef1f7"
-export const ENCRE_DOUX = "#9fb0cc"
+export { ENCRE, ENCRE_TEXTE, ENCRE_DOUX } from "./encre"
 
 export function Entete({
   prenom,
@@ -63,109 +77,96 @@ export function Entete({
 }) {
   const t = d.coque
 
+  // Ouverte d'emblée si une recherche est déjà en cours : on doit pouvoir
+  // corriger « mathématiqes » sans d'abord retrouver la loupe.
+  const [chercheOuverte, setChercheOuverte] = useState(Boolean(recherche))
+
   return (
     <header
-      className="relative z-40 flex h-14 flex-shrink-0 items-center gap-2.5 px-3.5 lg:h-16 lg:gap-[22px] lg:px-[26px]"
+      className="relative z-40 flex flex-shrink-0 flex-col"
       style={{ background: ENCRE, color: ENCRE_TEXTE }}
     >
-      {/* `--marque-reserve` vaut l'encre, et pas le fond de page.
-          Les deux silhouettes du logo sont des RÉSERVES — des trous dans
-          l'écran — remplies de la couleur de ce qu'il y a derrière. Sans
-          cette ligne elles prenaient le crème du fond, posé sur un écran
-          lui-même presque blanc : le logo devenait un rectangle vide avec un
-          point orange, et les deux personnes disparaissaient. Le fichier de
-          la marque prévient de ce piège ; je l'ai quand même fait. */}
-      <Link
-        href={chemin(langue, accueil)}
-        className="relative inline-flex shrink-0 items-center gap-2 lg:gap-2.5"
-        style={{ "--marque-reserve": ENCRE } as React.CSSProperties}
-      >
-        <span className="lg:hidden">
-          <Marque taille={26} />
-        </span>
-        <span className="hidden lg:inline">
-          <Marque taille={30} />
-        </span>
-        <span className="text-[15px] font-bold tracking-[0.11em] lg:text-[17px]">
-          TUTELA
-        </span>
-      </Link>
+      <div className="flex h-14 items-center gap-2.5 px-3.5 lg:h-16 lg:gap-[22px] lg:px-[26px]">
+        {/* `--marque-reserve` vaut l'encre, et pas le fond de page.
+            Les deux silhouettes du logo sont des RÉSERVES — des trous dans
+            l'écran — remplies de la couleur de ce qu'il y a derrière. Sans
+            cette ligne elles prenaient le crème du fond, posé sur un écran
+            lui-même presque blanc : le logo devenait un rectangle vide avec un
+            point orange, et les deux personnes disparaissaient. Le fichier de
+            la marque prévient de ce piège ; je l'ai quand même fait. */}
+        <Link
+          href={chemin(langue, accueil)}
+          className="relative inline-flex shrink-0 items-center gap-2 lg:gap-2.5"
+          style={{ "--marque-reserve": ENCRE } as React.CSSProperties}
+        >
+          <span className="lg:hidden">
+            <Marque taille={26} />
+          </span>
+          <span className="hidden lg:inline">
+            <Marque taille={30} />
+          </span>
+          <span className="text-[15px] font-bold tracking-[0.11em] lg:text-[17px]">
+            TUTELA
+          </span>
+        </Link>
 
-      {chercher ? (
-        <Recherche
+        {chercher ? (
+          <RechercheBureau
+            valeur={recherche}
+            placeholder={t.recherchePlaceholder}
+            etiquette={t.rechercher}
+            langue={langue}
+            encre={ENCRE_TEXTE}
+            encreDoux={ENCRE_DOUX}
+          />
+        ) : null}
+
+        <div className="flex-1" />
+
+        {chercher ? (
+          <BoutonLoupe
+            ouvert={chercheOuverte}
+            etiquette={t.rechercher}
+            encreDoux={ENCRE_DOUX}
+            surClic={() => setChercheOuverte((o) => !o)}
+          />
+        ) : null}
+
+        {chercher && villes.length > 0 ? (
+          <ChoixVille
+            villes={villes}
+            active={villeActive}
+            etiquette={t.ville}
+            toutLePays={t.toutLePays}
+            langue={langue}
+            encreDoux={ENCRE_DOUX}
+          />
+        ) : null}
+
+        <MenuCompte
+          prenom={prenom}
+          nom={nom}
+          photoUrl={photoUrl}
+          sousTitre={sousTitre}
+          entrees={entrees}
+          langue={langue}
+          d={d}
+        />
+      </div>
+
+      {/* La seconde ligne, téléphone seulement. */}
+      {chercher && chercheOuverte ? (
+        <RechercheTelephone
           valeur={recherche}
           placeholder={t.recherchePlaceholder}
           etiquette={t.rechercher}
+          valider={t.rechercher}
           langue={langue}
           encre={ENCRE_TEXTE}
           encreDoux={ENCRE_DOUX}
+          surFermer={() => setChercheOuverte(false)}
         />
       ) : null}
-
-      <div className="flex-1" />
-
-      {chercher && villes.length > 0 ? (
-        <form
-          action={chemin(langue, "/annuaire")}
-          className="hidden items-center gap-[7px] text-[13.5px] lg:flex"
-          style={{ color: ENCRE_DOUX }}
-        >
-          <Broche taille={15} />
-          <label htmlFor="ville" className="sr-only">
-            {t.ville}
-          </label>
-          <select
-            id="ville"
-            name="ville"
-            defaultValue={villeActive ?? ""}
-            className="cursor-pointer border-0 bg-transparent text-[13.5px] outline-none"
-            style={{ color: ENCRE_DOUX }}
-          >
-            <option value="" style={{ color: "#1b2a4a" }}>
-              {t.toutLePays}
-            </option>
-            {villes.map((v) => (
-              <option key={v} value={v} style={{ color: "#1b2a4a" }}>
-                {v}
-              </option>
-            ))}
-          </select>
-          <button type="submit" className="sr-only">
-            {t.ville}
-          </button>
-        </form>
-      ) : null}
-
-      <MenuCompte
-        prenom={prenom}
-        nom={nom}
-        photoUrl={photoUrl}
-        sousTitre={sousTitre}
-        entrees={entrees}
-        langue={langue}
-        d={d}
-      />
     </header>
-  )
-}
-
-
-function Broche({ taille }: { taille: number }) {
-  return (
-    <svg
-      width={taille}
-      height={taille}
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.8"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden
-      className="block shrink-0"
-    >
-      <path d="M12 21s7-6.2 7-11a7 7 0 1 0-14 0c0 4.8 7 11 7 11z" />
-      <circle cx="12" cy="10" r="2.6" />
-    </svg>
   )
 }
