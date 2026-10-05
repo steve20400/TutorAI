@@ -8,6 +8,7 @@ import { seDeconnecter } from "@/actions/authentification"
 import { BoutonAction } from "@/composants/bouton-action"
 import { BasculeLangue } from "@/composants/langue"
 import { BasculeMode } from "@/composants/theme"
+import { useSortie } from "@/composants/sortie"
 import { type Dictionnaire, type Langue } from "@/langues"
 
 export type Entree = { href: string; titre: string; detail: string; icone: Icone }
@@ -45,6 +46,7 @@ export function MenuCompte({
 }) {
   const [ouvert, setOuvert] = useState(false)
   const zone = useRef<HTMLDivElement | null>(null)
+  const sortie = useSortie(langue)
 
   // Fermer en cliquant ailleurs et sur Échap : un menu qui ne se ferme que
   // par son propre bouton se laisse ouvert, et masque la page dessous.
@@ -136,9 +138,14 @@ export function MenuCompte({
             <BasculeLangue />
             <BasculeMode />
           </div>
-          <form action={seDeconnecter} className="px-1.5 pb-1">
+          <form
+            action={seDeconnecter}
+            onSubmit={sortie.quitter}
+            className="px-1.5 pb-1"
+          >
             <input type="hidden" name="langue" value={langue} />
             <BoutonAction
+              occupe={sortie.enCours}
               className="w-full rounded-[8px] px-2 py-2.5 text-left text-[14px]"
               style={{ color: "var(--voyant)" }}
             >
@@ -223,9 +230,14 @@ export function MenuCompte({
               <BasculeMode />
             </div>
 
-            <form action={seDeconnecter} className="px-[18px]">
+            <form
+              action={seDeconnecter}
+              onSubmit={sortie.quitter}
+              className="px-[18px]"
+            >
               <input type="hidden" name="langue" value={langue} />
               <BoutonAction
+                occupe={sortie.enCours}
                 className="w-full py-1 text-left text-[15px]"
                 style={{ color: "var(--voyant)" }}
               >

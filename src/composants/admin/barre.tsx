@@ -9,6 +9,7 @@ import { seDeconnecter } from "@/actions/authentification"
 import { chemin, type Dictionnaire, type Langue } from "@/langues"
 import { Avatar } from "@/composants/avatar"
 import { Marque } from "@/composants/marque"
+import { useSortie } from "@/composants/sortie"
 import { BasculeMode } from "@/composants/theme"
 
 /**
@@ -227,6 +228,7 @@ export function BarreAdmin({
   // `repliee` qui décide si elle montre ses libellés ou seulement ses icônes.
   const [ouverte, poserOuverte] = useState(false)
   const cheminActuel = usePathname()
+  const sortie = useSortie(langue)
 
   useEffect(() => {
     try {
@@ -471,9 +473,16 @@ export function BarreAdmin({
               </span>
             </span>
           </Link>
-          <form action={seDeconnecter} className="shrink-0">
+          <form
+            action={seDeconnecter}
+            onSubmit={sortie.quitter}
+            className="shrink-0"
+          >
             <input type="hidden" name="langue" value={langue} />
-            <BoutonSortie libelle={d.commun.seDeconnecter} />
+            <BoutonSortie
+              libelle={d.commun.seDeconnecter}
+              occupe={sortie.enCours}
+            />
           </form>
         </div>
       </div>
@@ -493,9 +502,20 @@ export function BarreAdmin({
  *
  * Le pictogramme cède la place au cercle plutôt que de l'accompagner : sur
  * trente points de côté, les deux ensemble ne se liraient pas.
+ *
+ * `occupe` vient de `useSortie`, qui ne passe plus par le formulaire :
+ * `useFormStatus` ne verrait donc jamais rien, et le bouton redeviendrait
+ * muet — le défaut même qu'on corrige.
  */
-function BoutonSortie({ libelle }: { libelle: string }) {
-  const { pending } = useFormStatus()
+function BoutonSortie({
+  libelle,
+  occupe,
+}: {
+  libelle: string
+  occupe: boolean
+}) {
+  const { pending: envoi } = useFormStatus()
+  const pending = envoi || occupe
 
   return (
     <button
