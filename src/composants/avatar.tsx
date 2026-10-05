@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from "react"
 
-import { avatarDe, estUnePhoto } from "@/lib/avatars"
+import { estUnePhoto } from "@/lib/avatars"
+import { useAvatar } from "@/lib/avatars-contexte"
 import { useLangue } from "@/langues/contexte"
 
 /**
@@ -80,7 +81,7 @@ export function Avatar({
 
   // Un avatar choisi dans la liste : un dessin, pas une image à télécharger.
   // Il ne s'agrandit pas non plus — il n'y a rien de plus à en voir.
-  const avatar = avatarDe(photoUrl)
+  const avatar = useAvatar(photoUrl)
   if (avatar) {
     return (
       <span

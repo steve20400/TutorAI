@@ -2,6 +2,8 @@ import type { Metadata, Viewport } from "next"
 
 import { EcranChargement } from "@/composants/chargement"
 import { FournisseurTeleversement } from "@/composants/televersement"
+import { FournisseurAvatars } from "@/lib/avatars-contexte"
+import { lireAvatars } from "@/lib/lire-avatars"
 import { FournisseurLangue } from "@/langues/contexte"
 import { dictionnaire, estLangue, LANGUES, LANGUE_PAR_DEFAUT } from "@/langues"
 import { SCRIPT_CHARGEMENT, SCRIPT_THEME } from "@/lib/theme"
@@ -71,6 +73,10 @@ export default async function LayoutRacine({
   const langue = estLangue(brut) ? brut : LANGUE_PAR_DEFAUT
   const d = dictionnaire(langue)
 
+  // Lus ici plutôt que dans chaque écran : la mise en page survit à la
+  // navigation, donc un seul appel pour toute une visite.
+  const avatars = await lireAvatars()
+
   return (
     // `suppressHydrationWarning` ne vaut que pour cette balise et ses attributs,
     // pas pour l'arbre en dessous. Il est nécessaire : le script ci-dessous
@@ -96,10 +102,15 @@ export default async function LayoutRacine({
           {/* Au-dessus des pages : un envoi de fichier doit survivre au
               changement d'écran. Le layout racine n'est pas démonté par la
               navigation, contrairement aux pages. */}
-          <FournisseurTeleversement>
-            <EcranChargement />
-            {children}
-          </FournisseurTeleversement>
+          {/* Les cinquante dessins, une fois pour toute l'application : sans
+              eux, un avatar choisi hors des douze du repli retombait en
+              initiales sur chaque écran. */}
+          <FournisseurAvatars avatars={avatars}>
+            <FournisseurTeleversement>
+              <EcranChargement />
+              {children}
+            </FournisseurTeleversement>
+          </FournisseurAvatars>
         </FournisseurLangue>
       </body>
     </html>

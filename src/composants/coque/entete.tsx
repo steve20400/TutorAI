@@ -35,6 +35,7 @@ export function Entete({
   villes,
   villeActive,
   recherche,
+  chercher,
   langue,
   d,
 }: {
@@ -47,6 +48,12 @@ export function Entete({
   villes: string[]
   villeActive?: string
   recherche?: string
+  /**
+   * Faux pour un enfant : il n'engage pas de répétiteur, et une barre de
+   * recherche qui mène à l'annuaire lui proposerait un écran qui ne le
+   * concerne pas.
+   */
+  chercher: boolean
   langue: Langue
   d: Dictionnaire
 }) {
@@ -73,6 +80,7 @@ export function Entete({
       </Link>
 
       {/* Le champ, déployé sur grand écran. */}
+      {chercher ? (
       <form
         action={chemin(langue, "/annuaire")}
         className="relative hidden w-[290px] items-center gap-[9px] rounded-[22px] px-3.5 py-2 lg:flex"
@@ -92,10 +100,12 @@ export function Entete({
           style={{ color: ENCRE_TEXTE }}
         />
       </form>
+      ) : null}
 
       <div className="flex-1" />
 
       {/* Replié sur téléphone : le pictogramme mène à l'annuaire. */}
+      {chercher ? (
       <Link
         href={chemin(langue, "/annuaire")}
         aria-label={t.rechercher}
@@ -104,8 +114,9 @@ export function Entete({
       >
         <Loupe taille={19} />
       </Link>
+      ) : null}
 
-      {villes.length > 0 ? (
+      {chercher && villes.length > 0 ? (
         <form
           action={chemin(langue, "/annuaire")}
           className="hidden items-center gap-[7px] text-[13.5px] lg:flex"

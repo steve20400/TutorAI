@@ -112,6 +112,7 @@ export async function Coque({
       villes={villes}
       villeActive={villeActive}
       recherche={recherche}
+      chercher={role !== "eleve"}
       langue={langue}
       d={d}
     />
