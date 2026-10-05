@@ -348,6 +348,41 @@ export const fr = {
       "Votre dossier est soumis. Confirmez d'abord votre adresse par l'email envoyé à {email}, puis attendez la vérification de vos pièces par notre équipe : vous serez prévenu par email, accepté ou refusé, avec les raisons.",
   },
 
+  /**
+   * Le dépôt des pièces, pendant l'inscription d'un répétiteur.
+   *
+   * Les textes disent à quoi servent ces documents, et surtout ce qu'il
+   * advient d'eux : quelqu'un qui envoie sa carte d'identité à une
+   * application a le droit de savoir qui la verra. La réponse est « personne,
+   * sauf l'administration » — et une famille ne voit que la date du contrôle.
+   */
+  inscriptionPieces: {
+    titre: "Vos pièces",
+    detail:
+      "C'est ce qui vous rend vérifiable, et c'est ce que les familles achètent. Elles ne verront jamais ces documents : elles verront qu'ils ont été contrôlés, et à quelle date.",
+    cni: "Carte nationale d'identité",
+    cniAide:
+      "Photo ou PDF. À plat, bien éclairée, les quatre coins visibles — un document illisible vous sera renvoyé.",
+    casier: "Casier judiciaire",
+    casierAide:
+      "Photo ou PDF. Facultatif aujourd'hui, et c'est pourtant lui qui pèse le plus lourd dans la décision.",
+    diplome: "Diplômes",
+    diplomeAide:
+      "Un ou plusieurs, photos et PDF mélangés. Vous pouvez en choisir plusieurs à la fois.",
+    requise: "Obligatoire",
+    facultative: "Facultative",
+    choisir: "Choisir un fichier",
+    choisirPlusieurs: "Choisir des fichiers",
+    ajouter: "Ajouter",
+    remplacer: "Remplacer",
+    envoi: "Envoi…",
+    tropLourde: "Ce fichier dépasse 8 Mo. Reprenez la photo en plus petit.",
+    mauvaisType: "Formats acceptés : JPEG, PNG, WebP, HEIC ou PDF.",
+    echec: "L'envoi a échoué. Vérifiez votre connexion et réessayez.",
+    sansCni:
+      "Déposez au moins votre carte nationale d'identité. Sans elle, personne ne peut vérifier qui vous êtes, et le dossier sera refusé.",
+  },
+
   reconnaitre: {
 
     question: "{nom} dit être ta maman ou ton papa.",
@@ -576,6 +611,9 @@ export const fr = {
       facultative: "Facultative",
       deposer: "Déposer",
       remplacer: "Remplacer",
+      // Un diplôme ne se remplace pas, il s'ajoute : on peut en avoir trois,
+      // et le second ne contredit pas le premier.
+      ajouterUn: "Ajouter",
       envoi: "Envoi…",
       absente: "Pas encore déposée",
       deposee: "Déposée le {date} — en attente d'examen",

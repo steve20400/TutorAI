@@ -108,7 +108,16 @@ export default async function PageDossier({
 
 
   const nom = [profil?.prenom, profil?.nom].filter(Boolean).join(" ") || "—"
-  const deposees = new Map((pieces ?? []).map((p) => [p.type_cle, p]))
+  // Groupées et non indexées : un répétiteur peut avoir trois diplômes, et une
+  // Map par type n'en gardait qu'un — les deux autres disparaissaient de
+  // l'écran où l'on décide. Vérifier un dossier sur une partie de ses pièces
+  // est exactement ce qu'il ne faut pas pouvoir faire sans le savoir.
+  const deposees = new Map<string, typeof pieces>()
+  for (const piece of pieces ?? []) {
+    const liste = deposees.get(piece.type_cle)
+    if (liste) liste.push(piece)
+    else deposees.set(piece.type_cle, [piece])
+  }
 
   return (
     <>
@@ -177,9 +186,10 @@ export default async function PageDossier({
 
         <div className="mt-3 flex flex-wrap gap-3">
           {(types ?? []).map((ty) => {
-            const p = deposees.get(ty.cle)
+            const liste = deposees.get(ty.cle) ?? []
+            const p = liste[0]
             const libelle = langue === "en" ? ty.libelle_en : ty.libelle_fr
-            const manquante = !p
+            const manquante = liste.length === 0
             return (
               <div
                 key={ty.cle}
@@ -216,15 +226,20 @@ export default async function PageDossier({
                     d'identité dans le dossier « Téléchargements » de
                     quiconque vérifie — sur un ordinateur partagé, c'est
                     exactement ce qu'il ne faut pas. */}
-                {p ? (
-                  <div className="mt-2.5">
+                {/* Un lecteur par pièce. Trois diplômes, trois boutons :
+                    celui qui vérifie doit pouvoir les ouvrir tous, et un
+                    seul bouton laisserait croire qu'il n'y en a qu'un. */}
+                {liste.map((piece, rang) => (
+                  <div key={piece.id} className="mt-2.5">
                     <LecteurPiece
-                      pieceId={p.id}
-                      libelle={libelle}
-                      disponible={Boolean(p.chemin)}
+                      pieceId={piece.id}
+                      libelle={
+                        liste.length > 1 ? `${libelle} ${rang + 1}` : libelle
+                      }
+                      disponible={Boolean(piece.chemin)}
                     />
                   </div>
-                ) : null}
+                ))}
               </div>
             )
           })}

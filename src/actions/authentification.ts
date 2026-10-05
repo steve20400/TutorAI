@@ -265,7 +265,32 @@ export async function sInscrire(
   if (!email) return { erreur: d.erreurs.emailManquant }
   if (motDePasse.length < 8) return { erreur: d.erreurs.motDePasseTropCourt }
 
+  // Le dépôt des pièces, ouvert par le navigateur avant que ce compte
+  // n'existe. Vide tant qu'aucun fichier n'est parti.
+  //
+  // La carte d'identité est exigée, et c'est la seule exigence : sans elle,
+  // personne ne peut vérifier qui est cette personne, et nous n'aurions rien
+  // à vendre d'autre qu'une liste de noms. Le casier et les diplômes pèsent
+  // dans la décision, ils ne la conditionnent pas — le casier judiciaire est
+  // long à obtenir au Cameroun, et l'exiger ici viderait l'annuaire.
+  const depot = String(donnees.get("depot") ?? "").trim()
   const supabase = await supabaseServeur()
+
+  if (role === "repetiteur") {
+    // Demandé à la base, et non à un champ caché du formulaire : le
+    // navigateur remplit les champs cachés, donc n'importe qui les remplit.
+    // La question est fermée, la réponse est un booléen, et elle ne révèle
+    // rien de ce que contient le dépôt.
+    let aSaCarte = false
+    if (depot) {
+      const { data } = await supabase.rpc("depot_porte", {
+        le_jeton: depot,
+        type_piece: "cni",
+      })
+      aSaCarte = data === true
+    }
+    if (!aSaCarte) return { erreur: d.inscriptionPieces.sansCni }
+  }
 
   // `data` alimente le déclencheur `sur_nouvel_utilisateur` du schéma, qui
   // crée la ligne dans `profils`. Les clés doivent correspondre exactement.
@@ -290,6 +315,13 @@ export async function sInscrire(
         role,
         pays: process.env.NEXT_PUBLIC_PAYS_PAR_DEFAUT ?? "CM",
         langue,
+        // Lu par `gerer_nouvel_utilisateur`, qui rattache les pièces à la
+        // fiche qu'il vient de créer. Ce champ vient du navigateur et n'est
+        // pas digne de confiance — pas plus que `role`, que le déclencheur
+        // ramène à une liste fermée. Celui-ci ne donne aucun pouvoir : au
+        // pire on rattache à son propre compte des fichiers qu'on a soi-même
+        // déposés, ce qui est l'usage prévu.
+        depot: depot || null,
       },
     },
   })

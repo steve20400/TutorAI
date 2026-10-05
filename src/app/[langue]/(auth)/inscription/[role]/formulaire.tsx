@@ -7,6 +7,7 @@ import { chemin } from "@/langues"
 import { useLangue } from "@/langues/contexte"
 import { Bouton, Champ, Message } from "../../champs"
 import { sInscrire, type EtatFormulaire } from "@/actions/authentification"
+import { PiecesInscription } from "./pieces"
 
 const ETAT_INITIAL: EtatFormulaire = {}
 
@@ -87,6 +88,14 @@ export function Formulaire({
             {c.avertissementEnfant}
           </p>
         )}
+
+        {/* Les pièces, et c'est ici qu'elles doivent être.
+
+            Elles se déposaient après la connexion, donc après l'inscription,
+            donc après le moment où quelqu'un aurait pu renoncer. Un dossier
+            arrivait à l'administration avec rien à vérifier, et nous vendons
+            un répétiteur vérifié. */}
+        {role === "repetiteur" && <PiecesInscription />}
 
         <Message erreur={etat.erreur} info={etat.info} />
 

@@ -329,6 +329,33 @@ export const en: Dictionnaire = {
       "Your file has been submitted. First confirm your address using the email sent to {email}, then wait while our team checks your documents: you will be told by email, accepted or refused, with the reasons.",
   },
 
+  inscriptionPieces: {
+    titre: "Your documents",
+    detail:
+      "This is what makes you verifiable, and it is what families are paying for. They will never see these documents: they will see that they were checked, and on what date.",
+    cni: "National ID card",
+    cniAide:
+      "Photo or PDF. Flat, well lit, all four corners visible — an unreadable document will be sent back to you.",
+    casier: "Police record",
+    casierAide:
+      "Photo or PDF. Optional today, and still the one that weighs most in the decision.",
+    diplome: "Certificates",
+    diplomeAide:
+      "One or several, photos and PDFs mixed. You can pick several at once.",
+    requise: "Required",
+    facultative: "Optional",
+    choisir: "Choose a file",
+    choisirPlusieurs: "Choose files",
+    ajouter: "Add",
+    remplacer: "Replace",
+    envoi: "Uploading…",
+    tropLourde: "This file is over 8 MB. Take the photo at a smaller size.",
+    mauvaisType: "Accepted formats: JPEG, PNG, WebP, HEIC or PDF.",
+    echec: "The upload failed. Check your connection and try again.",
+    sansCni:
+      "Upload at least your national ID card. Without it nobody can check who you are, and the file will be refused.",
+  },
+
   reconnaitre: {
 
     question: "{nom} says they are your mum or dad.",
@@ -526,6 +553,7 @@ export const en: Dictionnaire = {
       facultative: "Optional",
       deposer: "Upload",
       remplacer: "Replace",
+      ajouterUn: "Add",
       envoi: "Sending…",
       absente: "Not uploaded yet",
       deposee: "Uploaded on {date} — awaiting review",
