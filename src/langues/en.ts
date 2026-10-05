@@ -354,6 +354,7 @@ export const en: Dictionnaire = {
       experience: "Experience",
       ansEtPlus: "{n} years and more",
       trier: "Most experienced",
+      trierTarif: "Lowest rate",
       compte: { one: "{n} tutor", other: "{n} tutors" },
       tousControles: "all checked",
     },

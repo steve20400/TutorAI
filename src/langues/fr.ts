@@ -370,6 +370,7 @@ export const fr = {
       experience: "Expérience",
       ansEtPlus: "{n} ans et plus",
       trier: "Les plus expérimentés",
+      trierTarif: "Le tarif le plus bas",
       // Le compte, en tête de la colonne de droite.
       compte: {
         one: "{n} répétiteur",

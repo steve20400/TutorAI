@@ -14,6 +14,7 @@ export type Etat = {
   prixMin?: number
   prixMax?: number
   experienceMin?: number
+  tri?: string
 }
 
 export type Ville = { ville: string; n: number }
@@ -148,6 +149,12 @@ export function Filtres({
         ))}
       </select>
 
+      {/* La glissière n'a de sens que si les tarifs s'étalent. Quand tout
+          l'annuaire est au même prix — ou qu'aucun tarif n'est renseigné —
+          elle ne filtrerait rien, et une glissière qui ne bouge pas se lit
+          comme une panne. Le reste de la barre, lui, s'affiche toujours. */}
+      {bornes.max > bornes.min ? (
+      <>
       <Espace />
       <div className="mb-1 flex items-baseline justify-between">
         <span className="text-[12.5px] font-medium">{t.prix}</span>
@@ -168,6 +175,8 @@ export function Filtres({
         <span>{francs(bornes.min)}</span>
         <span>{francs(bornes.max)}</span>
       </div>
+      </>
+      ) : null}
 
       <Espace />
       <Titre>{t.experience}</Titre>
@@ -309,5 +318,48 @@ function Glissiere({
         className="glissiere"
       />
     </div>
+  )
+}
+
+/**
+ * Le tri, en tête de la colonne des fiches.
+ *
+ * Deux ordres seulement, et c'est une limite assumée : « le mieux noté »
+ * n'existe pas, il n'y a pas de notes — et il n'y en aura pas tant qu'un
+ * répétiteur pourra être coulé par trois avis d'un parent fâché.
+ */
+export function Tri({
+  etat,
+  langue,
+  d,
+}: {
+  etat: Etat & { tri?: string }
+  langue: Langue
+  d: Dictionnaire
+}) {
+  const t = d.annuaire.rail
+  const router = useRouter()
+
+  function choisir(valeur: string) {
+    const p = new URLSearchParams()
+    for (const [k, v] of Object.entries(etat)) {
+      if (v !== undefined && v !== "" && k !== "tri") p.set(k, String(v))
+    }
+    if (valeur) p.set("tri", valeur)
+    const q = p.toString()
+    router.push(chemin(langue, `/annuaire${q ? `?${q}` : ""}`))
+  }
+
+  return (
+    <select
+      value={etat.tri ?? "experience"}
+      onChange={(e) => choisir(e.target.value)}
+      aria-label={t.trier}
+      className="shrink-0 border-0 bg-transparent text-[12.5px] lg:text-[13px]"
+      style={{ color: "var(--texte-doux)" }}
+    >
+      <option value="experience">{t.trier}</option>
+      <option value="tarif">{t.trierTarif}</option>
+    </select>
   )
 }

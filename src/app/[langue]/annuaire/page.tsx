@@ -2,7 +2,7 @@ import Link from "next/link"
 
 import { Coque } from "@/composants/coque"
 import { Fiche, type Repetiteur } from "./fiche"
-import { Filtres, type Etat, type Ville } from "./filtres"
+import { Filtres, Tri, type Etat, type Ville } from "./filtres"
 import {
   chemin,
   dictionnaire,
@@ -55,6 +55,7 @@ export default async function PageAnnuaire({
     prixMin: sp.prixMin ? Number(sp.prixMin) : undefined,
     prixMax: sp.prixMax ? Number(sp.prixMax) : undefined,
     experienceMin: sp.experienceMin ? Number(sp.experienceMin) : undefined,
+    tri: sp.tri || undefined,
   }
 
   const numero = Math.max(1, Number(sp.page) || 1)
@@ -99,17 +100,15 @@ export default async function PageAnnuaire({
       <div className="flex flex-1 gap-9 px-3 pb-10 pt-3.5 lg:px-[30px] lg:pt-[26px]">
         {/* La barre de filtres : grand écran seulement. */}
         <div className="hidden lg:block">
-          {bornes.haut > bornes.bas ? (
-            <Filtres
-              etat={etat}
-              villes={villes}
-              matieres={referentiel.matieres}
-              niveaux={referentiel.niveaux}
-              bornes={{ min: bornes.bas, max: bornes.haut }}
-              langue={langue}
-              d={d}
-            />
-          ) : null}
+          <Filtres
+            etat={etat}
+            villes={villes}
+            matieres={referentiel.matieres}
+            niveaux={referentiel.niveaux}
+            bornes={{ min: bornes.bas, max: bornes.haut }}
+            langue={langue}
+            d={d}
+          />
         </div>
 
         <div className="min-w-0 flex-1">
@@ -182,7 +181,7 @@ export default async function PageAnnuaire({
 
           {/* Le compte, en tête de colonne. */}
           {reponse ? (
-            <div className="mb-3 flex items-baseline justify-between lg:mb-4">
+            <div className="mb-3 flex items-baseline justify-between gap-3 lg:mb-4">
               <p className="doux m-0 text-[12.5px] lg:text-[14px]">
                 <strong
                   className="font-medium"
@@ -194,6 +193,10 @@ export default async function PageAnnuaire({
                 {", "}
                 {t.rail.tousControles}
               </p>
+
+              {/* Le tri du canevas. Deux ordres, et pas trois : « le mieux
+                  noté » n'existe pas, il n'y a pas de notes. */}
+              <Tri etat={etat} langue={langue} d={d} />
             </div>
           ) : null}
 
@@ -215,14 +218,6 @@ export default async function PageAnnuaire({
             ))
           )}
 
-          {/* La frontière, dite plutôt que cachée derrière un bouton qui ne
-              ferait rien. */}
-          <section className="carte mt-4 p-5">
-            <div className="text-[14px] font-medium">{t.suiteTitre}</div>
-            <p className="doux mt-1 text-[12px] leading-relaxed">
-              {t.suiteDetail}
-            </p>
-          </section>
         </div>
       </div>
     </div>
