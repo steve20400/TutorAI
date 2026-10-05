@@ -102,10 +102,12 @@ export default async function PageDossier({
   // une séance » lui répondrait « rattachez d'abord un enfant à votre
   // compte », conseil absurde adressé à quelqu'un qui n'en aura jamais.
   //
-  // Vrai par défaut, et c'est voulu : ce dossier est public, on y arrive par
-  // un lien partagé sans avoir de compte. À celui-là il faut montrer ce qu'on
-  // peut demander — c'est la seule raison pour laquelle il créera un compte.
-  // Seul un rôle connu qui n'engage pas fait disparaître le bloc.
+  // Vrai par défaut, et seul un rôle connu qui n'engage pas l'efface. Le
+  // défaut ne sert qu'au cas où `/v1/moi` reste muet : cette page demande une
+  // session — `/annuaire` ne figure pas dans les routes publiques, un visiteur
+  // sans compte est renvoyé sur la connexion avant d'arriver ici. Le jour où
+  // l'on voudra qu'un dossier se partage par lien, c'est `acces.ts` qu'il
+  // faudra ouvrir, pas cette ligne.
   let enfants: EnfantChoisissable[] = []
   let peutEngager = true
   try {
