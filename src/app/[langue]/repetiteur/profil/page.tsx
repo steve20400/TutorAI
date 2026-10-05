@@ -9,6 +9,11 @@ import { supabaseServeur } from "@/lib/supabase/server"
 import { FormulaireProfil } from "./formulaire"
 import { lireReferentiel } from "@/lib/referentiel"
 import { PiecesRepetiteur, type Piece } from "@/composants/pieces-repetiteur"
+import {
+  PropositionsRepetiteur,
+  type Proposition,
+} from "@/composants/propositions-repetiteur"
+import { TempsReel } from "@/composants/temps-reel"
 
 /** Un statut inconnu en base ne doit pas faire disparaître le bandeau. */
 const STATUTS = ["brouillon", "en_attente", "verifie", "refuse"] as const
@@ -96,6 +101,15 @@ export default async function PageProfilRepetiteur({
     pieces = []
   }
 
+  // Les propositions reçues, auxquelles il n'avait aucun moyen de répondre.
+  let propositions: Proposition[] = []
+  try {
+    const r = await api<{ donnees: Proposition[] }>("/v1/contrats/propositions")
+    propositions = r.donnees ?? []
+  } catch {
+    propositions = []
+  }
+
   if (!fiche) redirect(chemin(langue, "/"))
 
   const brutStatut = fiche?.statut ?? "brouillon"
@@ -137,6 +151,18 @@ export default async function PageProfilRepetiteur({
             </p>
           ) : null}
         </section>
+
+        {/* Une proposition arrive pendant qu'il est sur cet écran : il ne
+            doit pas avoir à recharger pour la découvrir. */}
+        <TempsReel tables={["contrats"]} />
+
+        {propositions.length > 0 ? (
+          <PropositionsRepetiteur
+            propositions={propositions}
+            langue={langue}
+            d={d}
+          />
+        ) : null}
 
         {pieces.length > 0 ? (
           <PiecesRepetiteur

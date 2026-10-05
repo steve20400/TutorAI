@@ -343,11 +343,24 @@ export const en: Dictionnaire = {
       parMois: "per month, for one pupil",
       proposer: "Propose a session",
       question: "Ask a question",
-      bientot:
-        "These two buttons do not work yet. Proposing a session and writing to a tutor arrive with the classroom.",
+      bientot: "Writing to a tutor arrives with the classroom.",
       salle:
         "The session takes place in TUTELA's room, and it is recorded. Your child is never alone with them.",
       absent: "This file does not exist, or is no longer published.",
+
+      proposerTitre: "Propose a session",
+      proposerDetail:
+        "They will receive your proposal and can accept or decline it. Nothing is committed until they answer.",
+      pourQui: "For which child?",
+      quelleMatiere: "Which subject?",
+      envoyer: "Send the proposal",
+      envoyee: "Proposal sent. You will see their answer in your space.",
+      sansEnfant:
+        "Link a child to your account first: a contract is between a tutor and one specific pupil.",
+      dejaPropose:
+        "You already have a pending proposal with this tutor for this subject.",
+      echecProposition:
+        "The proposal could not be sent. Try again in a moment.",
     },
   },
 
@@ -447,6 +460,18 @@ export const en: Dictionnaire = {
       echec: "The upload failed. Try again in a moment.",
       aide:
         "Photograph the document flat, well lit, all four corners visible. An unreadable document will be sent back to you.",
+    },
+    propositions: {
+      titre: "Proposals received",
+      detail:
+        "A family is asking for you, for one pupil. Nothing binds you until you answer.",
+      aucune: "No pending proposal.",
+      pour: "{matiere}",
+      accepter: "Accept",
+      refuser: "Decline",
+      refusDit:
+        "Your decline is passed on to the family — not the reason. They need to know they can look elsewhere rather than wait.",
+      echec: "The answer could not be saved. Try again in a moment.",
     },
   },
 

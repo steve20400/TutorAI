@@ -365,10 +365,26 @@ export const fr = {
       proposer: "Proposer une séance",
       question: "Poser une question",
       bientot:
-        "Ces deux boutons ne marchent pas encore. Proposer une séance et écrire à un répétiteur arrivent avec la salle de cours.",
+        "Écrire à un répétiteur arrive avec la salle de cours.",
       salle:
         "La séance se tient dans la salle de TUTELA, elle est enregistrée. Votre enfant n'est jamais seul avec lui.",
       absent: "Ce dossier n'existe pas, ou n'est plus publié.",
+
+      // La proposition. Elle n'engage pas le répétiteur : il répond.
+      proposerTitre: "Proposer une séance",
+      proposerDetail:
+        "Il recevra votre proposition et pourra l'accepter ou la refuser. Rien n'est engagé tant qu'il n'a pas répondu.",
+      pourQui: "Pour quel enfant ?",
+      quelleMatiere: "Quelle matière ?",
+      envoyer: "Envoyer la proposition",
+      envoyee:
+        "Proposition envoyée. Vous verrez sa réponse dans votre espace.",
+      sansEnfant:
+        "Rattachez d'abord un enfant à votre compte : un contrat se passe entre un répétiteur et un élève précis.",
+      dejaPropose:
+        "Vous avez déjà une proposition en cours avec ce répétiteur pour cette matière.",
+      echecProposition:
+        "La proposition n'a pas pu être envoyée. Réessayez dans un moment.",
     },
   },
 
@@ -474,6 +490,18 @@ export const fr = {
       echec: "L'envoi a échoué. Réessayez dans un moment.",
       aide:
         "Photographiez le document à plat, bien éclairé, les quatre coins visibles. Un document illisible vous sera renvoyé.",
+    },
+    propositions: {
+      titre: "Propositions reçues",
+      detail:
+        "Une famille vous demande pour un élève. Rien ne vous engage tant que vous n'avez pas répondu.",
+      aucune: "Aucune proposition en attente.",
+      pour: "{matiere}",
+      accepter: "Accepter",
+      refuser: "Refuser",
+      refusDit:
+        "Votre refus est transmis à la famille — pas la raison. Elle doit savoir qu'elle peut chercher ailleurs plutôt que d'attendre.",
+      echec: "La réponse n'a pas pu être enregistrée. Réessayez dans un moment.",
     },
   },
 

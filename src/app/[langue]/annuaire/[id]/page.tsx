@@ -9,6 +9,8 @@ import {
   remplir,
 } from "@/langues"
 import { api } from "@/lib/api"
+import { Proposer, type EnfantChoisissable } from "./proposer"
+import { supabaseServeur } from "@/lib/supabase/server"
 
 type Fiche = {
   id: string
@@ -112,6 +114,26 @@ export default async function PageDossier({
   }
 
   if (!fiche) notFound()
+
+  // Les enfants de celui qui regarde.
+  //
+  // Un contrat lie un répétiteur à UN élève : sans ce choix, il faudrait en
+  // déduire un, et le déduire voudrait dire le choisir à sa place. La liste
+  // est vide pour un élève, un répétiteur ou un visiteur — le formulaire
+  // disparaît alors de lui-même.
+  let enfants: EnfantChoisissable[] = []
+  try {
+    const supabase = await supabaseServeur()
+    const {
+      data: { user },
+    } = await supabase.auth.getUser()
+    if (user) {
+      const r = await api<{ donnees: EnfantChoisissable[] }>("/v1/enfants")
+      enfants = r.donnees ?? []
+    }
+  } catch {
+    enfants = []
+  }
 
   const nomComplet = [fiche.prenom, fiche.nom].filter(Boolean).join(" ")
   const dateLongue = (iso: string | null) =>
@@ -326,23 +348,25 @@ export default async function PageDossier({
             </p>
           )}
 
+          {/* La proposition est ouverte ; écrire ne l'est pas encore. */}
+          <Proposer
+            repetiteurId={fiche.id}
+            matieres={fiche.matieres}
+            enfants={enfants}
+            langue={langue}
+            d={d}
+          />
+
           <button
             type="button"
             disabled
-            className="bouton mb-2.5 block w-full px-4 py-3.5 text-[14.5px] opacity-50"
-          >
-            {t.proposer}
-          </button>
-          <button
-            type="button"
-            disabled
-            className="bt3 block w-full px-4 py-3 text-[14.5px] opacity-50"
+            className="bt3 mt-2.5 block w-full px-4 py-3 text-[14.5px] opacity-50"
           >
             {t.question}
           </button>
 
           <p
-            className="mt-3 text-[11.5px] leading-relaxed"
+            className="mt-2.5 text-[11.5px] leading-relaxed"
             style={{ color: "var(--texte-doux)" }}
           >
             {t.bientot}
