@@ -2,7 +2,6 @@ import Link from "next/link"
 import { notFound, redirect } from "next/navigation"
 
 import { FilMessages, type Message } from "@/composants/fil-messages"
-import { TempsReel } from "@/composants/temps-reel"
 import { chemin, dictionnaire, estLangue, LANGUE_PAR_DEFAUT } from "@/langues"
 import { api } from "@/lib/api"
 import { supabaseServeur } from "@/lib/supabase/server"
@@ -73,10 +72,17 @@ export default async function PageFil({
       <Coque langue={langue} />
 
       <main className="mx-auto flex w-full max-w-2xl flex-1 flex-col px-4 lg:px-6">
-      <TempsReel
-        tables={["messages_familles"]}
-        filtre={`conversation_id=eq.${id}`}
-      />
+      {/* Plus de `TempsReel` ici, et c'est le correctif.
+
+          Il rafraîchissait la page entière à chaque message reçu : la liste
+          des fils redemandée au service, les messages relus, l'écran
+          remplacé — et le « marquer comme lu » ci-dessus renvoyé au passage,
+          une écriture de plus par message. La vue sautait, et ce qu'on était
+          en train d'écrire vivait dans un champ qu'on venait de remonter.
+
+          C'est `FilMessages` qui écoute maintenant, et qui AJOUTE le message
+          reçu. Une conversation ne fait qu'ajouter à la fin : c'est la seule
+          forme de donnée où l'état local ne peut pas contredire le serveur. */}
 
       <header
         className="sticky top-0 z-10 flex items-center gap-3 border-b py-3"
