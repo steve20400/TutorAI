@@ -296,6 +296,28 @@ export async function sInscrire(
 
   if (error) return { erreur: traduire(error.message, d, await contactAdministration()) }
 
+  // Une adresse déjà prise ne lève PAS d'erreur, et c'est le piège.
+  //
+  // Supabase protège contre l'énumération des adresses : plutôt que de
+  // répondre « ce compte existe », il rend un utilisateur factice — même
+  // forme, aucune identité, aucune session — exactement comme une inscription
+  // qui attend sa confirmation. Les deux cas se ressemblaient donc, et le
+  // second message s'affichait pour le premier : « vérifiez votre boîte »,
+  // sur un courriel qui n'arrivera jamais. Steve l'a rencontré en s'inscrivant
+  // comme répétiteur avec l'adresse de l'administration : tout semblait
+  // marcher, et rien n'avait été créé.
+  //
+  // `identities` est ce qui les sépare : une vraie inscription en porte une,
+  // le leurre n'en porte aucune.
+  //
+  // Le dire coûte quelque chose, et c'est un choix assumé : on confirme à qui
+  // demande qu'une adresse a un compte ici. En face, laisser quelqu'un
+  // attendre un courriel qui n'existe pas lui fait perdre son compte, pas
+  // seulement sa soirée — et il recommencera, avec la même adresse.
+  if (data.user && (data.user.identities?.length ?? 0) === 0) {
+    return { erreur: d.erreurs.compteExistant }
+  }
+
   // Si la confirmation par email est active dans Supabase, aucune session
   // n'est ouverte tout de suite.
   if (!data.session) {

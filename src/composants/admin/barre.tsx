@@ -240,6 +240,16 @@ export function BarreAdmin({
 
   // Changer de page referme la barre : sur téléphone elle couvre l'écran, et
   // la laisser ouverte cacherait la page qu'on vient de demander.
+  //
+  // Cet effet ne suffisait pas, et chaque lien ferme donc aussi au clic. Deux
+  // raisons, toutes deux constatées. Il attend que l'adresse ait changé,
+  // c'est-à-dire que la page soit arrivée : sur une rubrique qui interroge le
+  // service, la barre restait en travers de l'écran pendant toute l'attente.
+  // Et cliquer la rubrique où l'on se trouve déjà ne change aucune adresse —
+  // l'effet ne se déclenchait jamais, et la barre ne se fermait plus du tout.
+  //
+  // Il reste malgré tout : il rattrape les retours en arrière du navigateur,
+  // qui ne passent par le clic d'aucun lien.
   useEffect(() => {
     poserOuverte(false)
   }, [cheminActuel])
@@ -418,6 +428,7 @@ export function BarreAdmin({
             <Link
               key={r.cle}
               href={cible}
+              onClick={() => poserOuverte(false)}
               className="admin-lien"
               aria-current={actif ? "page" : undefined}
               title={repliee ? d.adminNav[r.cle] : undefined}
@@ -457,6 +468,7 @@ export function BarreAdmin({
               ce qu'on ne fait pas pour une opération courante. */}
           <Link
             href={chemin(langue, "/admin/profil")}
+            onClick={() => poserOuverte(false)}
             title={d.adminPages.profil.etiquette}
             className="flex min-w-0 flex-1 items-center gap-2.5 rounded-[8px] transition hover:bg-white/10"
           >
