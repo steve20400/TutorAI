@@ -1,8 +1,6 @@
 import { redirect } from "next/navigation"
 import Link from "next/link"
-import { ReglagesRapides } from "@/composants/reglages-rapides"
 
-import { BoutonDeconnexion } from "@/composants/deconnexion"
 import { Registre } from "@/composants/registre"
 import {
   chemin,
@@ -17,7 +15,7 @@ import { Enfants, type Enfant } from "./enfants"
 import { Rattacher } from "./rattacher"
 import { supabaseServeur } from "@/lib/supabase/server"
 import { TempsReel } from "@/composants/temps-reel"
-import { Avatar } from "@/composants/avatar"
+import { Coque } from "@/composants/coque"
 
 /**
  * Accueil parent — volontairement minimal à ce stade.
@@ -109,37 +107,14 @@ export default async function AccueilParent({
         tables={["liens_familiaux", "demandes_mot_de_passe"]}
         echeance={prochaineEcheance}
       />
-      <main className="mx-auto flex max-w-lg flex-col gap-6 p-6">
-        <header className="flex items-baseline justify-between pt-6">
-          <div>
-            <h1 className="text-2xl font-medium">
-              {remplir(d.parent.bonjour, { prenom: profil.prenom ?? "" })}
-            </h1>
-            <p className="doux mt-0.5 text-sm">{d.parent.espace}</p>
-          </div>
-          {/* L'avatar mène au compte, comme chez l'enfant. La page existait
-              déjà et gérait le cas adulte ; rien n'y menait depuis ici, donc
-              un adulte ne pouvait ni poser sa photo, ni changer son mot de
-              passe. */}
-          <Link
-            href={chemin(langue, "/compte")}
-            title={d.compte.titreAdulte}
-            className="transition hover:opacity-80"
-          >
-            <Avatar
-              nom={profil.prenom ?? ""}
-              photoUrl={profil.photo_url}
-              taille={32}
-            />
-          </Link>
-          <Link
-            href={chemin(langue, "/messages")}
-            className="doux text-sm underline underline-offset-4"
-          >
-            {d.messagerie.etiquette}
-          </Link>
-          <ReglagesRapides />
-          <BoutonDeconnexion langue={langue} />
+      <Coque langue={langue} />
+
+      <main className="mx-auto flex w-full max-w-2xl flex-col gap-5 px-4 pb-10 pt-6 lg:px-6">
+        <header className="pt-2">
+          <h1 className="text-[27px] font-medium tracking-[-0.02em] lg:text-[34px]">
+            {remplir(d.parent.bonjour, { prenom: profil.prenom ?? "" })}
+          </h1>
+          <p className="doux mt-1 text-sm">{d.parent.espace}</p>
         </header>
 
         {demandesMdp > 0 ? (

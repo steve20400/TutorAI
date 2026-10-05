@@ -4,6 +4,7 @@ import { useState } from "react"
 
 import { remplir, type Dictionnaire, type Langue } from "@/langues"
 import { enregistrerFacturation } from "@/actions/admin"
+import { BoutonAction } from "@/composants/bouton-action"
 
 type Valeurs = {
   mode: string
@@ -164,9 +165,9 @@ export function FormulaireFacturation({
           <button type="button" onClick={() => poser(initiales)} className="bt3">
             {t.annuler}
           </button>
-          <button type="submit" className="bt1">
+          <BoutonAction className="bt1">
             {t.enregistrer}
-          </button>
+          </BoutonAction>
         </div>
       ) : null}
     </form>

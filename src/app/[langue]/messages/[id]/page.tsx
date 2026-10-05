@@ -6,6 +6,7 @@ import { TempsReel } from "@/composants/temps-reel"
 import { chemin, dictionnaire, estLangue, LANGUE_PAR_DEFAUT } from "@/langues"
 import { api } from "@/lib/api"
 import { supabaseServeur } from "@/lib/supabase/server"
+import { Coque } from "@/composants/coque"
 
 type Fil = {
   id: string
@@ -68,7 +69,10 @@ export default async function PageFil({
   }
 
   return (
-    <main className="mx-auto flex min-h-dvh max-w-md flex-col px-5">
+    <div className="flex min-h-dvh flex-col">
+      <Coque langue={langue} />
+
+      <main className="mx-auto flex w-full max-w-2xl flex-1 flex-col px-4 lg:px-6">
       <TempsReel
         tables={["messages_familles"]}
         filtre={`conversation_id=eq.${id}`}
@@ -113,6 +117,7 @@ export default async function PageFil({
         langue={langue}
         d={d}
       />
-    </main>
+      </main>
+    </div>
   )
 }

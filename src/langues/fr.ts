@@ -17,6 +17,26 @@ export const fr = {
       "Un répétiteur vérifié. Une séance qui laisse une trace. Le soutien scolaire où un enfant n'est jamais seul avec un adulte.",
   },
 
+  coque: {
+    rechercher: "Rechercher",
+    recherchePlaceholder: "Un nom, une matière…",
+    ville: "Ville",
+    toutLePays: "Tout le Cameroun",
+    monProfil: "Mon profil",
+    monProfilDetail: "Photo, mot de passe",
+    mesEnfants: "Mes enfants",
+    mesEnfantsDetail: "Rattachements et jetons",
+    mesAdultes: "Mes adultes",
+    mesAdultesDetail: "Qui est rattaché à moi",
+    messages: "Messages",
+    messagesDetail: "Vos échanges avec les répétiteurs",
+    messagesDetailRepetiteur: "Vos échanges avec les familles",
+    monDossier: "Mon dossier",
+    monDossierDetail: "Fiche, pièces, propositions",
+    reglages: "Réglages",
+    reglagesDetail: "Thème et langue",
+  },
+
   commun: {
     choisirPhoto: "Choisir une photo",
     changerPhoto: "Changer la photo",
@@ -336,7 +356,27 @@ export const fr = {
       "Aucun répétiteur n'est encore contrôlé. Cet écran se remplira à mesure que les dossiers passent la vérification.",
     muet:
       "L'annuaire n'a pas pu être chargé. Réessayez dans un moment.",
+    aVille: "à",
     filtres: "Filtres",
+    rail: {
+      titre: "FILTRES",
+      effacer: "Effacer",
+      ville: "Ville",
+      toutLePays: "Tout le Cameroun",
+      matiere: "Matière",
+      niveau: "Niveau",
+      tousNiveaux: "Tous les niveaux",
+      prix: "Prix par mois",
+      experience: "Expérience",
+      ansEtPlus: "{n} ans et plus",
+      trier: "Les plus expérimentés",
+      // Le compte, en tête de la colonne de droite.
+      compte: {
+        one: "{n} répétiteur",
+        other: "{n} répétiteurs",
+      },
+      tousControles: "tous contrôlés",
+    },
     tousLesFiltres: "Tout afficher",
     // « Dossier contrôlé » et non « Identité, casier, diplôme ».
     //
@@ -347,6 +387,8 @@ export const fr = {
     // du produit. Le détail est sur le dossier, où il vient de la base et
     // porte une date par pièce.
     verifie: "Dossier contrôlé",
+    verifieLe: "Dossier contrôlé le {date}",
+    parMoisCourt: "par mois",
     ans: { one: "{n} an", other: "{n} ans" },
     parMois: "/mois",
     sansTarif: "Tarif à convenir",
@@ -377,6 +419,7 @@ export const fr = {
       salle:
         "La séance se tient dans la salle de TUTELA, elle est enregistrée. Votre enfant n'est jamais seul avec lui.",
       absent: "Ce dossier n'existe pas, ou n'est plus publié.",
+      experience: "d'expérience",
 
       // La proposition. Elle n'engage pas le répétiteur : il répond.
       proposerTitre: "Proposer une séance",

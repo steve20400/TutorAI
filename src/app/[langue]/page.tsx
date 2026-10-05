@@ -1,11 +1,8 @@
 import Link from "next/link"
-import { ReglagesRapides } from "@/composants/reglages-rapides"
 import { Reconnaitre, type DemandeARecconnaitre } from "./reconnaitre"
 import { TempsReel } from "@/composants/temps-reel"
 import { redirect } from "next/navigation"
 
-import { Avatar } from "@/composants/avatar"
-import { BoutonDeconnexion } from "@/composants/deconnexion"
 import {
   chemin,
   dictionnaire,
@@ -16,6 +13,7 @@ import {
 import { api } from "@/lib/api"
 import { lireParametres } from "@/lib/parametres"
 import { supabaseServeur } from "@/lib/supabase/server"
+import { Coque } from "@/composants/coque"
 
 /**
  * Accueil élève — deux entrées, rien de plus (docs/SPEC_APPLICATION.md §2.1).
@@ -100,33 +98,19 @@ export default async function Accueil({
   }
 
   return (
-    <main className="mx-auto flex min-h-dvh max-w-md flex-col gap-4 p-6">
-      <header className="flex items-baseline justify-between pt-8">
-        <div>
-          <h1 className="text-2xl font-medium">
+    <div className="flex min-h-dvh flex-col">
+      {/* La coque porte désormais l'avatar, les réglages et la sortie. Chaque
+          écran bricolait les siens, et ils finissaient par ne plus se
+          ressembler d'une page à l'autre. */}
+      <Coque langue={langue} />
+
+      <main className="mx-auto flex w-full max-w-2xl flex-col gap-4 px-4 pb-10 pt-6 lg:px-6">
+        <header className="pt-2">
+          <h1 className="text-[27px] font-medium tracking-[-0.02em] lg:text-[34px]">
             {remplir(d.accueil.bonjour, { prenom: profil.prenom ?? "" })}
           </h1>
           <p className="doux mt-1 text-sm">{d.accueil.question}</p>
-        </div>
-
-        <span className="flex items-center gap-3">
-          {/* L'avatar mène au compte. Un enfant cherche son image là où elle
-              s'affiche, pas dans un menu de réglages. */}
-          <Link
-            href={chemin(langue, "/compte")}
-            title={d.compte.titre}
-            className="transition hover:opacity-80"
-          >
-            <Avatar
-              nom={profil.prenom ?? ""}
-              photoUrl={profil.photo_url}
-              taille={32}
-            />
-          </Link>
-          <ReglagesRapides />
-          <BoutonDeconnexion langue={langue} libelle={d.commun.quitter} />
-        </span>
-      </header>
+        </header>
 
       {/* La demande d'un adulte arrive pendant que l'enfant est sur cet
           écran : il ne doit pas avoir à recharger pour la découvrir. */}
@@ -157,6 +141,7 @@ export default async function Accueil({
           </div>
         )}
       </div>
-    </main>
+      </main>
+    </div>
   )
 }

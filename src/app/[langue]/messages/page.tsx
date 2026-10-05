@@ -1,7 +1,6 @@
 import Link from "next/link"
 
 import { Avatar } from "@/composants/avatar"
-import { ReglagesRapides } from "@/composants/reglages-rapides"
 import { TempsReel } from "@/composants/temps-reel"
 import {
   chemin,
@@ -13,6 +12,7 @@ import {
 import { api } from "@/lib/api"
 import { supabaseServeur } from "@/lib/supabase/server"
 import { redirect } from "next/navigation"
+import { Coque } from "@/composants/coque"
 
 type Fil = {
   id: string
@@ -74,26 +74,19 @@ export default async function PageMessages({
       : ""
 
   return (
-    <main className="mx-auto flex min-h-dvh max-w-md flex-col gap-5 p-6">
+    <div className="flex min-h-dvh flex-col">
+      <Coque langue={langue} />
       <TempsReel tables={["messages_familles", "conversations"]} />
 
-      <header className="flex items-baseline justify-between pt-6">
-        <div>
+      <main className="mx-auto flex w-full max-w-2xl flex-col gap-4 px-4 pb-10 pt-6 lg:px-6">
+        <header className="pt-2">
           <p className="doux text-[10px] font-semibold uppercase tracking-[0.14em]">
             {t.etiquette}
           </p>
-          <h1 className="mt-1 text-2xl font-medium">{t.titre}</h1>
-        </div>
-        <div className="flex items-center gap-3">
-          <ReglagesRapides />
-          <Link
-            href={chemin(langue, role === "repetiteur" ? "/repetiteur/profil" : "/parent")}
-            className="doux text-sm underline underline-offset-4"
-          >
-            {t.retour}
-          </Link>
-        </div>
-      </header>
+          <h1 className="mt-1 text-[27px] font-medium tracking-[-0.02em] lg:text-[34px]">
+            {t.titre}
+          </h1>
+        </header>
 
       {fils.length === 0 ? (
         <p className="doux text-sm leading-relaxed">
@@ -139,7 +132,8 @@ export default async function PageMessages({
             </li>
           ))}
         </ul>
-      )}
-    </main>
+        )}
+      </main>
+    </div>
   )
 }

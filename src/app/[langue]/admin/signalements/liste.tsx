@@ -10,6 +10,7 @@ import {
   type EtatTraitement,
 } from "@/actions/signalement"
 import { Message } from "../../(auth)/champs"
+import { BoutonAction } from "@/composants/bouton-action"
 
 type Personne = {
   id: string
@@ -195,9 +196,9 @@ function Carte({
             <Message erreur={etat.erreur} info={etat.info} />
 
             <div className="flex gap-2">
-              <button type="submit" disabled={enCours} className="bt1 px-4 py-2">
+              <BoutonAction desactive={enCours} className="bt1 px-4 py-2">
                 {enCours ? commun.enCours : t.classer}
-              </button>
+              </BoutonAction>
               <button
                 type="button"
                 onClick={() => setOuvert(false)}
@@ -219,9 +220,9 @@ function Carte({
               <form action={marquerLue}>
                 <input type="hidden" name="langue" value={langue} />
                 <input type="hidden" name="signalement" value={s.id} />
-                <button type="submit" className="bt1 px-4 py-2">
+                <BoutonAction className="bt1 px-4 py-2">
                   {t.marquerLue}
-                </button>
+                </BoutonAction>
               </form>
             ) : null}
 

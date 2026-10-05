@@ -10,6 +10,7 @@ import { supabaseServeur } from "@/lib/supabase/server"
 import { redirect } from "next/navigation"
 import Link from "next/link"
 import { Liste, type DemandeMotDePasse } from "./liste"
+import { Coque } from "@/composants/coque"
 
 /**
  * Les demandes de mot de passe des enfants.
@@ -49,15 +50,19 @@ export default async function PageMotsDePasse({
 
   return (
     <Registre>
-      <main className="mx-auto flex max-w-lg flex-col gap-5 p-6">
-        <header className="pt-6">
+      <Coque langue={langue} />
+
+      <main className="mx-auto flex w-full max-w-2xl flex-col gap-5 px-4 pb-10 pt-6 lg:px-6">
+        <header className="pt-2">
           <Link
             href={chemin(langue, "/parent")}
             className="doux text-[12px] hover:underline"
           >
             ‹ {d.admin.retour}
           </Link>
-          <h1 className="mt-1.5 text-2xl font-medium">{t.pageTitre}</h1>
+          <h1 className="mt-1.5 text-[27px] font-medium tracking-[-0.02em] lg:text-[34px]">
+            {t.pageTitre}
+          </h1>
           <p className="doux mt-1 text-sm leading-relaxed">{t.pageDetail}</p>
         </header>
 

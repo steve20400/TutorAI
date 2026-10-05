@@ -3,6 +3,7 @@
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { useEffect, useState } from "react"
+import { useFormStatus } from "react-dom"
 
 import { seDeconnecter } from "@/actions/authentification"
 import { chemin, type Dictionnaire, type Langue } from "@/langues"
@@ -472,32 +473,58 @@ export function BarreAdmin({
           </Link>
           <form action={seDeconnecter} className="shrink-0">
             <input type="hidden" name="langue" value={langue} />
-            <button
-              type="submit"
-              title={d.commun.seDeconnecter}
-              aria-label={d.commun.seDeconnecter}
-              className="grid h-[30px] w-[30px] place-items-center rounded-[8px] transition hover:bg-white/10"
-              style={{ color: "#c3cde0" }}
-            >
-              <svg
-                width="16"
-                height="16"
-                viewBox="0 0 20 20"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="1.6"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                aria-hidden
-              >
-                <path d="M12.5 14.2v1.6a1.8 1.8 0 0 1-1.8 1.8H4.6a1.8 1.8 0 0 1-1.8-1.8V4.2a1.8 1.8 0 0 1 1.8-1.8h6.1a1.8 1.8 0 0 1 1.8 1.8v1.6" />
-                <path d="M8.4 10h9M14.6 7l3 3-3 3" />
-              </svg>
-            </button>
+            <BoutonSortie libelle={d.commun.seDeconnecter} />
           </form>
         </div>
       </div>
       </nav>
     </>
+  )
+}
+
+
+/**
+ * Le bouton de sortie de l'administration, qui dit qu'il travaille.
+ *
+ * Il était nu : fermer la session demande un aller-retour à Supabase, et
+ * pendant ce temps rien ne bougeait. On le croyait mort et on recliquait.
+ * Le même défaut avait été corrigé dans l'application ; l'administration
+ * était restée de côté.
+ *
+ * Le pictogramme cède la place au cercle plutôt que de l'accompagner : sur
+ * trente points de côté, les deux ensemble ne se liraient pas.
+ */
+function BoutonSortie({ libelle }: { libelle: string }) {
+  const { pending } = useFormStatus()
+
+  return (
+    <button
+      type="submit"
+      disabled={pending}
+      title={libelle}
+      aria-label={libelle}
+      aria-busy={pending}
+      className="grid h-[30px] w-[30px] place-items-center rounded-[8px] transition hover:bg-white/10"
+      style={{ color: "#c3cde0" }}
+    >
+      {pending ? (
+        <span aria-hidden className="cercle-attente" />
+      ) : (
+        <svg
+          width="16"
+          height="16"
+          viewBox="0 0 20 20"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.6"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          aria-hidden
+        >
+          <path d="M12.5 14.2v1.6a1.8 1.8 0 0 1-1.8 1.8H4.6a1.8 1.8 0 0 1-1.8-1.8V4.2a1.8 1.8 0 0 1 1.8-1.8h6.1a1.8 1.8 0 0 1 1.8 1.8v1.6" />
+          <path d="M8.4 10h9M14.6 7l3 3-3 3" />
+        </svg>
+      )}
+    </button>
   )
 }

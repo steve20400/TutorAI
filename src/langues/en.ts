@@ -21,6 +21,26 @@ export const en: Dictionnaire = {
       "A verified tutor. A lesson that leaves a record. Home study where a child is never alone with an adult.",
   },
 
+  coque: {
+    rechercher: "Search",
+    recherchePlaceholder: "A name, a subject…",
+    ville: "City",
+    toutLePays: "All of Cameroon",
+    monProfil: "My profile",
+    monProfilDetail: "Photo, password",
+    mesEnfants: "My children",
+    mesEnfantsDetail: "Links and tokens",
+    mesAdultes: "My adults",
+    mesAdultesDetail: "Who is linked to me",
+    messages: "Messages",
+    messagesDetail: "Your exchanges with tutors",
+    messagesDetailRepetiteur: "Your exchanges with families",
+    monDossier: "My file",
+    monDossierDetail: "Profile, documents, proposals",
+    reglages: "Settings",
+    reglagesDetail: "Theme and language",
+  },
+
   commun: {
     choisirPhoto: "Choose a photo",
     changerPhoto: "Change photo",
@@ -320,9 +340,27 @@ export const en: Dictionnaire = {
     aucunDuTout:
       "No tutor has been checked yet. This screen fills up as applications pass verification.",
     muet: "The directory could not be loaded. Try again in a moment.",
+    aVille: "in",
     filtres: "Filters",
+    rail: {
+      titre: "FILTERS",
+      effacer: "Clear",
+      ville: "City",
+      toutLePays: "All of Cameroon",
+      matiere: "Subject",
+      niveau: "Level",
+      tousNiveaux: "All levels",
+      prix: "Price per month",
+      experience: "Experience",
+      ansEtPlus: "{n} years and more",
+      trier: "Most experienced",
+      compte: { one: "{n} tutor", other: "{n} tutors" },
+      tousControles: "all checked",
+    },
     tousLesFiltres: "Show all",
     verifie: "File checked",
+    verifieLe: "File checked on {date}",
+    parMoisCourt: "per month",
     ans: { one: "{n} year", other: "{n} years" },
     parMois: "/month",
     sansTarif: "Rate to be agreed",
@@ -347,6 +385,7 @@ export const en: Dictionnaire = {
       salle:
         "The session takes place in TUTELA's room, and it is recorded. Your child is never alone with them.",
       absent: "This file does not exist, or is no longer published.",
+      experience: "of experience",
 
       proposerTitre: "Propose a session",
       proposerDetail:

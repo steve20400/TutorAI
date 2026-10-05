@@ -1,7 +1,5 @@
 import { redirect } from "next/navigation"
-import { ReglagesRapides } from "@/composants/reglages-rapides"
 
-import { BoutonDeconnexion } from "@/composants/deconnexion"
 import { Registre } from "@/composants/registre"
 import { chemin, dictionnaire, estLangue, LANGUE_PAR_DEFAUT } from "@/langues"
 import { api } from "@/lib/api"
@@ -14,7 +12,7 @@ import {
   type Proposition,
 } from "@/composants/propositions-repetiteur"
 import { TempsReel } from "@/composants/temps-reel"
-import Link from "next/link"
+import { Coque } from "@/composants/coque"
 
 /** Un statut inconnu en base ne doit pas faire disparaître le bandeau. */
 const STATUTS = ["brouillon", "en_attente", "verifie", "refuse"] as const
@@ -122,22 +120,16 @@ export default async function PageProfilRepetiteur({
 
   return (
     <Registre>
-      <main className="mx-auto flex max-w-lg flex-col gap-6 p-6">
-        <header className="flex items-baseline justify-between pt-6">
-          <div>
-            <h1 className="text-2xl font-medium">{d.repetiteurProfil.titre}</h1>
-            <p className="doux mt-0.5 text-sm">
-              {profil?.prenom} {profil?.nom ?? ""}
-            </p>
-          </div>
-          <Link
-            href={chemin(langue, "/messages")}
-            className="doux text-sm underline underline-offset-4"
-          >
-            {d.messagerie.etiquette}
-          </Link>
-          <ReglagesRapides />
-          <BoutonDeconnexion langue={langue} />
+      <Coque langue={langue} />
+
+      <main className="mx-auto flex w-full max-w-2xl flex-col gap-5 px-4 pb-10 pt-6 lg:px-6">
+        <header className="pt-2">
+          <h1 className="text-[27px] font-medium tracking-[-0.02em] lg:text-[34px]">
+            {d.repetiteurProfil.titre}
+          </h1>
+          <p className="doux mt-1 text-sm">
+            {profil?.prenom} {profil?.nom ?? ""}
+          </p>
         </header>
 
         <section

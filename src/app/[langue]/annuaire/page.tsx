@@ -1,7 +1,8 @@
 import Link from "next/link"
 
+import { Coque } from "@/composants/coque"
 import { Fiche, type Repetiteur } from "./fiche"
-import { ReglagesRapides } from "@/composants/reglages-rapides"
+import { Filtres, type Etat, type Ville } from "./filtres"
 import {
   chemin,
   dictionnaire,
@@ -20,182 +21,210 @@ type Reponse = {
 /**
  * L'annuaire des répétiteurs vérifiés.
  *
- * Repris du canevas « Annuaire · téléphone ». Il en garde la matière — le
- * titre, le compte de contrôlés, la bande de filtres, les fiches — et lui
- * emprunte ses proportions, mais ses couleurs viennent des variables du
- * thème : le dessin est en clair, l'application a quatre combinaisons.
+ * Deux mises en page, et c'est le canevas qui les donne : `Main.dc.html` pour
+ * le grand écran — une barre de filtres de 238 px à gauche, les fiches à
+ * droite — et `AnnuaireTel.dc.html` pour le téléphone, où les filtres se
+ * replient en une bande de pastilles qui défile.
  *
- * Les filtres vivent dans l'adresse et non dans un état de composant. Trois
- * raisons : l'écran reste servi et n'embarque aucun JavaScript, une recherche
- * se partage par un lien, et le retour du navigateur défait un filtre au lieu
- * de quitter la page.
+ * Les filtres vivent dans l'adresse et non dans un état de composant : l'écran
+ * reste servi, une recherche se partage par un lien, et le retour du
+ * navigateur défait un filtre au lieu de quitter la page.
  *
- * Les matières et les niveaux proposés viennent du référentiel, donc de la
- * base. Les écrire ici en ferait une deuxième liste, qui divergerait de celle
- * que les répétiteurs cochent dans leur dossier.
+ * Tout ce qui s'affiche vient de la base — les matières et les niveaux du
+ * référentiel, les effectifs par ville et les bornes de prix de deux fonctions
+ * dédiées. Rien n'est écrit en dur, pas même « de 0 à 100 000 F ».
  */
 export default async function PageAnnuaire({
   params,
   searchParams,
 }: {
   params: Promise<{ langue: string }>
-  searchParams: Promise<{ matiere?: string; niveau?: string; page?: string }>
+  searchParams: Promise<Record<string, string | undefined>>
 }) {
   const { langue: brut } = await params
-  const { matiere, niveau, page } = await searchParams
+  const sp = await searchParams
   const langue = estLangue(brut) ? brut : LANGUE_PAR_DEFAUT
   const d = dictionnaire(langue)
   const t = d.annuaire
 
-  const numero = Math.max(1, Number(page) || 1)
-
-  const requete = new URLSearchParams({ page: String(numero), parPage: "20" })
-  if (matiere) requete.set("matiere", matiere)
-  if (niveau) requete.set("niveau", niveau)
-
-  let reponse: Reponse | null = null
-  try {
-    reponse = await api<Reponse>(`/v1/repetiteurs?${requete.toString()}`, {
-      sansSession: true,
-    })
-  } catch {
-    reponse = null
+  const etat: Etat = {
+    ville: sp.ville || undefined,
+    matiere: sp.matiere || undefined,
+    niveau: sp.niveau || undefined,
+    q: sp.q || undefined,
+    prixMin: sp.prixMin ? Number(sp.prixMin) : undefined,
+    prixMax: sp.prixMax ? Number(sp.prixMax) : undefined,
+    experienceMin: sp.experienceMin ? Number(sp.experienceMin) : undefined,
   }
 
-  const referentiel = await lireReferentiel()
+  const numero = Math.max(1, Number(sp.page) || 1)
+  const requete = new URLSearchParams({ page: String(numero), parPage: "20" })
+  for (const [k, v] of Object.entries(etat)) {
+    if (v !== undefined && v !== "") requete.set(k, String(v))
+  }
 
-  /** Une adresse identique, un filtre en plus ou en moins. */
-  const avec = (cle: "matiere" | "niveau", valeur: string | null) => {
+  const [reponse, referentiel, villes, bornes] = await Promise.all([
+    api<Reponse>(`/v1/repetiteurs?${requete.toString()}`, {
+      sansSession: true,
+    }).catch(() => null),
+    lireReferentiel(),
+    api<{ donnees: Ville[] }>("/v1/repetiteurs/villes", { sansSession: true })
+      .then((r) => r.donnees ?? [])
+      .catch(() => [] as Ville[]),
+    api<{ bas: number; haut: number }>("/v1/repetiteurs/bornes", {
+      sansSession: true,
+    }).catch(() => ({ bas: 0, haut: 0 })),
+  ])
+
+  const actifs = Object.values(etat).filter(
+    (v) => v !== undefined && v !== "",
+  ).length
+
+  /** Une adresse identique, un filtre en plus ou en moins — pour la bande. */
+  const avec = (cle: keyof Etat, valeur: string | null) => {
     const p = new URLSearchParams()
-    const courant = { matiere, niveau }
-    for (const [k, v] of Object.entries(courant)) {
-      if (v) p.set(k, v)
+    for (const [k, v] of Object.entries(etat)) {
+      if (v !== undefined && v !== "") p.set(k, String(v))
     }
     if (valeur === null) p.delete(cle)
     else p.set(cle, valeur)
-    p.delete("page")
     const q = p.toString()
     return chemin(langue, `/annuaire${q ? `?${q}` : ""}`)
   }
 
-  const actifs = [matiere, niveau].filter(Boolean).length
-
   return (
-    <main className="mx-auto flex min-h-dvh max-w-md flex-col p-0">
-      <header className="flex items-baseline justify-between px-3 pt-6">
-        <div>
-          <p className="doux text-[10px] font-semibold uppercase tracking-[0.14em]">
-            {t.etiquette}
-          </p>
-          <h1 className="mt-1 text-[22px] font-medium tracking-[-0.02em]">
-            {t.titre}
-          </h1>
-          {reponse ? (
-            <p className="doux mt-1 text-[12.5px]">
-              {pluriel(langue, reponse.pagination.total, t.controles)}
-            </p>
+    <div className="flex min-h-dvh flex-col">
+      <Coque langue={langue} villeActive={etat.ville} recherche={etat.q} />
+
+      <div className="flex flex-1 gap-9 px-3 pb-10 pt-3.5 lg:px-[30px] lg:pt-[26px]">
+        {/* La barre de filtres : grand écran seulement. */}
+        <div className="hidden lg:block">
+          {bornes.haut > bornes.bas ? (
+            <Filtres
+              etat={etat}
+              villes={villes}
+              matieres={referentiel.matieres}
+              niveaux={referentiel.niveaux}
+              bornes={{ min: bornes.bas, max: bornes.haut }}
+              langue={langue}
+              d={d}
+            />
           ) : null}
         </div>
-        <div className="flex items-center gap-3">
-          <ReglagesRapides />
-          <Link
-            href={chemin(langue, "/parent")}
-            className="doux text-sm underline underline-offset-4"
+
+        <div className="min-w-0 flex-1">
+          {/* Sur téléphone, les filtres deviennent une bande de pastilles.
+
+              Elle défile horizontalement — le seul endroit de l'application
+              où c'est voulu. Une bande se lit comme telle, et tronquer la
+              liste cacherait des matières. La page, elle, ne défile jamais de
+              côté. */}
+          <div
+            className="-mx-3 mb-3 overflow-x-auto px-3 pb-1 lg:hidden"
+            style={{ scrollbarWidth: "none" }}
           >
-            {t.retour}
-          </Link>
-        </div>
-      </header>
+            <div className="flex w-max gap-1.5">
+              <Link
+                href={chemin(langue, "/annuaire")}
+                className="whitespace-nowrap rounded-[20px] border px-[11px] py-[5px] text-[12px]"
+                style={
+                  actifs > 0
+                    ? {
+                        borderColor: "var(--voyant)",
+                        background: "var(--voyant)",
+                        color: "#fff",
+                      }
+                    : { borderColor: "var(--bordure)" }
+                }
+              >
+                {actifs > 0 ? `${t.filtres} · ${actifs}` : t.tousLesFiltres}
+              </Link>
 
-      {/* La bande de filtres.
+              {referentiel.matieres.map((m) => (
+                <Link
+                  key={`m-${m}`}
+                  href={avec("matiere", etat.matiere === m ? null : m)}
+                  className="whitespace-nowrap rounded-[20px] border px-[11px] py-[5px] text-[12px]"
+                  style={{
+                    borderColor:
+                      etat.matiere === m ? "var(--accent)" : "var(--bordure)",
+                    background:
+                      etat.matiere === m
+                        ? "color-mix(in srgb, var(--accent) 12%, transparent)"
+                        : "transparent",
+                  }}
+                >
+                  {m}
+                </Link>
+              ))}
 
-          Elle défile horizontalement — c'est le seul endroit de
-          l'application où cela est voulu : une bande de pastilles se lit
-          comme telle, et tronquer la liste cacherait des matières. La page,
-          elle, ne défile jamais de côté. */}
-      <div
-        className="relative mt-3.5 overflow-x-auto pb-3"
-        style={{ scrollbarWidth: "none" }}
-      >
-        <div className="flex w-max gap-1.5 px-3">
-          <Link
-            href={chemin(langue, "/annuaire")}
-            className="whitespace-nowrap rounded-[20px] border px-[11px] py-[5px] text-[12px]"
-            style={
-              actifs > 0
-                ? {
-                    borderColor: "var(--voyant)",
-                    background: "var(--voyant)",
-                    color: "#fff",
-                  }
-                : { borderColor: "var(--bordure)" }
-            }
-          >
-            {actifs > 0 ? `${t.filtres} · ${actifs}` : t.tousLesFiltres}
-          </Link>
+              {villes.map((v) => (
+                <Link
+                  key={`v-${v.ville}`}
+                  href={avec("ville", etat.ville === v.ville ? null : v.ville)}
+                  className="whitespace-nowrap rounded-[20px] border px-[11px] py-[5px] text-[12px]"
+                  style={{
+                    borderColor:
+                      etat.ville === v.ville
+                        ? "var(--accent)"
+                        : "var(--bordure)",
+                    background:
+                      etat.ville === v.ville
+                        ? "color-mix(in srgb, var(--accent) 12%, transparent)"
+                        : "transparent",
+                  }}
+                >
+                  {v.ville}
+                </Link>
+              ))}
+            </div>
+          </div>
 
-          {referentiel.matieres.map((m) => (
-            <Link
-              key={`m-${m}`}
-              href={avec("matiere", matiere === m ? null : m)}
-              className="whitespace-nowrap rounded-[20px] border px-[11px] py-[5px] text-[12px]"
-              style={{
-                borderColor: matiere === m ? "var(--accent)" : "var(--bordure)",
-                background:
-                  matiere === m
-                    ? "color-mix(in srgb, var(--accent) 12%, transparent)"
-                    : "transparent",
-              }}
-            >
-              {m}
-            </Link>
-          ))}
+          {/* Le compte, en tête de colonne. */}
+          {reponse ? (
+            <div className="mb-3 flex items-baseline justify-between lg:mb-4">
+              <p className="doux m-0 text-[12.5px] lg:text-[14px]">
+                <strong
+                  className="font-medium"
+                  style={{ color: "var(--texte)" }}
+                >
+                  {pluriel(langue, reponse.pagination.total, t.rail.compte)}
+                </strong>
+                {etat.ville ? ` ${t.aVille} ${etat.ville}` : ""}
+                {", "}
+                {t.rail.tousControles}
+              </p>
+            </div>
+          ) : null}
 
-          {referentiel.niveaux.map((n) => (
-            <Link
-              key={`n-${n}`}
-              href={avec("niveau", niveau === n ? null : n)}
-              className="whitespace-nowrap rounded-[20px] border px-[11px] py-[5px] text-[12px]"
-              style={{
-                borderColor: niveau === n ? "var(--accent)" : "var(--bordure)",
-                background:
-                  niveau === n
-                    ? "color-mix(in srgb, var(--accent) 12%, transparent)"
-                    : "transparent",
-              }}
-            >
-              {n}
-            </Link>
-          ))}
+          {reponse === null ? (
+            <p className="doux text-sm leading-relaxed">{t.muet}</p>
+          ) : reponse.donnees.length === 0 ? (
+            <p className="doux text-sm leading-relaxed">
+              {actifs > 0 ? t.aucun : t.aucunDuTout}
+            </p>
+          ) : (
+            reponse.donnees.map((r) => (
+              <Link
+                key={r.id}
+                href={chemin(langue, `/annuaire/${r.id}`)}
+                className="block transition hover:opacity-90"
+              >
+                <Fiche r={r} langue={langue} d={d} />
+              </Link>
+            ))
+          )}
+
+          {/* La frontière, dite plutôt que cachée derrière un bouton qui ne
+              ferait rien. */}
+          <section className="carte mt-4 p-5">
+            <div className="text-[14px] font-medium">{t.suiteTitre}</div>
+            <p className="doux mt-1 text-[12px] leading-relaxed">
+              {t.suiteDetail}
+            </p>
+          </section>
         </div>
       </div>
-
-      <div className="px-3">
-        {reponse === null ? (
-          <p className="doux text-sm leading-relaxed">{t.muet}</p>
-        ) : reponse.donnees.length === 0 ? (
-          <p className="doux text-sm leading-relaxed">
-            {actifs > 0 ? t.aucun : t.aucunDuTout}
-          </p>
-        ) : (
-          reponse.donnees.map((r) => (
-            <Link
-              key={r.id}
-              href={chemin(langue, `/annuaire/${r.id}`)}
-              className="block transition hover:opacity-90"
-            >
-              <Fiche r={r} langue={langue} d={d} />
-            </Link>
-          ))
-        )}
-      </div>
-
-      {/* La frontière, dite plutôt que cachée derrière un bouton qui ne
-          ferait rien. */}
-      <section className="carte mx-3 mb-8 mt-4 p-5">
-        <div className="text-[14px] font-medium">{t.suiteTitre}</div>
-        <p className="doux mt-1 text-[12px] leading-relaxed">{t.suiteDetail}</p>
-      </section>
-    </main>
+    </div>
   )
 }

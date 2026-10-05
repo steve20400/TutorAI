@@ -5,6 +5,7 @@ import { useActionState, useState } from "react"
 import { dictionnaire, type Langue } from "@/langues"
 import { enregistrerLecon, type EtatLecon } from "@/actions/programme"
 import { Message } from "../../../(auth)/champs"
+import { BoutonAction } from "@/composants/bouton-action"
 
 export type Lecon = {
   id: string
@@ -141,9 +142,9 @@ function FormulaireLecon({
 
       <Message erreur={etat.erreur} info={etat.info} />
 
-      <button type="submit" disabled={enCours} className="bt1 self-start px-4 py-2">
+      <BoutonAction desactive={enCours} className="bt1 self-start px-4 py-2">
         {enCours ? commun.enCours : t.enregistrer}
-      </button>
+      </BoutonAction>
     </form>
   )
 }

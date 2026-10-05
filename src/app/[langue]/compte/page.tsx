@@ -1,4 +1,3 @@
-import Link from "next/link"
 import { redirect } from "next/navigation"
 
 import {
@@ -15,6 +14,7 @@ import { MesAdultes, type AdulteRattache } from "./mes-adultes"
 import { FormulairesCompte } from "@/composants/formulaires-compte"
 
 import { ChoixCompte } from "./choix"
+import { Coque } from "@/composants/coque"
 
 type Compte = {
   id: string
@@ -89,18 +89,15 @@ export default async function PageCompte({
   }
 
   return (
-    <main className="mx-auto flex min-h-dvh max-w-md flex-col gap-5 p-6">
-      <header className="flex items-baseline justify-between pt-6">
-        <h1 className="text-2xl font-medium">
-          {adulte ? t.titreAdulte : t.titre}
-        </h1>
-        <Link
-          href={chemin(langue, "/")}
-          className="doux text-sm underline underline-offset-4"
-        >
-          {t.retour}
-        </Link>
-      </header>
+    <div className="flex min-h-dvh flex-col">
+      <Coque langue={langue} />
+
+      <main className="mx-auto flex w-full max-w-2xl flex-col gap-5 px-4 pb-10 pt-6 lg:px-6">
+        <header className="pt-2">
+          <h1 className="text-[27px] font-medium tracking-[-0.02em] lg:text-[34px]">
+            {adulte ? t.titreAdulte : t.titre}
+          </h1>
+        </header>
 
       {/* Deux publics, deux formulaires.
 
@@ -161,6 +158,7 @@ export default async function PageCompte({
           )}
         </section>
       ) : null}
-    </main>
+      </main>
+    </div>
   )
 }

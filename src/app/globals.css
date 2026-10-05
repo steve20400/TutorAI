@@ -355,6 +355,121 @@ input.avec-bascule {
   padding-right: 74px;
 }
 
+/* --- L'annuaire ------------------------------------------------------------
+   La fiche d'un répétiteur, reprise du canevas. La photo flotte à gauche,
+   taillée en biais, et le texte épouse son contour : `shape-outside` fait le
+   contour, `clip-path` découpe, le dégradé de masque fait mourir l'image dans
+   le fond au lieu de l'arrêter net. Les trois vont ensemble.
+
+   Le canevas pose la photo à 10 px du bord et laisse la carte sans marge à
+   gauche. Avec un texte court, cela ne se voit pas. Avec une vraie biographie,
+   les lignes qui passent SOUS la photo retombent à zéro et collent au trait
+   vert. La marge est donc portée par la carte, et la photo n'en a plus : même
+   bord visible, et plus rien ne touche.                                      */
+
+.fiche {
+  position: relative;
+  overflow: hidden;
+  border-radius: 11px;
+  padding: 12px 13px 12px 12px;
+  background: color-mix(in srgb, var(--texte) 5%, var(--fond));
+}
+
+.fiche-trait {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: var(--accent-doux-texte);
+}
+
+.fiche-photo {
+  float: left;
+  width: 104px;
+  height: 112px;
+  margin: 0 11px 0 0;
+  position: relative;
+  border-radius: 9px;
+  overflow: hidden;
+  shape-outside: polygon(0 0, 100% 0, 72% 100%, 0 100%);
+  shape-margin: 8px;
+  clip-path: polygon(0 0, 100% 0, 72% 100%, 0 100%);
+}
+
+.fiche-photo > * {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 20%;
+  display: block;
+  -webkit-mask-image: linear-gradient(101deg, #000 40%, rgb(0 0 0 / 0.34) 79%, transparent 97%);
+  mask-image: linear-gradient(101deg, #000 40%, rgb(0 0 0 / 0.34) 79%, transparent 97%);
+}
+
+@media (min-width: 1024px) {
+  .fiche {
+    border-radius: 14px;
+    padding: 20px 22px 20px 18px;
+  }
+
+  .fiche-trait {
+    width: 4px;
+  }
+
+  .fiche-photo {
+    width: 206px;
+    height: 168px;
+    margin: 0 20px 0 0;
+    border-radius: 10px;
+    shape-outside: polygon(0 0, 100% 0, 74% 100%, 0 100%);
+    shape-margin: 14px;
+    clip-path: polygon(0 0, 100% 0, 74% 100%, 0 100%);
+  }
+}
+
+/* La glissière à deux poignées : deux `range` natifs superposés sur une même
+   piste. Chacun garde sa poignée et son accessibilité au clavier ; seule la
+   piste est effacée, puisqu'elle est dessinée derrière eux.               */
+.glissiere {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 14px;
+  margin: 0;
+  background: none;
+  pointer-events: none;
+  appearance: none;
+  -webkit-appearance: none;
+}
+
+.glissiere::-webkit-slider-thumb {
+  pointer-events: auto;
+  appearance: none;
+  -webkit-appearance: none;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--fond);
+  border: 2px solid var(--voyant);
+  cursor: pointer;
+}
+
+.glissiere::-moz-range-thumb {
+  pointer-events: auto;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--fond);
+  border: 2px solid var(--voyant);
+  cursor: pointer;
+}
+
+.glissiere::-moz-range-track {
+  background: none;
+}
+
 .badge-verifie {
   background: var(--accent-doux);
   color: var(--accent-doux-texte);
