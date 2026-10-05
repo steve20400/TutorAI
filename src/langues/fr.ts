@@ -44,6 +44,8 @@ export const fr = {
     messagesDetailRepetiteur: "Vos échanges avec les familles",
     monDossier: "Mon dossier",
     monDossierDetail: "Fiche, pièces, propositions",
+    annuaire: "L'annuaire",
+    annuaireDetail: "Les autres dossiers vérifiés",
     reglages: "Réglages",
     reglagesDetail: "Thème et langue",
   },
@@ -584,6 +586,38 @@ export const fr = {
         "Votre refus est transmis à la famille — pas la raison. Elle doit savoir qu'elle peut chercher ailleurs plutôt que d'attendre.",
       echec: "La réponse n'a pas pu être enregistrée. Réessayez dans un moment.",
     },
+  },
+
+  /**
+   * L'espace du répétiteur, qui est son dossier.
+   *
+   * Les intitulés reprennent ceux du dossier public, au vous : il lit sa
+   * propre page, et « Sa façon de travailler » au-dessus de son propre texte
+   * sonnerait comme si on parlait de quelqu'un d'autre.
+   *
+   * Les manques sont dits comme des manques, et c'est la seule différence de
+   * fond avec la page publique. Chez un inconnu, une section vide disparaît —
+   * elle n'apprend rien. Sur sa propre page, elle doit se voir : sans photo ni
+   * matière, il n'apparaît dans aucune recherche, et rien ne le lui disait.
+   */
+  repetiteurAccueil: {
+    etiquette: "Votre dossier",
+    telQue: "Voici votre dossier tel qu'une famille le lit.",
+    modifier: "Modifier mon dossier",
+    pieces: "Mes pièces",
+    visible: "Visible dans l'annuaire",
+    facon: "Votre façon de travailler",
+    enseigne: "Ce que vous enseignez",
+    libre: "Quand vous êtes libre",
+    sansPhoto:
+      "Votre dossier n'a pas de photographie. C'est la première chose qu'une famille regarde.",
+    sansBio:
+      "Vous n'avez pas écrit comment vous travaillez. C'est le passage le plus lu d'un dossier.",
+    sansMatiere:
+      "Aucune matière n'est renseignée : votre dossier ne ressort d'aucune recherche.",
+    sansTarif: "Aucun tarif n'est indiqué.",
+    sansDisponibilite: "Vous n'avez pas dit quand vous êtes libre.",
+    completer: "Compléter",
   },
 
   /**

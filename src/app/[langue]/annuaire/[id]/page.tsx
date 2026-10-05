@@ -95,15 +95,31 @@ export default async function PageDossier({
 
   if (!fiche) notFound()
 
+  // Qui lit ce dossier décide de ce qu'on lui propose.
+  //
+  // Un répétiteur peut désormais ouvrir l'annuaire — c'est ainsi qu'il voit à
+  // quoi ressemble un dossier complet. Mais il n'engage personne : « Proposer
+  // une séance » lui répondrait « rattachez d'abord un enfant à votre
+  // compte », conseil absurde adressé à quelqu'un qui n'en aura jamais.
+  //
+  // Vrai par défaut, et c'est voulu : ce dossier est public, on y arrive par
+  // un lien partagé sans avoir de compte. À celui-là il faut montrer ce qu'on
+  // peut demander — c'est la seule raison pour laquelle il créera un compte.
+  // Seul un rôle connu qui n'engage pas fait disparaître le bloc.
   let enfants: EnfantChoisissable[] = []
+  let peutEngager = true
   try {
     const supabase = await supabaseServeur()
     const {
       data: { user },
     } = await supabase.auth.getUser()
     if (user) {
-      const r = await api<{ donnees: EnfantChoisissable[] }>("/v1/enfants")
-      enfants = r.donnees ?? []
+      const moi = await api<{ role: string }>("/v1/moi").catch(() => null)
+      peutEngager = moi?.role === "parent"
+      if (peutEngager) {
+        const r = await api<{ donnees: EnfantChoisissable[] }>("/v1/enfants")
+        enfants = r.donnees ?? []
+      }
     }
   } catch {
     enfants = []
@@ -360,16 +376,20 @@ export default async function PageDossier({
               </p>
             )}
 
-            <Proposer
-              repetiteurId={fiche.id}
-              matieres={fiche.matieres}
-              enfants={enfants}
-              langue={langue}
-              d={d}
-            />
+            {peutEngager ? (
+              <>
+                <Proposer
+                  repetiteurId={fiche.id}
+                  matieres={fiche.matieres}
+                  enfants={enfants}
+                  langue={langue}
+                  d={d}
+                />
 
-            {enfants.length > 0 ? (
-              <Questionner repetiteurId={fiche.id} langue={langue} d={d} />
+                {enfants.length > 0 ? (
+                  <Questionner repetiteurId={fiche.id} langue={langue} d={d} />
+                ) : null}
+              </>
             ) : null}
           </div>
 

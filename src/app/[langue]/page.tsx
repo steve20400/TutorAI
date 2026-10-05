@@ -60,7 +60,7 @@ export default async function Accueil({
   // s'ouvrira quand un parent t'aura rattaché à son compte ».
   if (profil.role === "admin") redirect(chemin(langue, "/admin"))
   if (profil.role === "parent") redirect(chemin(langue, "/annuaire"))
-  if (profil.role === "repetiteur") redirect(chemin(langue, "/repetiteur/profil"))
+  if (profil.role === "repetiteur") redirect(chemin(langue, "/repetiteur"))
 
 
   // Les entrées du tuteur IA ne s'affichent que si le module est allumé. Les

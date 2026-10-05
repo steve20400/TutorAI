@@ -1,3 +1,4 @@
+import Link from "next/link"
 import { redirect } from "next/navigation"
 
 import { Registre } from "@/composants/registre"
@@ -7,11 +8,6 @@ import { supabaseServeur } from "@/lib/supabase/server"
 import { FormulaireProfil } from "./formulaire"
 import { lireReferentiel } from "@/lib/referentiel"
 import { PiecesRepetiteur, type Piece } from "@/composants/pieces-repetiteur"
-import {
-  PropositionsRepetiteur,
-  type Proposition,
-} from "@/composants/propositions-repetiteur"
-import { TempsReel } from "@/composants/temps-reel"
 import { Coque } from "@/composants/coque"
 
 /** Un statut inconnu en base ne doit pas faire disparaître le bandeau. */
@@ -100,14 +96,6 @@ export default async function PageProfilRepetiteur({
     pieces = []
   }
 
-  // Les propositions reçues, auxquelles il n'avait aucun moyen de répondre.
-  let propositions: Proposition[] = []
-  try {
-    const r = await api<{ donnees: Proposition[] }>("/v1/contrats/propositions")
-    propositions = r.donnees ?? []
-  } catch {
-    propositions = []
-  }
 
   if (!fiche) redirect(chemin(langue, "/"))
 
@@ -124,6 +112,29 @@ export default async function PageProfilRepetiteur({
 
       <main className="mx-auto flex w-full max-w-2xl flex-col gap-5 px-4 pb-10 pt-6 lg:px-6">
         <header className="pt-2">
+          {/* Le retour vers le dossier. Cette page n'est plus l'accueil du
+              répétiteur mais l'atelier derrière : sans ce lien, on modifie
+              sans jamais revoir le résultat. */}
+          <Link
+            href={chemin(langue, "/repetiteur")}
+            className="doux mb-3 inline-flex items-center gap-1.5 text-[13px] transition hover:opacity-70"
+          >
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.8"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden
+              className="block shrink-0"
+            >
+              <path d="M14 7l-5 5 5 5" />
+            </svg>
+            {d.repetiteurAccueil.etiquette}
+          </Link>
           <h1 className="text-[27px] font-medium tracking-[-0.02em] lg:text-[34px]">
             {d.repetiteurProfil.titre}
           </h1>
@@ -151,25 +162,15 @@ export default async function PageProfilRepetiteur({
           ) : null}
         </section>
 
-        {/* Une proposition arrive pendant qu'il est sur cet écran : il ne
-            doit pas avoir à recharger pour la découvrir. */}
-        <TempsReel tables={["contrats"]} />
-
-        {propositions.length > 0 ? (
-          <PropositionsRepetiteur
-            propositions={propositions}
-            langue={langue}
-            d={d}
-          />
-        ) : null}
-
         {pieces.length > 0 ? (
-          <PiecesRepetiteur
-            pieces={pieces}
-            verrouille={statut === "verifie"}
-            langue={langue}
-            d={d}
-          />
+          <div id="pieces" className="scroll-mt-20">
+            <PiecesRepetiteur
+              pieces={pieces}
+              verrouille={statut === "verifie"}
+              langue={langue}
+              d={d}
+            />
+          </div>
         ) : null}
 
         <FormulaireProfil

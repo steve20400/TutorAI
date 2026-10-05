@@ -211,6 +211,30 @@ body {
   }
 }
 
+/* --- La feuille du menu, sur téléphone --------------------------------------
+   Elle apparaissait d'un coup, en place, sans venir de nulle part. Un objet
+   qui surgit ne se referme pas d'un geste : rien n'avait dit d'où il venait,
+   donc rien ne disait où le renvoyer. Elle monte maintenant du bas, et c'est
+   ce mouvement-là qu'on inverse en la repoussant.
+
+   Courte — 0,22 s. Au-delà, on attend le menu qu'on vient d'ouvrir. */
+.feuille {
+  animation: feuille-monte 0.22s ease-out;
+  touch-action: none;
+}
+
+@keyframes feuille-monte {
+  from {
+    transform: translateY(100%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .feuille {
+    animation: none;
+  }
+}
+
 /* --- Les ascenseurs ---------------------------------------------------------
    Le navigateur en dessine un gris système, identique partout. Sur l'encre de
    la barre latérale, qui reste sombre dans les quatre thèmes, cette barre

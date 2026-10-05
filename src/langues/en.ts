@@ -48,6 +48,8 @@ export const en: Dictionnaire = {
     messagesDetailRepetiteur: "Your exchanges with families",
     monDossier: "My file",
     monDossierDetail: "Profile, documents, proposals",
+    annuaire: "The directory",
+    annuaireDetail: "The other verified files",
     reglages: "Settings",
     reglagesDetail: "Theme and language",
   },
@@ -541,6 +543,26 @@ export const en: Dictionnaire = {
         "Your decline is passed on to the family — not the reason. They need to know they can look elsewhere rather than wait.",
       echec: "The answer could not be saved. Try again in a moment.",
     },
+  },
+
+  repetiteurAccueil: {
+    etiquette: "Your file",
+    telQue: "This is your file as a family reads it.",
+    modifier: "Edit my file",
+    pieces: "My documents",
+    visible: "Listed in the directory",
+    facon: "How you work",
+    enseigne: "What you teach",
+    libre: "When you are free",
+    sansPhoto:
+      "Your file has no photograph. It is the first thing a family looks at.",
+    sansBio:
+      "You have not written how you work. It is the most-read part of a file.",
+    sansMatiere:
+      "No subject is set: your file does not come up in any search.",
+    sansTarif: "No rate is given.",
+    sansDisponibilite: "You have not said when you are free.",
+    completer: "Fill in",
   },
 
   /** Keys are the values actually stored in the database — never translate them. */

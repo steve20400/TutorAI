@@ -12,7 +12,12 @@ import { useSortie } from "@/composants/sortie"
 import { type Dictionnaire, type Langue } from "@/langues"
 
 export type Entree = { href: string; titre: string; detail: string; icone: Icone }
-export type Icone = "profil" | "enfants" | "messages" | "reglages"
+export type Icone =
+  | "profil"
+  | "enfants"
+  | "messages"
+  | "annuaire"
+  | "reglages"
 
 /**
  * Le menu du compte : liste déroulante sur grand écran, feuille montante sur
@@ -48,6 +53,40 @@ export function MenuCompte({
   const zone = useRef<HTMLDivElement | null>(null)
   const sortie = useSortie(langue)
 
+  // Le glissement de la feuille, sur téléphone.
+  //
+  // Elle montait et ne redescendait que par le fond assombri ou par Échap —
+  // or une feuille qu'on a poussée vers le haut, on la repousse vers le bas.
+  // C'est le geste que la poignée promet, et il ne faisait rien.
+  //
+  // `tire` coupe la transition pendant le geste : la feuille doit suivre le
+  // doigt sans retard. Elle la retrouve au relâcher, pour revenir ou partir.
+  const [glisse, setGlisse] = useState(0)
+  const [tire, setTire] = useState(false)
+  const depart = useRef<number | null>(null)
+
+  function fermer() {
+    setOuvert(false)
+    setTire(false)
+    setGlisse(0)
+    depart.current = null
+  }
+
+  /**
+   * Fermer en poursuivant le geste.
+   *
+   * La feuille disparaissait net à la fin du glissement : le doigt la
+   * descendait de cent points, puis les deux cents restants s'évanouissaient
+   * d'un coup. On la laisse finir sa course sous le même mouvement, puis on
+   * la retire. La durée est celle de la transition, à rien près.
+   */
+  function fermerEnGlissant() {
+    setTire(false)
+    depart.current = null
+    setGlisse(1000)
+    window.setTimeout(fermer, 190)
+  }
+
   // Fermer en cliquant ailleurs et sur Échap : un menu qui ne se ferme que
   // par son propre bouton se laisse ouvert, et masque la page dessous.
   useEffect(() => {
@@ -55,10 +94,14 @@ export function MenuCompte({
     const dehors = (e: MouseEvent) => {
       if (zone.current && !zone.current.contains(e.target as Node)) {
         setOuvert(false)
+        setGlisse(0)
       }
     }
     const echap = (e: KeyboardEvent) => {
-      if (e.key === "Escape") setOuvert(false)
+      if (e.key === "Escape") {
+        setOuvert(false)
+        setGlisse(0)
+      }
     }
     document.addEventListener("mousedown", dehors)
     document.addEventListener("keydown", echap)
@@ -74,7 +117,7 @@ export function MenuCompte({
     <div className="relative" ref={zone}>
       <button
         type="button"
-        onClick={() => setOuvert((o) => !o)}
+        onClick={() => (ouvert ? fermer() : setOuvert(true))}
         aria-expanded={ouvert}
         aria-haspopup="menu"
         aria-label={d.coque.monCompte}
@@ -123,7 +166,7 @@ export function MenuCompte({
               key={e.href}
               href={e.href}
               role="menuitem"
-              onClick={() => setOuvert(false)}
+              onClick={fermer}
               className="flex items-center gap-[11px] rounded-[8px] px-3.5 py-2.5 text-[14px] transition hover:opacity-70"
             >
               <Icone nom={e.icone} taille={17} />
@@ -164,13 +207,39 @@ export function MenuCompte({
           className="fixed inset-0 z-50 flex items-end lg:hidden"
           style={{ background: "rgb(10 16 28 / 0.42)" }}
           onClick={(e) => {
-            if (e.target === e.currentTarget) setOuvert(false)
+            if (e.target === e.currentTarget) fermer()
           }}
         >
           <div
             role="menu"
-            className="w-full rounded-t-[18px] pb-6 pt-2"
-            style={{ background: "var(--surface)", color: "var(--texte)" }}
+            className="feuille w-full rounded-t-[18px] pb-6 pt-2"
+            style={{
+              background: "var(--surface)",
+              color: "var(--texte)",
+              transform: glisse ? `translateY(${glisse}px)` : undefined,
+              transition: tire ? "none" : "transform .19s ease-out",
+            }}
+            onTouchStart={(e) => {
+              depart.current = e.touches[0].clientY
+              setTire(true)
+            }}
+            onTouchMove={(e) => {
+              if (depart.current === null) return
+              const dy = e.touches[0].clientY - depart.current
+              // Vers le haut, rien : la feuille est déjà en butée, et la
+              // tirer plus haut ne veut rien dire.
+              setGlisse(dy > 0 ? dy : 0)
+            }}
+            onTouchEnd={() => {
+              setTire(false)
+              depart.current = null
+              // Un tiers de la feuille, ou cent points : au-delà, le geste
+              // disait bien « referme ». En deçà, elle revient en place —
+              // une feuille qui se ferme sur une hésitation est pire que
+              // celle qui ne se ferme pas.
+              if (glisse > 100) fermerEnGlissant()
+              else setGlisse(0)
+            }}
           >
             <div
               aria-hidden
@@ -196,7 +265,7 @@ export function MenuCompte({
                   key={e.href}
                   href={e.href}
                   role="menuitem"
-                  onClick={() => setOuvert(false)}
+                  onClick={fermer}
                   className="flex items-center gap-3.5 px-[18px] py-[15px]"
                   style={{ borderBottom: "1px solid var(--bordure)" }}
                 >
@@ -290,6 +359,17 @@ function Icone({ nom, taille }: { nom: Icone; taille: number }) {
     return (
       <svg {...commun}>
         <path d="M4 5.5h16v11H9l-5 4z" />
+      </svg>
+    )
+  }
+  // L'annuaire : des fiches empilées, pas une loupe. La loupe dit « chercher »
+  // et vit déjà dans la barre ; ici on désigne la liste elle-même.
+  if (nom === "annuaire") {
+    return (
+      <svg {...commun}>
+        <rect x="3" y="4.5" width="18" height="6" rx="1.8" />
+        <rect x="3" y="13.5" width="18" height="6" rx="1.8" />
+        <path d="M7 7.5h.01M7 16.5h.01" />
       </svg>
     )
   }

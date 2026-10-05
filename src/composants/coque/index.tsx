@@ -80,10 +80,20 @@ export async function Coque({
 
   if (role === "repetiteur") {
     entrees.push({
-      href: chemin(langue, "/repetiteur/profil"),
+      href: chemin(langue, "/repetiteur"),
       titre: t.monDossier,
       detail: t.monDossierDetail,
       icone: "enfants",
+    })
+    // L'annuaire lui était fermé par le menu, pas par la règle : la page
+    // n'écarte que les élèves. Un répétiteur a toutes les raisons de lire les
+    // autres dossiers — c'est ainsi qu'on voit à quoi ressemble un dossier
+    // complet, et combien se pratique dans sa ville.
+    entrees.push({
+      href: chemin(langue, "/annuaire"),
+      titre: t.annuaire,
+      detail: t.annuaireDetail,
+      icone: "annuaire",
     })
     entrees.push({
       href: chemin(langue, "/messages"),
@@ -116,8 +126,12 @@ export async function Coque({
       villeActive={villeActive}
       recherche={recherche}
       chercher={role !== "eleve"}
+      // Le logo ramène chez soi, et « chez soi » a changé : l'adulte ouvre sa
+      // session sur l'annuaire, le répétiteur sur son dossier. Le logo menait
+      // encore à « Mes enfants », c'est-à-dire ailleurs que là où la connexion
+      // dépose — deux accueils pour une même personne.
       accueil={
-        role === "parent" ? "/parent" : role === "repetiteur" ? "/repetiteur/profil" : "/"
+        role === "parent" ? "/annuaire" : role === "repetiteur" ? "/repetiteur" : "/"
       }
       langue={langue}
       d={d}

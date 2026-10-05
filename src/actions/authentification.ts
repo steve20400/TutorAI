@@ -169,7 +169,10 @@ const ACCUEIL_PAR_ROLE: Record<RoleInscription, string> = {
   // ce qui presse, une demande de mot de passe qui ne dure qu'une heure,
   // s'annonce en bandeau au-dessus de l'annuaire.
   parent: "/annuaire",
-  repetiteur: "/repetiteur/profil",
+  // Le répétiteur arrivait sur ses propres champs de saisie, comme s'il
+  // n'existait ici qu'en tant que fiche à remplir. Il arrive sur son dossier,
+  // tel qu'une famille le lit ; le formulaire est à un bouton de là.
+  repetiteur: "/repetiteur",
 }
 
 /**
@@ -195,9 +198,9 @@ async function accueilDeLUtilisateur(
 
   const role = data?.role as RoleInscription | "admin" | undefined
   if (role === "admin") return chemin(langue, "/admin")
-  if (role === "parent") return chemin(langue, "/parent")
-  if (role === "repetiteur") return chemin(langue, "/repetiteur/profil")
-  return chemin(langue, "/")
+  if (role === "parent") return chemin(langue, ACCUEIL_PAR_ROLE.parent)
+  if (role === "repetiteur") return chemin(langue, ACCUEIL_PAR_ROLE.repetiteur)
+  return chemin(langue, ACCUEIL_PAR_ROLE.eleve)
 }
 
 export async function sInscrire(
