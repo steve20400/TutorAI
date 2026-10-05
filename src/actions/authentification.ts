@@ -161,7 +161,14 @@ type RoleInscription = (typeof ROLES_AUTORISES)[number]
 /** Où chaque rôle atterrit juste après son inscription. */
 const ACCUEIL_PAR_ROLE: Record<RoleInscription, string> = {
   eleve: "/",
-  parent: "/parent",
+  // L'adulte arrive sur l'annuaire, pas sur un tableau de bord.
+  //
+  // Son accueil ne portait que deux cartes, et il arrivait dessus pour en
+  // repartir aussitôt : ce qu'il vient faire, c'est trouver quelqu'un. Ce
+  // qu'il y avait là vit maintenant sous « Mes enfants », dans le menu — et
+  // ce qui presse, une demande de mot de passe qui ne dure qu'une heure,
+  // s'annonce en bandeau au-dessus de l'annuaire.
+  parent: "/annuaire",
   repetiteur: "/repetiteur/profil",
 }
 

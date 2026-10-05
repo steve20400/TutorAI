@@ -21,6 +21,13 @@ export const en: Dictionnaire = {
       "A verified tutor. A lesson that leaves a record. Home study where a child is never alone with an adult.",
   },
 
+  ecranErreur: {
+    titre: "This screen could not load",
+    detail:
+      "The connection may have dropped, or the service is taking too long. Nothing is lost on your side.",
+    reessayer: "Try again",
+  },
+
   coque: {
     roleEleve: "Pupil",
     roleParent: "Adult",

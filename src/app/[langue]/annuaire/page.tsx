@@ -3,7 +3,7 @@ import { redirect } from "next/navigation"
 
 import { Coque } from "@/composants/coque"
 import { Fiche, type Repetiteur } from "./fiche"
-import { Filtres, Tri, type Etat, type Ville } from "./filtres"
+import { BandePastilles, Filtres, Tri, type Etat, type Ville } from "./filtres"
 import {
   chemin,
   dictionnaire,
@@ -65,6 +65,15 @@ export default async function PageAnnuaire({
     if (v !== undefined && v !== "") requete.set(k, String(v))
   }
 
+  // Ce qui attend l'adulte, et qui ne doit pas se perdre.
+  //
+  // Il atterrit ici en se connectant : son ancien accueil ne portait que deux
+  // cartes, et il en repartait aussitôt. Mais ces cartes-là pressent — une
+  // demande de mot de passe d'enfant ne vaut qu'une heure. Elle s'annonce
+  // donc au-dessus de l'annuaire plutôt que d'attendre derrière un menu.
+  let demandesMdp = 0
+  let estParent = false
+
   // Un enfant n'engage pas de répétiteur, et l'annuaire est une liste
   // d'adultes avec leurs photographies. On ne la lui ouvre pas : ce n'est pas
   // dangereux — ils sont vérifiés, et il ne peut écrire à personne — mais
@@ -73,8 +82,20 @@ export default async function PageAnnuaire({
   try {
     const moi = await api<{ role: string }>("/v1/moi")
     if (moi.role === "eleve") redirect(chemin(langue, "/"))
+    estParent = moi.role === "parent"
   } catch {
     // Pas de session, ou service muet : l'annuaire reste lisible.
+  }
+
+  if (estParent) {
+    try {
+      const r = await api<{ donnees: { fermee: boolean }[] }>(
+        "/v1/liens/mots-de-passe",
+      )
+      demandesMdp = (r.donnees ?? []).filter((x) => !x.fermee).length
+    } catch {
+      demandesMdp = 0
+    }
   }
 
   const [reponse, referentiel, villes, bornes] = await Promise.all([
@@ -93,18 +114,6 @@ export default async function PageAnnuaire({
   const actifs = Object.values(etat).filter(
     (v) => v !== undefined && v !== "",
   ).length
-
-  /** Une adresse identique, un filtre en plus ou en moins — pour la bande. */
-  const avec = (cle: keyof Etat, valeur: string | null) => {
-    const p = new URLSearchParams()
-    for (const [k, v] of Object.entries(etat)) {
-      if (v !== undefined && v !== "") p.set(k, String(v))
-    }
-    if (valeur === null) p.delete(cle)
-    else p.set(cle, valeur)
-    const q = p.toString()
-    return chemin(langue, `/annuaire${q ? `?${q}` : ""}`)
-  }
 
   return (
     <div className="flex min-h-dvh flex-col">
@@ -125,72 +134,29 @@ export default async function PageAnnuaire({
         </div>
 
         <div className="min-w-0 flex-1">
-          {/* Sur téléphone, les filtres deviennent une bande de pastilles.
+          {demandesMdp > 0 ? (
+            <Link
+              href={chemin(langue, "/parent/mots-de-passe")}
+              className="carte mb-3 block p-4 transition hover:opacity-90 lg:mb-4"
+              style={{ borderColor: "var(--accent)" }}
+            >
+              <div className="text-[14px] font-medium">
+                {d.recuperation.lienDepuisAccueil}
+              </div>
+              <p className="doux mt-1 text-[12px] leading-relaxed">
+                {d.recuperation.pageDetail}
+              </p>
+            </Link>
+          ) : null}
 
-              Elle défile horizontalement — le seul endroit de l'application
-              où c'est voulu. Une bande se lit comme telle, et tronquer la
-              liste cacherait des matières. La page, elle, ne défile jamais de
-              côté. */}
-          <div
-            className="-mx-3 mb-3 overflow-x-auto px-3 pb-1 lg:hidden"
-            style={{ scrollbarWidth: "none" }}
-          >
-            <div className="flex w-max gap-1.5">
-              <Link
-                href={chemin(langue, "/annuaire")}
-                className="whitespace-nowrap rounded-[20px] border px-[11px] py-[5px] text-[12px]"
-                style={
-                  actifs > 0
-                    ? {
-                        borderColor: "var(--voyant)",
-                        background: "var(--voyant)",
-                        color: "#fff",
-                      }
-                    : { borderColor: "var(--bordure)" }
-                }
-              >
-                {actifs > 0 ? `${t.filtres} · ${actifs}` : t.tousLesFiltres}
-              </Link>
-
-              {referentiel.matieres.map((m) => (
-                <Link
-                  key={`m-${m}`}
-                  href={avec("matiere", etat.matiere === m ? null : m)}
-                  className="whitespace-nowrap rounded-[20px] border px-[11px] py-[5px] text-[12px]"
-                  style={{
-                    borderColor:
-                      etat.matiere === m ? "var(--accent)" : "var(--bordure)",
-                    background:
-                      etat.matiere === m
-                        ? "color-mix(in srgb, var(--accent) 12%, transparent)"
-                        : "transparent",
-                  }}
-                >
-                  {m}
-                </Link>
-              ))}
-
-              {villes.map((v) => (
-                <Link
-                  key={`v-${v.ville}`}
-                  href={avec("ville", etat.ville === v.ville ? null : v.ville)}
-                  className="whitespace-nowrap rounded-[20px] border px-[11px] py-[5px] text-[12px]"
-                  style={{
-                    borderColor:
-                      etat.ville === v.ville
-                        ? "var(--accent)"
-                        : "var(--bordure)",
-                    background:
-                      etat.ville === v.ville
-                        ? "color-mix(in srgb, var(--accent) 12%, transparent)"
-                        : "transparent",
-                  }}
-                >
-                  {v.ville}
-                </Link>
-              ))}
-            </div>
-          </div>
+          <BandePastilles
+            etat={etat}
+            villes={villes}
+            matieres={referentiel.matieres}
+            niveaux={referentiel.niveaux}
+            langue={langue}
+            d={d}
+          />
 
           {/* Le compte, en tête de colonne. */}
           {reponse ? (

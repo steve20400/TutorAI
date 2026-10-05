@@ -61,11 +61,22 @@ export function Avatar({
   photoUrl,
   taille = 32,
   className,
+  statique = false,
 }: {
   nom: string | null | undefined
   photoUrl?: string | null
   taille?: number
   className?: string
+  /**
+   * Vrai quand l'avatar est posé DANS un autre bouton.
+   *
+   * Une vraie photo s'agrandit au clic, et c'est utile sur une fiche. Mais
+   * dans le bouton du menu, le clic faisait les deux à la fois : la feuille
+   * montait, et la photo s'ouvrait par-dessus — il fallait fermer l'une pour
+   * voir l'autre. Un bouton dans un bouton n'est d'ailleurs pas du HTML
+   * valide, et les navigateurs en font ce qu'ils veulent.
+   */
+  statique?: boolean
 }) {
   const libelle = (nom ?? "").trim()
   const [ouverte, poserOuverte] = useState(false)
@@ -140,6 +151,35 @@ export function Avatar({
       ? url
       : `${url}${url.includes("?") ? "&" : "?"}r=${essai}`
 
+  const image = (
+    /* eslint-disable-next-line @next/next/no-img-element */
+    <img
+      src={source}
+      alt={libelle}
+      width={taille}
+      height={taille}
+      onError={() => {
+        if (essai === 0) {
+          setTimeout(() => poserEssai(1), 2500)
+        } else {
+          poserCassee(true)
+        }
+      }}
+      className="h-full w-full object-cover"
+    />
+  )
+
+  if (statique) {
+    return (
+      <span
+        className={`block shrink-0 overflow-hidden rounded-full ${className ?? ""}`}
+        style={{ width: taille, height: taille }}
+      >
+        {image}
+      </span>
+    )
+  }
+
   return (
     <>
       <button
@@ -148,21 +188,7 @@ export function Avatar({
         className={`shrink-0 overflow-hidden rounded-full transition hover:opacity-85 ${className ?? ""}`}
         style={{ width: taille, height: taille }}
       >
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src={source}
-          alt={libelle}
-          width={taille}
-          height={taille}
-          onError={() => {
-            if (essai === 0) {
-              setTimeout(() => poserEssai(1), 2500)
-            } else {
-              poserCassee(true)
-            }
-          }}
-          className="h-full w-full object-cover"
-        />
+        {image}
       </button>
 
       {ouverte ? (

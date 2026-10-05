@@ -59,7 +59,7 @@ export default async function Accueil({
   // l'accueil élève, avec un message qui ne le concernait pas : « ton espace
   // s'ouvrira quand un parent t'aura rattaché à son compte ».
   if (profil.role === "admin") redirect(chemin(langue, "/admin"))
-  if (profil.role === "parent") redirect(chemin(langue, "/parent"))
+  if (profil.role === "parent") redirect(chemin(langue, "/annuaire"))
   if (profil.role === "repetiteur") redirect(chemin(langue, "/repetiteur/profil"))
 
 

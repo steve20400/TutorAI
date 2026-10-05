@@ -2,6 +2,7 @@ import Link from "next/link"
 
 import { Marque } from "@/composants/marque"
 import { MenuCompte, type Entree } from "./menu-compte"
+import { Recherche } from "./recherche"
 import { chemin, type Dictionnaire, type Langue } from "@/langues"
 
 /**
@@ -36,6 +37,7 @@ export function Entete({
   villeActive,
   recherche,
   chercher,
+  accueil,
   langue,
   d,
 }: {
@@ -54,6 +56,8 @@ export function Entete({
    * concerne pas.
    */
   chercher: boolean
+  /** L'accueil du rôle : le logo y ramène d'un seul geste, de n'importe où. */
+  accueil: string
   langue: Langue
   d: Dictionnaire
 }) {
@@ -64,9 +68,17 @@ export function Entete({
       className="relative z-40 flex h-14 flex-shrink-0 items-center gap-2.5 px-3.5 lg:h-16 lg:gap-[22px] lg:px-[26px]"
       style={{ background: ENCRE, color: ENCRE_TEXTE }}
     >
+      {/* `--marque-reserve` vaut l'encre, et pas le fond de page.
+          Les deux silhouettes du logo sont des RÉSERVES — des trous dans
+          l'écran — remplies de la couleur de ce qu'il y a derrière. Sans
+          cette ligne elles prenaient le crème du fond, posé sur un écran
+          lui-même presque blanc : le logo devenait un rectangle vide avec un
+          point orange, et les deux personnes disparaissaient. Le fichier de
+          la marque prévient de ce piège ; je l'ai quand même fait. */}
       <Link
-        href={chemin(langue, "/")}
+        href={chemin(langue, accueil)}
         className="relative inline-flex shrink-0 items-center gap-2 lg:gap-2.5"
+        style={{ "--marque-reserve": ENCRE } as React.CSSProperties}
       >
         <span className="lg:hidden">
           <Marque taille={26} />
@@ -79,42 +91,18 @@ export function Entete({
         </span>
       </Link>
 
-      {/* Le champ, déployé sur grand écran. */}
       {chercher ? (
-      <form
-        action={chemin(langue, "/annuaire")}
-        className="relative hidden w-[290px] items-center gap-[9px] rounded-[22px] px-3.5 py-2 lg:flex"
-        style={{ background: "rgb(238 241 247 / 0.1)", color: ENCRE_DOUX }}
-      >
-        <Loupe taille={15} />
-        <label htmlFor="q" className="sr-only">
-          {t.rechercher}
-        </label>
-        <input
-          id="q"
-          name="q"
-          type="search"
-          defaultValue={recherche ?? ""}
+        <Recherche
+          valeur={recherche}
           placeholder={t.recherchePlaceholder}
-          className="min-w-0 flex-1 border-0 bg-transparent text-[13.5px] outline-none"
-          style={{ color: ENCRE_TEXTE }}
+          etiquette={t.rechercher}
+          langue={langue}
+          encre={ENCRE_TEXTE}
+          encreDoux={ENCRE_DOUX}
         />
-      </form>
       ) : null}
 
       <div className="flex-1" />
-
-      {/* Replié sur téléphone : le pictogramme mène à l'annuaire. */}
-      {chercher ? (
-      <Link
-        href={chemin(langue, "/annuaire")}
-        aria-label={t.rechercher}
-        className="p-2 lg:hidden"
-        style={{ color: ENCRE_DOUX }}
-      >
-        <Loupe taille={19} />
-      </Link>
-      ) : null}
 
       {chercher && villes.length > 0 ? (
         <form
@@ -161,25 +149,6 @@ export function Entete({
   )
 }
 
-function Loupe({ taille }: { taille: number }) {
-  return (
-    <svg
-      width={taille}
-      height={taille}
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.8"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden
-      className="block shrink-0"
-    >
-      <circle cx="11" cy="11" r="7" />
-      <path d="m20 20-3.5-3.5" />
-    </svg>
-  )
-}
 
 function Broche({ taille }: { taille: number }) {
   return (

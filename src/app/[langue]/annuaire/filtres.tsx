@@ -1,7 +1,7 @@
 "use client"
 
 import { useRouter } from "next/navigation"
-import { useState } from "react"
+import { useState, useTransition } from "react"
 
 import { francs } from "./fiche"
 import { chemin, remplir, type Dictionnaire, type Langue } from "@/langues"
@@ -57,6 +57,7 @@ export function Filtres({
   const t = d.annuaire.rail
   const router = useRouter()
 
+  const [enCours, demarrer] = useTransition()
   const [prixMin, setPrixMin] = useState(etat.prixMin ?? bornes.min)
   const [prixMax, setPrixMax] = useState(etat.prixMax ?? bornes.max)
 
@@ -67,7 +68,10 @@ export function Filtres({
       if (v !== undefined && v !== "" && v !== null) p.set(k, String(v))
     }
     const q = p.toString()
-    router.push(chemin(langue, `/annuaire${q ? `?${q}` : ""}`))
+    // `replace` et non `push` : dix filtres essayés ne doivent pas obliger à
+    // dix retours pour revenir à l'écran d'où l'on vient. Le bouton Retour
+    // sort de l'annuaire, il ne rejoue pas les filtres un par un.
+    demarrer(() => router.replace(chemin(langue, `/annuaire${q ? `?${q}` : ""}`)))
   }
 
   const total = villes.reduce((n, v) => n + v.n, 0)
@@ -76,18 +80,28 @@ export function Filtres({
   ).length
 
   return (
-    <aside className="w-[238px] flex-shrink-0">
+    <aside
+      className="w-[238px] flex-shrink-0 transition-opacity"
+      style={{ opacity: enCours ? 0.55 : 1 }}
+      aria-busy={enCours}
+    >
       <div className="mb-[11px] flex items-baseline justify-between">
         <span
-          className="text-[11.5px] tracking-[0.12em]"
+          className="flex items-center gap-2 text-[11.5px] tracking-[0.12em]"
           style={{ color: "var(--texte-doux)" }}
         >
           {t.titre}
+          {/* Le filtre a pris : sans ce cercle, on clique et rien ne bouge
+              tant que le serveur n'a pas répondu — on croit avoir manqué la
+              pastille et on reclique. */}
+          {enCours ? <span aria-hidden className="cercle-attente" /> : null}
         </span>
         {actifs > 0 ? (
           <button
             type="button"
-            onClick={() => router.push(chemin(langue, "/annuaire"))}
+            onClick={() =>
+              demarrer(() => router.replace(chemin(langue, "/annuaire")))
+            }
             className="text-[12.5px]"
             style={{ color: "var(--voyant)" }}
           >
@@ -339,6 +353,7 @@ export function Tri({
 }) {
   const t = d.annuaire.rail
   const router = useRouter()
+  const [enCours, demarrer] = useTransition()
 
   function choisir(valeur: string) {
     const p = new URLSearchParams()
@@ -347,11 +362,12 @@ export function Tri({
     }
     if (valeur) p.set("tri", valeur)
     const q = p.toString()
-    router.push(chemin(langue, `/annuaire${q ? `?${q}` : ""}`))
+    demarrer(() => router.replace(chemin(langue, `/annuaire${q ? `?${q}` : ""}`)))
   }
 
   return (
     <select
+      disabled={enCours}
       value={etat.tri ?? "experience"}
       onChange={(e) => choisir(e.target.value)}
       aria-label={t.trier}
@@ -361,5 +377,134 @@ export function Tri({
       <option value="experience">{t.trier}</option>
       <option value="tarif">{t.trierTarif}</option>
     </select>
+  )
+}
+
+/**
+ * La bande de pastilles du téléphone.
+ *
+ * Elle ne portait que les matières. Le grand écran a la ville, la matière, le
+ * niveau, le prix et l'expérience ; n'en donner qu'une sur téléphone revient à
+ * dire qu'un parent au téléphone cherche moins bien — alors que c'est
+ * l'écran sur lequel il cherchera.
+ *
+ * Le prix reste au grand écran, et c'est le seul qui n'y est pas : une
+ * glissière à deux poignées dans une bande qui défile de côté ne se tient
+ * pas sous le pouce. Les quatre autres y sont.
+ *
+ * Elle défile horizontalement — le seul endroit de l'application où c'est
+ * voulu. Une bande se lit comme telle, et tronquer la liste cacherait des
+ * matières. La page, elle, ne défile jamais de côté.
+ */
+export function BandePastilles({
+  etat,
+  villes,
+  matieres,
+  niveaux,
+  langue,
+  d,
+}: {
+  etat: Etat
+  villes: Ville[]
+  matieres: string[]
+  niveaux: string[]
+  langue: Langue
+  d: Dictionnaire
+}) {
+  const t = d.annuaire
+  const router = useRouter()
+  const [enCours, demarrer] = useTransition()
+
+  function aller(modif: Partial<Etat>) {
+    const p = new URLSearchParams()
+    const suivant = { ...etat, ...modif }
+    for (const [k, v] of Object.entries(suivant)) {
+      if (v !== undefined && v !== "" && v !== null) p.set(k, String(v))
+    }
+    const q = p.toString()
+    demarrer(() => router.replace(chemin(langue, `/annuaire${q ? `?${q}` : ""}`)))
+  }
+
+  const actifs = Object.values(etat).filter(
+    (v) => v !== undefined && v !== "",
+  ).length
+
+  const pastille = (
+    cle: string,
+    libelle: string,
+    choisi: boolean,
+    surClic: () => void,
+  ) => (
+    <button
+      key={cle}
+      type="button"
+      onClick={surClic}
+      className="whitespace-nowrap rounded-[20px] border px-[11px] py-[5px] text-[12px]"
+      style={{
+        borderColor: choisi ? "var(--accent)" : "var(--bordure)",
+        background: choisi
+          ? "color-mix(in srgb, var(--accent) 12%, transparent)"
+          : "transparent",
+      }}
+    >
+      {libelle}
+    </button>
+  )
+
+  return (
+    <div
+      className="-mx-3 mb-3 overflow-x-auto px-3 pb-1 transition-opacity lg:hidden"
+      style={{ scrollbarWidth: "none", opacity: enCours ? 0.55 : 1 }}
+      aria-busy={enCours}
+    >
+      <div className="flex w-max items-center gap-1.5">
+        <button
+          type="button"
+          onClick={() =>
+            demarrer(() => router.replace(chemin(langue, "/annuaire")))
+          }
+          className="flex items-center gap-1.5 whitespace-nowrap rounded-[20px] border px-[11px] py-[5px] text-[12px]"
+          style={
+            actifs > 0
+              ? {
+                  borderColor: "var(--voyant)",
+                  background: "var(--voyant)",
+                  color: "#fff",
+                }
+              : { borderColor: "var(--bordure)" }
+          }
+        >
+          {actifs > 0 ? `${t.filtres} · ${actifs}` : t.tousLesFiltres}
+          {enCours ? <span aria-hidden className="cercle-attente" /> : null}
+        </button>
+
+        {villes.map((v) =>
+          pastille(`v-${v.ville}`, v.ville, etat.ville === v.ville, () =>
+            aller({ ville: etat.ville === v.ville ? undefined : v.ville }),
+          ),
+        )}
+
+        {matieres.map((m) =>
+          pastille(`m-${m}`, m, etat.matiere === m, () =>
+            aller({ matiere: etat.matiere === m ? undefined : m }),
+          ),
+        )}
+
+        {niveaux.map((n) =>
+          pastille(`n-${n}`, n, etat.niveau === n, () =>
+            aller({ niveau: etat.niveau === n ? undefined : n }),
+          ),
+        )}
+
+        {[2, 5, 10].map((n) =>
+          pastille(
+            `x-${n}`,
+            remplir(t.rail.ansEtPlus, { n }),
+            etat.experienceMin === n,
+            () => aller({ experienceMin: etat.experienceMin === n ? undefined : n }),
+          ),
+        )}
+      </div>
+    </div>
   )
 }

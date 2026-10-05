@@ -17,6 +17,13 @@ export const fr = {
       "Un répétiteur vérifié. Une séance qui laisse une trace. Le soutien scolaire où un enfant n'est jamais seul avec un adulte.",
   },
 
+  ecranErreur: {
+    titre: "Cet écran n'a pas pu se charger",
+    detail:
+      "La connexion a peut-être été coupée, ou le service met trop de temps à répondre. Rien n'est perdu de votre côté.",
+    reessayer: "Réessayer",
+  },
+
   coque: {
     roleEleve: "Élève",
     roleParent: "Adulte",

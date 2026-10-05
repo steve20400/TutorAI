@@ -78,7 +78,7 @@ export function MenuCompte({
         aria-label={d.coque.monCompte}
         className="flex items-center gap-2 p-0.5 lg:gap-[9px] lg:px-0.5 lg:py-1"
       >
-        <Avatar nom={prenom ?? "?"} photoUrl={photoUrl} taille={32} />
+        <Avatar nom={prenom ?? "?"} photoUrl={photoUrl} taille={32} statique />
         <span className="hidden text-[13.5px] lg:inline">{prenom}</span>
         <svg
           width="14"
@@ -172,7 +172,7 @@ export function MenuCompte({
             />
 
             <div className="flex items-center gap-3.5 px-[18px] pb-4">
-              <Avatar nom={prenom ?? "?"} photoUrl={photoUrl} taille={54} />
+              <Avatar nom={prenom ?? "?"} photoUrl={photoUrl} taille={54} statique />
               <span>
                 <span className="block text-[17px] font-medium">
                   {nomComplet}

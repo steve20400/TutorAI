@@ -116,6 +116,9 @@ export async function Coque({
       villeActive={villeActive}
       recherche={recherche}
       chercher={role !== "eleve"}
+      accueil={
+        role === "parent" ? "/parent" : role === "repetiteur" ? "/repetiteur/profil" : "/"
+      }
       langue={langue}
       d={d}
     />
