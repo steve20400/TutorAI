@@ -4,6 +4,7 @@ import { useActionState, useState } from "react"
 
 import { enregistrerCompte, type EtatCompte } from "@/actions/compte"
 import { Avatar } from "@/composants/avatar"
+import { ChampIdentifiant } from "@/composants/champ-identifiant"
 import type { Dictionnaire, Langue } from "@/langues"
 import type { Avatar as AvatarChoisi } from "@/lib/avatars"
 
@@ -72,6 +73,25 @@ export function ChoixCompte({
           className="champ mt-1 px-3 py-2 text-[14px]"
         />
       </label>
+
+      {/* Son nom de connexion, qu'il peut maintenant changer.
+
+          Il était figé et fabriqué : le deuxième Junior Mbala s'appelait
+          « junior mbala 2 », et c'est pourtant la SEULE chose avec laquelle il
+          se connecte — il n'a pas d'adresse.
+
+          Un adulte qui attend de le rattacher le cherche par ce nom. S'il en
+          change, c'est l'ancien que son parent connaît : l'écran le dit, il
+          n'y a pas de bonne façon de le deviner à sa place. */}
+      <div className="flex flex-col">
+        <span className="doux mb-1 text-[11.5px]">{t.identifiant}</span>
+        <ChampIdentifiant
+          label={d.inscriptionRole.identifiantEnfant}
+          aide={t.identifiantChange}
+          valeurInitiale={identifiant ?? ""}
+          enfant
+        />
+      </div>
 
       <div>
         <p className="text-[13.5px] font-medium">{t.avatar}</p>

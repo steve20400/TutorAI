@@ -107,6 +107,8 @@ export const en: Dictionnaire = {
     identifiant: "Sign-in username",
     identifiantFige:
       "This is what you sign in with. It was chosen when your account was created and does not change.",
+    identifiantChange:
+      "This is what you sign in with. If you change it, tell the adult who wants to link to you: the old one is what they know.",
     mesAdultes: "My adults",
     mesAdultesDetail:
       "These are the adults linked to your account. They can see your work and help you if you lose your password. If someone is here who should not be, tell an adult you trust.",
@@ -296,6 +298,20 @@ export const en: Dictionnaire = {
       motDePasse: "Your password",
     },
     nom: "Your surname",
+
+    identifiant: "Your sign-in name",
+    identifiantEnfant: "Your sign-in name",
+    aideIdentifiant:
+      "This is what you will sign in with, instead of your email if you prefer. You can change it later.",
+    aideIdentifiantEnfant:
+      "This is what you will sign in with. Pick one you will remember: you will not have an email address.",
+    identifiantPris: "That name is already taken. Pick another one.",
+    identifiantPrisEnfant: "That name is already taken. Pick another one.",
+    identifiantLibre: "That name is free.",
+    identifiantCourt: "Three characters at least.",
+    identifiantManquant: "I need a sign-in name.",
+    identifiantVerifie: "One moment…",
+
     telephone: "Your phone number",
     aideTelephone:
       "Used by the team for verification, never shown to families",

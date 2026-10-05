@@ -7,6 +7,7 @@ import { chemin } from "@/langues"
 import { useLangue } from "@/langues/contexte"
 import { Bouton, Champ, Message } from "../../champs"
 import { sInscrire, type EtatFormulaire } from "@/actions/authentification"
+import { ChampIdentifiant } from "@/composants/champ-identifiant"
 import { PiecesInscription } from "./pieces"
 
 const ETAT_INITIAL: EtatFormulaire = {}
@@ -33,6 +34,18 @@ export function Formulaire({
         {role !== "eleve" && (
           <Champ label={c.nom} name="nom" autoComplete="family-name" />
         )}
+
+        {/* Le nom de connexion, choisi et non plus fabriqué.
+
+            Il l'était à partir du prénom et du nom, et figé à vie : le
+            deuxième Alain Nkoulou devenait « alain nkoulou 2 », qui n'est le
+            nom de personne. Pour un enfant c'est encore plus net — il n'a pas
+            d'adresse, donc c'est la SEULE chose avec quoi il se connecte. */}
+        <ChampIdentifiant
+          label={role === "eleve" ? c.identifiantEnfant : c.identifiant}
+          aide={role === "eleve" ? c.aideIdentifiantEnfant : c.aideIdentifiant}
+          enfant={role === "eleve"}
+        />
 
         {/* Pas d'adresse pour un enfant.
 

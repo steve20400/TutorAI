@@ -112,6 +112,8 @@ export const fr = {
     identifiant: "Identifiant de connexion",
     identifiantFige:
       "C'est avec lui que tu te connectes. Il a été choisi à la création de ton compte et ne change pas.",
+    identifiantChange:
+      "C'est avec lui que tu te connectes. Si tu en changes, préviens l'adulte qui veut te rattacher : c'est l'ancien qu'il connaît.",
     mesAdultes: "Mes adultes",
     mesAdultesDetail:
       "Ce sont les adultes rattachés à ton compte. Ils voient ton travail et peuvent t'aider si tu perds ton mot de passe. Si quelqu'un est là et ne devrait pas y être, parle-en à un adulte de confiance.",
@@ -311,6 +313,24 @@ export const fr = {
       motDePasse: "Votre mot de passe",
     },
     nom: "Votre nom",
+
+    // Le nom de connexion, choisi et non plus fabriqué.
+    //
+    // « identifiant » est le mot de la base ; à l'écran on dit « nom de
+    // connexion », qui explique à quoi il sert au lieu de nommer une colonne.
+    identifiant: "Votre nom de connexion",
+    identifiantEnfant: "Ton nom de connexion",
+    aideIdentifiant:
+      "C'est avec lui que vous vous connecterez, à la place de votre email si vous préférez. Vous pourrez en changer.",
+    aideIdentifiantEnfant:
+      "C'est avec lui que tu te connecteras. Choisis-en un que tu retiendras : tu n'auras pas d'adresse mail.",
+    identifiantPris: "Ce nom est déjà pris. Choisissez-en un autre.",
+    identifiantPrisEnfant: "Ce nom est déjà pris. Choisis-en un autre.",
+    identifiantLibre: "Ce nom est libre.",
+    identifiantCourt: "Trois caractères au moins.",
+    identifiantManquant: "Il me faut un nom de connexion.",
+    identifiantVerifie: "Un instant…",
+
     telephone: "Votre téléphone",
     aideTelephone:
       "Utilisé par l'équipe pour la vérification, jamais affiché aux familles",

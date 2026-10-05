@@ -35,6 +35,24 @@ function langueDe(donnees: FormData): Langue {
   return estLangue(brut) ? brut : LANGUE_PAR_DEFAUT
 }
 
+/**
+ * Met un nom de connexion en forme, comme `normaliser_identifiant` en base.
+ *
+ * Trois endroits appliquent cette règle : le champ, pour montrer tout de
+ * suite ce qui sera enregistré ; ici, parce que ce qui arrive d'un formulaire
+ * n'est jamais ce qu'on croit ; et la base, qui fait foi. Les deux premiers
+ * ne protègent pas, ils évitent une surprise.
+ */
+function normaliserIdentifiant(saisie: string): string {
+  return saisie
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9'\- ]+/g, " ")
+    .replace(/\s+/g, " ")
+    .trim()
+}
+
 /** Messages d'erreur Supabase traduits. Personne ne doit lire de l'anglais brut. */
 function traduire(message: string, d: Dictionnaire, contact: string): string {
   const m = message.toLowerCase()
@@ -216,6 +234,12 @@ export async function sInscrire(
   const email = String(donnees.get("email") ?? "").trim()
   const motDePasse = String(donnees.get("motDePasse") ?? "")
   const roleBrut = String(donnees.get("role") ?? "")
+  // Déjà mis en forme par le champ, remis en forme ici : ce qui arrive d'un
+  // formulaire n'est jamais ce qu'on croit. La base le normalisera une
+  // troisième fois, et c'est elle qui fait foi.
+  const identifiant = normaliserIdentifiant(
+    String(donnees.get("identifiant") ?? ""),
+  )
 
   // Le rôle arrive du navigateur : il est vérifié contre une liste fermée.
   // Sans ce contrôle, un champ modifié à la main suffirait à se déclarer
@@ -226,6 +250,33 @@ export async function sInscrire(
   const role = roleBrut as RoleInscription
 
   if (!prenom) return { erreur: d.erreurs.prenomManquant }
+
+  // Le nom de connexion, vérifié avant tout le reste.
+  //
+  // Avant, et pas après : apprendre que son nom est pris une fois le compte
+  // créé, c'est découvrir des jours plus tard qu'on en porte un autre — ce
+  // que faisait le déclencheur, qui en attribuait un en silence.
+  //
+  // La course entre deux inscriptions simultanées sur le même nom reste
+  // possible ; c'est la base qui tranche alors, et elle le dit.
+  if (!identifiant) return { erreur: d.inscriptionRole.identifiantManquant }
+  if (identifiant.length < 3) {
+    return { erreur: d.inscriptionRole.identifiantCourt }
+  }
+  {
+    const supabase = await supabaseServeur()
+    const { data } = await supabase.rpc("identifiant_disponible", {
+      saisie: identifiant,
+    })
+    if (data !== true) {
+      return {
+        erreur:
+          role === "eleve"
+            ? d.inscriptionRole.identifiantPrisEnfant
+            : d.inscriptionRole.identifiantPris,
+      }
+    }
+  }
 
   // ── L'enfant venu seul ───────────────────────────────────────────────────
   //
@@ -241,17 +292,25 @@ export async function sInscrire(
   if (role === "eleve") {
     if (motDePasse.length < 6) return { erreur: d.erreurs.motDePasseTropCourt }
 
-    let identifiant: string
+    // Celui que le service rend : normalement celui qu'il a choisi, mais
+    // c'est la base qui l'écrit, et c'est avec celui-là qu'on ouvre sa
+    // session. Lui en supposer un autre le laisserait à la porte.
+    let attribue: string
     try {
       const rendu = await api<{ identifiant: string }>(
         "/v1/inscription/enfant",
         {
           methode: "POST",
-          corps: { prenom, nom: nom || undefined, motDePasse },
+          corps: {
+            prenom,
+            nom: nom || undefined,
+            motDePasse,
+            identifiant,
+          },
           sansSession: true,
         },
       )
-      identifiant = rendu.identifiant
+      attribue = rendu.identifiant
     } catch (e: unknown) {
       return {
         erreur:
@@ -259,7 +318,7 @@ export async function sInscrire(
       }
     }
 
-    return ouvrirLaSession(identifiant, motDePasse, langue, d)
+    return ouvrirLaSession(attribue, motDePasse, langue, d)
   }
 
   if (!email) return { erreur: d.erreurs.emailManquant }
@@ -313,6 +372,7 @@ export async function sInscrire(
         nom: nom || null,
         telephone: telephone || null,
         role,
+        identifiant,
         pays: process.env.NEXT_PUBLIC_PAYS_PAR_DEFAUT ?? "CM",
         langue,
         // Lu par `gerer_nouvel_utilisateur`, qui rattache les pièces à la
