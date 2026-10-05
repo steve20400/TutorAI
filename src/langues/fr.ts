@@ -338,7 +338,15 @@ export const fr = {
       "L'annuaire n'a pas pu être chargé. Réessayez dans un moment.",
     filtres: "Filtres",
     tousLesFiltres: "Tout afficher",
-    verifie: "Identité, casier, diplôme",
+    // « Dossier contrôlé » et non « Identité, casier, diplôme ».
+    //
+    // Le canevas portait la seconde, et je l'avais recopiée telle quelle. Mais
+    // une carte d'annuaire ne sait pas QUELLES pièces ont été contrôlées —
+    // elle ne lit que `statut = 'verifie'`. Nommer trois documents sans les
+    // avoir lus, c'est affirmer, et sur la seule phrase qui porte la promesse
+    // du produit. Le détail est sur le dossier, où il vient de la base et
+    // porte une date par pièce.
+    verifie: "Dossier contrôlé",
     ans: { one: "{n} an", other: "{n} ans" },
     parMois: "/mois",
     sansTarif: "Tarif à convenir",

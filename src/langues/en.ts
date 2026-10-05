@@ -322,7 +322,7 @@ export const en: Dictionnaire = {
     muet: "The directory could not be loaded. Try again in a moment.",
     filtres: "Filters",
     tousLesFiltres: "Show all",
-    verifie: "Identity, record, diploma",
+    verifie: "File checked",
     ans: { one: "{n} year", other: "{n} years" },
     parMois: "/month",
     sansTarif: "Rate to be agreed",
