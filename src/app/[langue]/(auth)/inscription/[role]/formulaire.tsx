@@ -70,6 +70,10 @@ export function Formulaire({
           // taper seul. L'aide disait « 8 caractères minimum » à tout le
           // monde, ce qui contredisait ce que le formulaire acceptait.
           aide={role === "eleve" ? c.aideMotDePasseEnfant : c.aideMotDePasse}
+          // Six pour un enfant, huit pour un adulte : la jauge compte à partir
+          // de la règle qui s'applique à lui, et non d'une règle moyenne qui
+          // ne vaudrait pour personne.
+          jauge={role === "eleve" ? 6 : 8}
           required
         />
 

@@ -80,6 +80,14 @@ export const en: Dictionnaire = {
     affichageSombre: "Switch to dark display",
     changerAffichage: "Change display",
     changerLangue: "Change language",
+
+    surete: {
+      etiquette: "Password strength",
+      tropCourt: "Too short",
+      faible: "Weak",
+      correct: "Fair",
+      solide: "Strong",
+    },
   },
 
   introuvable: {
@@ -317,6 +325,8 @@ export const en: Dictionnaire = {
     inscriptionEchouee: "Sign-up did not go through. Try again in a moment.",
     compteCree:
       "Account created. Open the email sent to {email} to confirm, then sign in.",
+    dossierSoumis:
+      "Your file has been submitted. First confirm your address using the email sent to {email}, then wait while our team checks your documents: you will be told by email, accepted or refused, with the reasons.",
   },
 
   reconnaitre: {

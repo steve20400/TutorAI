@@ -82,6 +82,17 @@ export const fr = {
     affichageSombre: "Passer en affichage sombre",
     changerAffichage: "Changer l'affichage",
     changerLangue: "Changer de langue",
+
+    // La jauge de sûreté. Quatre mots, pas de pourcentage : « 64 % sûr » ne
+    // veut rien dire et se lit comme une note, alors que la question est
+    // binaire pour celui qui choisit — est-ce que je garde celui-là.
+    surete: {
+      etiquette: "Sûreté du mot de passe",
+      tropCourt: "Trop court",
+      faible: "Faible",
+      correct: "Correct",
+      solide: "Solide",
+    },
   },
 
   introuvable: {
@@ -329,6 +340,12 @@ export const fr = {
     inscriptionEchouee: "L'inscription n'a pas abouti. Réessaie dans un moment.",
     compteCree:
       "Compte créé. Ouvre l'email envoyé à {email} pour confirmer, puis connecte-toi.",
+    // Le répétiteur, lui, ne se connecte pas en sortant d'ici : son dossier
+    // part en vérification, et c'est l'administration qui ouvre la porte.
+    // Lui dire « connecte-toi » l'envoyait buter contre un espace vide sans
+    // comprendre ce qu'il attendait.
+    dossierSoumis:
+      "Votre dossier est soumis. Confirmez d'abord votre adresse par l'email envoyé à {email}, puis attendez la vérification de vos pièces par notre équipe : vous serez prévenu par email, accepté ou refusé, avec les raisons.",
   },
 
   reconnaitre: {

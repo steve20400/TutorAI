@@ -57,6 +57,9 @@ export function Nouveau({ perime }: { perime: boolean }) {
           type="password"
           autoComplete="new-password"
           aide={d.inscriptionRole.aideMotDePasse}
+          // On choisit un mot de passe ici aussi, et c'est même le moment où
+          // l'on en choisit un mauvais : on vient d'oublier le précédent.
+          jauge={8}
           required
         />
 

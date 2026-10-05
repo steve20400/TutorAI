@@ -1,6 +1,9 @@
 "use client"
 
+import { useState } from "react"
+
 import { useLangue } from "@/langues/contexte"
+import { JaugeMotDePasse } from "@/composants/jauge-mot-de-passe"
 import { BoutonVoir, useVisibilite } from "@/composants/mot-de-passe"
 
 /**
@@ -22,13 +25,27 @@ import { BoutonVoir, useVisibilite } from "@/composants/mot-de-passe"
 export function Champ({
   label,
   aide,
+  jauge,
   ...props
 }: React.InputHTMLAttributes<HTMLInputElement> & {
   label: string
   aide?: string
+  /**
+   * Longueur minimale attendue. Sa présence allume la jauge de sûreté — on
+   * ne la met donc que là où l'on CHOISIT un mot de passe, jamais là où l'on
+   * ressaisit un mot de passe existant : juger celui qui se connecte n'aide
+   * personne et laisse croire que la connexion va échouer.
+   */
+  jauge?: number
 }) {
   const { visible, basculer, type } = useVisibilite()
   const motDePasse = props.type === "password"
+
+  // Suivi ici et non remonté au formulaire : la jauge est le seul usage de
+  // cette valeur, et la faire voyager obligerait chaque écran qui porte un
+  // mot de passe à en tenir l'état.
+  const [saisi, poserSaisi] = useState("")
+  const [indices, poserIndices] = useState<string[]>([])
 
   return (
     <div className="flex flex-col gap-1.5">
@@ -46,6 +63,17 @@ export function Champ({
             type={motDePasse ? type : props.type}
             className={motDePasse ? "avec-bascule" : undefined}
             placeholder=" "
+            onChange={(e) => {
+              props.onChange?.(e)
+              if (jauge === undefined) return
+              poserSaisi(e.target.value)
+              // Le prénom, le nom et le début de l'adresse sont lus dans le
+              // formulaire au moment de la frappe, plutôt que remontés en
+              // état : ce sont des champs non contrôlés, et les contrôler
+              // tous pour alimenter une jauge reviendrait à réécrire le
+              // formulaire autour d'elle.
+              poserIndices(voisinsDuFormulaire(e.target.form))
+            }}
           />
           <span>{label}</span>
         </label>
@@ -53,8 +81,28 @@ export function Champ({
           <BoutonVoir visible={visible} basculer={basculer} />
         ) : null}
       </div>
+      {jauge !== undefined ? (
+        <JaugeMotDePasse valeur={saisi} minimum={jauge} aEviter={indices} />
+      ) : null}
       {aide ? <span className="doux px-1 text-xs">{aide}</span> : null}
     </div>
+  )
+}
+
+/**
+ * Ce que le formulaire sait déjà de la personne, et qui n'a donc rien à faire
+ * dans son mot de passe : son prénom, son nom, le début de son adresse.
+ *
+ * C'est la première chose qu'essaie quelqu'un qui la connaît.
+ */
+function voisinsDuFormulaire(formulaire: HTMLFormElement | null): string[] {
+  if (!formulaire) return []
+  const lire = (nom: string) => {
+    const champ = formulaire.elements.namedItem(nom)
+    return champ instanceof HTMLInputElement ? champ.value : ""
+  }
+  return [lire("prenom"), lire("nom"), lire("email").split("@")[0] ?? ""].filter(
+    Boolean,
   )
 }
 

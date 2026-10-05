@@ -43,10 +43,24 @@ export async function exigerAdmin(langue: Langue): Promise<ProfilAdmin> {
   try {
     profil = await api<ProfilAdmin>("/v1/moi")
   } catch (erreur) {
-    // Service injoignable : on renvoie à l'accueil plutôt que d'ouvrir
-    // l'espace d'administration sans avoir pu vérifier le rôle. Une panne ne
-    // doit jamais élargir un droit.
-    if (erreur instanceof ErreurApi) redirect(chemin(langue, "/"))
+    // Une panne ne doit jamais élargir un droit : faute de pouvoir lire le
+    // rôle, on n'ouvre pas l'espace. Mais le renvoi à l'accueil ne vaut que
+    // pour un REFUS. Pour une panne passagère, il faisait pire que le mal.
+    //
+    // C'est le défaut que Steve a rencontré en apposant un cachet. Render
+    // endort le service au bout de quinze minutes et le réveil prend une
+    // cinquantaine de secondes. L'action réussissait ou non, puis la page se
+    // redessinait ; `/v1/moi` tombait sur un service endormi ; cette ligne
+    // renvoyait l'administrateur à la racine, qui interroge `/v1/moi` à son
+    // tour et sans filet — et l'écran affichait « Cet écran n'a pas pu se
+    // charger ». Un service qui bâille avait l'air d'une déconnexion.
+    //
+    // Une panne passagère remonte donc telle quelle : la frontière d'erreur
+    // la reçoit, annonce l'attente et offre « Réessayer », en laissant
+    // l'administrateur là où il est.
+    if (erreur instanceof ErreurApi && erreur.statut !== 502 && erreur.statut !== 504) {
+      redirect(chemin(langue, "/"))
+    }
     throw erreur
   }
 

@@ -52,6 +52,12 @@ type FicheComplete = {
     chemin: string | null
     deposee_le: string | null
   }[]
+  /**
+   * L'adresse du compte, lue dans `auth.users` par une fonction réservée à
+   * l'administration. Nulle si le service est muet — l'écran se passe d'elle
+   * plutôt que de tomber.
+   */
+  courriel: string | null
   types: {
     cle: string
     libelle_fr: string
@@ -88,6 +94,7 @@ export default async function PageDossier({
   const types = reponse?.types ?? []
   const pieces = reponse?.pieces ?? []
   const profil = reponse?.profil ?? null
+  const courriel = reponse?.courriel ?? null
 
   if (!fiche) {
     return (
@@ -133,6 +140,17 @@ export default async function PageDossier({
             ) : null}
             {profil?.telephone ? (
               <p className="doux mt-0.5 text-[12.5px]">{profil.telephone}</p>
+            ) : null}
+            {/* L'adresse manquait. C'est pourtant par elle qu'il s'est
+                inscrit, elle qui reçoit le verdict, et elle qu'il faut avoir
+                sous les yeux pour écrire à quelqu'un dont on s'apprête à
+                refuser le dossier. Sélectionnable d'un geste : on la recopie
+                pour écrire, et une adresse qu'on retape est une adresse qu'on
+                se trompe. */}
+            {courriel ? (
+              <p className="doux mt-0.5 select-all break-all text-[12.5px]">
+                {courriel}
+              </p>
             ) : null}
           </div>
         </div>

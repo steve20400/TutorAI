@@ -320,8 +320,19 @@ export async function sInscrire(
 
   // Si la confirmation par email est active dans Supabase, aucune session
   // n'est ouverte tout de suite.
+  //
+  // Et le répétiteur n'a pas la même suite que l'adulte. L'adulte confirme
+  // son adresse et entre. Lui, son dossier part en vérification : confirmer
+  // son adresse ne lui ouvre rien tant que l'administration n'a pas regardé
+  // ses pièces. Lui dire « puis connecte-toi » l'envoyait buter contre un
+  // espace vide sans comprendre ce qu'il attendait.
   if (!data.session) {
-    return { info: remplir(d.erreurs.compteCree, { email }) }
+    return {
+      info: remplir(
+        role === "repetiteur" ? d.erreurs.dossierSoumis : d.erreurs.compteCree,
+        { email },
+      ),
+    }
   }
 
   revalidatePath("/", "layout")

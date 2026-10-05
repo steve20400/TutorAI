@@ -58,7 +58,15 @@ async function agir(chemin_: string, corps?: unknown): Promise<void> {
   try {
     await api(chemin_, { methode: "POST", corps })
   } catch (erreur) {
+    // `redirect()` et `notFound()` lèvent une erreur pour interrompre le
+    // rendu : l'avaler ici transformerait une redirection en silence.
+    if (estControleNext(erreur)) throw erreur
     if (!(erreur instanceof ErreurApi)) throw erreur
+
+    // Dans les journaux, le code en plus du message : « Le service est
+    // injoignable » et « Ce dossier n'a pas pu être vérifié » demandent deux
+    // enquêtes différentes, et seule la seconde vient de nous.
+    console.error("[admin] action refusée :", chemin_, erreur.statut, erreur.code, erreur.message)
 
     const boite = await cookies()
     boite.set(SIGNALEMENT, erreur.message, {
@@ -69,6 +77,18 @@ async function agir(chemin_: string, corps?: unknown): Promise<void> {
     })
   }
   revalidatePath("/", "layout")
+}
+
+/**
+ * Est-ce une erreur de contrôle de Next, et non une panne ?
+ *
+ * `redirect()` et `notFound()` signalent leur intention en levant une erreur
+ * portant un `digest` reconnaissable. Un `catch` large qui ne les distingue
+ * pas annule la redirection sans rien dire.
+ */
+function estControleNext(erreur: unknown): boolean {
+  const digest = (erreur as { digest?: unknown } | null)?.digest
+  return typeof digest === "string" && digest.startsWith("NEXT_")
 }
 
 /** Réglages booléens. Liste fermée : ce qui vient d'un formulaire est filtré. */
