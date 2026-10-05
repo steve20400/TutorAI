@@ -1,7 +1,7 @@
 "use client"
 
 import { usePathname, useRouter } from "next/navigation"
-import { useTransition } from "react"
+import { useEffect, useTransition } from "react"
 
 import { LANGUES, dictionnaire, cheminSansLangue } from "@/langues"
 import { useLangue } from "@/langues/contexte"
@@ -25,11 +25,19 @@ import { useLangue } from "@/langues/contexte"
  * aussi : l'écran se vidait, se redessinait en gris, puis revenait. Steve l'a
  * dit tel quel — « ça actualise toute la page ».
  *
- * `startTransition` règle exactement ça. Pendant une transition, Next garde
- * l'écran actuel affiché et n'ouvre aucun `loading.tsx` : rien ne disparaît,
- * les deux lettres montrent qu'elles travaillent, et le texte change quand il
- * est prêt. On ne gagne pas une milliseconde ; on cesse de détruire l'écran
- * pour le reconstruire sous les yeux de celui qui le lisait.
+ * `startTransition` seul n'y suffit pas, et je l'ai mesuré avant de le dire :
+ * une transition n'épargne que les frontières d'attente DÉJÀ montées. Changer
+ * de langue change `[langue]`, donc tout le sous-arbre est neuf, frontière
+ * comprise — le squelette s'ouvrait quand même.
+ *
+ * Ce qui l'évite, c'est de n'avoir rien à attendre. L'autre langue est
+ * récupérée d'avance, dès que ces deux lettres apparaissent à l'écran : dans
+ * un menu, c'est au moment où on l'ouvre, donc avant le clic et sans frais
+ * pour qui ne s'en sert jamais. Au clic, la page est déjà là, rien ne
+ * suspend, et l'écran change de langue sans jamais se vider.
+ *
+ * La transition reste : elle rend le travail visible si le réseau a été plus
+ * lent que la main.
  *
  * Le second défaut est plus vieux et plus grave : `usePathname` ne rend pas
  * la requête. Passer à l'anglais depuis `/fr/annuaire?ville=Douala&q=maths`
@@ -42,15 +50,23 @@ export function BasculeLangue() {
   const router = useRouter()
   const [enCours, demarrer] = useTransition()
 
-  function basculer(cible: string) {
-    // Lue ici et non par `useSearchParams` : nous sommes dans un gestionnaire
-    // de clic, donc dans le navigateur, et ce détour évite d'imposer une
-    // frontière de suspense à chaque écran qui porte la coque.
-    const requete =
+  // L'adresse de l'autre langue, requête comprise.
+  const versLangue = (cible: string) =>
+    `/${cible}${cheminSansLangue(chemin)}${
       typeof window === "undefined" ? "" : window.location.search
+    }`
 
+  useEffect(() => {
+    for (const cible of LANGUES) {
+      if (cible !== langue) router.prefetch(versLangue(cible))
+    }
+    // `versLangue` se referme sur `chemin` : la liste ci-dessous suffit.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [langue, chemin, router])
+
+  function basculer(cible: string) {
     demarrer(() => {
-      router.replace(`/${cible}${cheminSansLangue(chemin)}${requete}`)
+      router.replace(versLangue(cible))
     })
   }
 
