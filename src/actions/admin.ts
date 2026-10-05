@@ -256,6 +256,34 @@ export async function apposerCachet(donnees: FormData): Promise<void> {
 }
 
 /**
+ * Dit ce qu'on pense d'une pièce.
+ *
+ * Il manquait la moitié du geste : on pouvait apposer un cachet sur une fiche
+ * sans jamais statuer sur une pièce. Elles restaient « déposée », et le
+ * dossier public d'un répétiteur vérifié annonçait « aucune pièce n'est
+ * encore affichable » — l'affirmation sans la preuve.
+ *
+ * Un refus sans motif est écarté ici avant même de partir : il ne se corrige
+ * pas, et la base le refuserait de toute façon.
+ */
+export async function statuerSurPiece(donnees: FormData): Promise<void> {
+  const langue = langueDeFormulaire(donnees)
+  const piece = String(donnees.get("pieceId") ?? "")
+  const verdict = String(donnees.get("verdict") ?? "")
+  const motif = String(donnees.get("motif") ?? "").trim()
+
+  if (!piece) return
+  if (!["lisible", "illisible", "refusee"].includes(verdict)) return
+  if (verdict === "refusee" && !motif) return
+
+  await exigerSession(langue)
+  await agir(`/v1/admin/pieces/${piece}/verdict`, {
+    verdict,
+    ...(motif ? { motif } : {}),
+  })
+}
+
+/**
  * Refuse un dossier. Le motif est obligatoire.
  *
  * Un refus sans motif ne se conteste pas, et le répétiteur ne peut rien

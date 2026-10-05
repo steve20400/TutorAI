@@ -3,6 +3,7 @@ import { BoutonAction } from "@/composants/bouton-action"
 import { EnteteAdmin, RienEncore } from "@/composants/admin/entete"
 import { Avatar } from "@/composants/avatar"
 import { LecteurPiece } from "@/composants/admin/lecteur"
+import { VerdictPiece } from "@/composants/admin/verdict-piece"
 import {
   chemin,
   dictionnaire,
@@ -218,7 +219,11 @@ export default async function PageDossier({
                 >
                   {manquante
                     ? t.manquante
-                    : t.statuts[p.statut as keyof typeof t.statuts]}
+                    : liste
+                        .map(
+                          (x) => t.statuts[x.statut as keyof typeof t.statuts],
+                        )
+                        .join(" · ")}
                 </div>
 
                 {/* On consulte ici, on ne télécharge que si on en a besoin.
@@ -230,7 +235,11 @@ export default async function PageDossier({
                     celui qui vérifie doit pouvoir les ouvrir tous, et un
                     seul bouton laisserait croire qu'il n'y en a qu'un. */}
                 {liste.map((piece, rang) => (
-                  <div key={piece.id} className="mt-2.5">
+                  <div
+                    key={piece.id}
+                    className="mt-2.5 border-t pt-2.5 first:border-t-0 first:pt-0"
+                    style={{ borderColor: "var(--bordure)" }}
+                  >
                     <LecteurPiece
                       pieceId={piece.id}
                       libelle={
@@ -238,6 +247,27 @@ export default async function PageDossier({
                       }
                       disponible={Boolean(piece.chemin)}
                     />
+                    {/* Le verdict, sous la pièce qu'il juge. Sans lui, on
+                        pouvait apposer un cachet sans jamais dire ce qu'on
+                        pensait d'un seul document — et le dossier public
+                        annonçait « aucune pièce affichable » sous le mot
+                        « vérifié ». */}
+                    {piece.chemin ? (
+                      <VerdictPiece
+                        pieceId={piece.id}
+                        statut={piece.statut}
+                        langue={langue}
+                        d={d}
+                      />
+                    ) : null}
+                    {piece.motif ? (
+                      <p
+                        className="mt-1 text-[11px] leading-snug"
+                        style={{ color: "var(--erreur-texte)" }}
+                      >
+                        {piece.motif}
+                      </p>
+                    ) : null}
                   </div>
                 ))}
               </div>

@@ -867,6 +867,13 @@ ajouter: "Ajouter",
       desactiveDepuis: "Compte désactivé le {date}.",
       desactivationDetail:
         "Le compte sort de l'annuaire et ne peut plus ouvrir de session ; les sessions en cours sont fermées immédiatement. Rien n'est supprimé : les séances, les comptes rendus et le registre subsistent, et la désactivation se défait.",
+      // Le verdict sur une pièce. Trois mots courts : ils vivent sous chaque
+      // document, et une phrase y tiendrait mal.
+      verdictLisible: "Contrôlée",
+      verdictIllisible: "Illisible",
+      verdictRefuser: "Refuser",
+      verdictAnnuler: "Annuler",
+      motifPiece: "Pourquoi ce refus ?",
       motifObligatoire: "Un refus sans motif est incompréhensible pour celui qui le reçoit.",
       consigne: "Chaque décision est inscrite au registre, avec votre nom et l'heure.",
       tarif: "{n} FCFA / mois",
