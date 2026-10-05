@@ -256,6 +256,19 @@ export async function apposerCachet(donnees: FormData): Promise<void> {
 }
 
 /**
+ * Efface les pièces des inscriptions jamais terminées.
+ *
+ * Les fichiers d'abord, par le service de stockage qui seul les retire ; les
+ * lignes ensuite. C'est la route qui tient cet ordre — ici on ne fait que
+ * l'appeler et ramener l'écran à jour, pour que le compte affiché descende.
+ */
+export async function purgerDepotsAbandonnes(donnees: FormData): Promise<void> {
+  const langue = langueDeFormulaire(donnees)
+  await exigerSession(langue)
+  await agir("/v1/admin/depots-abandonnes/purge")
+}
+
+/**
  * Dit ce qu'on pense d'une pièce.
  *
  * Il manquait la moitié du geste : on pouvait apposer un cachet sur une fiche

@@ -1,5 +1,6 @@
 import Link from "next/link"
 
+import { DepotsAbandonnes } from "@/composants/admin/depots-abandonnes"
 import { EnteteAdmin, RienEncore } from "@/composants/admin/entete"
 import {
   chemin,
@@ -70,6 +71,12 @@ export default async function PageDossiers({
         <EnteteAdmin
         retourVers={chemin(langue, "/admin")} etiquette={t.etiquette} titre={t.vide} />
         <RienEncore titre={t.vide} detail={t.videDetail} />
+        {/* Même quand la pile est vide : des cartes d'identité d'inconnus
+            peuvent attendre d'être effacées, et c'est précisément les jours
+            sans dossier à traiter qu'on ne penserait pas à regarder. */}
+        <div className="px-5 pb-7 sm:px-7">
+          <DepotsAbandonnes langue={langue} d={d} />
+        </div>
       </>
     )
   }
@@ -183,6 +190,8 @@ export default async function PageDossiers({
 
           </section>
         ) : null}
+
+        <DepotsAbandonnes langue={langue} d={d} />
       </div>
     </>
   )

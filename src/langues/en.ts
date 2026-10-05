@@ -749,6 +749,19 @@ ajouter: "Add",
       apposer: "Apply the stamp",
       ouvrirPieces: "Open the documents",
       plusTard: "Later",
+      depots: {
+        titre: "Abandoned uploads",
+        compte: "{fichiers} to delete, left by {depots}.",
+        fichiers: { one: "{n} file", other: "{n} files" },
+        inscriptions: {
+          one: "{n} sign-up never completed",
+          other: "{n} sign-ups never completed",
+        },
+        detail:
+          "ID cards and certificates uploaded by people who did not finish signing up. They belong to no account and prove nothing. Uploads from the last twenty-four hours are not listed: an interrupted sign-up is often resumed the next day.",
+        purger: "Delete these files",
+        fait: "{n} upload(s) deleted.",
+      },
     },
     dossier: {
       retour: "Files",

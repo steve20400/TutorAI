@@ -833,6 +833,20 @@ ajouter: "Ajouter",
       apposer: "Apposer le cachet",
       ouvrirPieces: "Ouvrir les pièces",
       plusTard: "Plus tard",
+      // Les pièces laissées par des inscriptions jamais terminées.
+      depots: {
+        titre: "Dépôts abandonnés",
+        compte: "{fichiers} à effacer, laissés par {depots}.",
+        fichiers: { one: "{n} fichier", other: "{n} fichiers" },
+        inscriptions: {
+          one: "{n} inscription jamais terminée",
+          other: "{n} inscriptions jamais terminées",
+        },
+        detail:
+          "Des cartes d'identité et des diplômes déposés par des gens qui n'ont pas achevé leur inscription. Ils ne sont rattachés à aucun compte et ne prouvent rien. Les dépôts de moins de vingt-quatre heures n'y figurent pas : une inscription interrompue se reprend souvent le lendemain.",
+        purger: "Effacer ces fichiers",
+        fait: "{n} dépôt(s) effacé(s).",
+      },
     },
     dossier: {
       retour: "Dossiers",

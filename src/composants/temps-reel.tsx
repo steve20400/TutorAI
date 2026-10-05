@@ -31,6 +31,27 @@ import { supabaseNavigateur } from "@/lib/supabase/client"
  * séance de travail vit plus longtemps que ça.
  *
  * Et on lit le résultat de `subscribe()`. Un abonnement refusé se taisait.
+ *
+ * ── Quand la session meurt ──
+ *
+ * Le canal ne se rétablit JAMAIS après l'expiration d'une session. Il se
+ * reconnecte en anonyme, la RLS ne lui rend rien, le serveur le refuse — et
+ * `supabase-js` recommence, indéfiniment, en écrivant la même erreur à chaque
+ * tour. C'est ce qu'on lisait dans la console : une cascade d'échecs
+ * WebSocket qui n'annonçaient rien de nouveau, et un socket qui se rouvrait
+ * en boucle sur un forfait compté au mégaoctet.
+ *
+ * On ferme donc le canal dès que la session disparaît. Rien n'est perdu :
+ * l'écran se recharge à la navigation suivante, et le middleware renvoie vers
+ * la connexion.
+ *
+ * ── Et quand c'est seulement le réseau ──
+ *
+ * Une coupure passagère est l'inverse : il FAUT laisser `supabase-js`
+ * retenter, c'est son travail, et ici une connexion qui s'interrompt est la
+ * règle plutôt que l'exception. On ne coupe donc rien — on se contente de ne
+ * dire la panne qu'une fois, et de dire aussi le rétablissement. Vingt lignes
+ * identiques dans la console ne décrivent pas vingt pannes.
  */
 export function TempsReel({
   tables,
@@ -64,12 +85,30 @@ export function TempsReel({
     const supabase = supabaseNavigateur()
     let vivant = true
     let canal: ReturnType<typeof supabase.channel> | null = null
+    // Vrai entre une panne annoncée et son rétablissement : sert à ne parler
+    // qu'aux changements d'état, pas à chaque tentative.
+    let enPanne = false
+
+    function fermerLeCanal(pourquoi: string) {
+      if (!canal) return
+      console.warn("[temps-reel] canal fermé :", pourquoi, "—", cle)
+      void supabase.removeChannel(canal)
+      canal = null
+    }
 
     // Le jeton suit ses renouvellements. Sans cela, le canal continue de
     // tourner avec un jeton périmé et cesse de recevoir, en silence, au bout
     // d'une heure.
-    const { data: veille } = supabase.auth.onAuthStateChange((_e, session) => {
-      if (session?.access_token) void supabase.realtime.setAuth(session.access_token)
+    const { data: veille } = supabase.auth.onAuthStateChange((e, session) => {
+      if (!session?.access_token) {
+        // Déconnexion, ou renouvellement impossible. Le canal ne reviendra
+        // pas : il se rouvrirait en anonyme, la RLS ne lui rendrait rien, et
+        // la bibliothèque retenterait sans fin sur le même refus.
+        vivant = false
+        fermerLeCanal(e)
+        return
+      }
+      void supabase.realtime.setAuth(session.access_token)
     })
 
     void (async () => {
@@ -102,9 +141,20 @@ export function TempsReel({
       }
 
       canal.subscribe((statut, erreur) => {
-        if (statut === "SUBSCRIBED") return
-        // Bruyant, et c'est voulu : un abonnement refusé rend l'écran
-        // silencieusement figé, ce qui ressemble à une application qui marche.
+        if (statut === "SUBSCRIBED") {
+          if (enPanne) {
+            console.info("[temps-reel] canal rétabli :", cle)
+            enPanne = false
+          }
+          return
+        }
+
+        // Une seule ligne par panne, pas une par tentative. Bruyant au
+        // premier échec, et c'est voulu : un abonnement refusé rend l'écran
+        // silencieusement figé, ce qui ressemble à une application qui
+        // marche. Bruyant au vingtième, en revanche, ne dit plus rien.
+        if (enPanne) return
+        enPanne = true
         console.error(
           "[temps-reel] abonnement",
           statut,
@@ -120,6 +170,7 @@ export function TempsReel({
       veille.subscription.unsubscribe()
       if (minuterie.current) clearTimeout(minuterie.current)
       if (canal) void supabase.removeChannel(canal)
+      canal = null
     }
   }, [cle, filtre, delai, router])
 
