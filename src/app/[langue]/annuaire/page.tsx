@@ -130,7 +130,10 @@ export default async function PageAnnuaire({
             720 points, la barre entière ne tient pas, et une barre figée dont
             le bas est inatteignable est pire qu'une barre qui défile. */}
         <div className="hidden lg:block">
-          <div className="sticky top-[26px] max-h-[calc(100dvh-52px)] overflow-y-auto overscroll-contain pr-1">
+          {/* 90 px : les 64 de la barre, qui reste maintenant en haut, plus
+              les 26 de respiration du canevas. Collée plus haut, la barre lui
+              passerait dessus et mangerait « Ville ». */}
+          <div className="sticky top-[90px] max-h-[calc(100dvh-116px)] overflow-y-auto overscroll-contain pr-1">
             <Filtres
               etat={etat}
               villes={villes}

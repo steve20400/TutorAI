@@ -80,8 +80,17 @@ export function Entete({
   const [chercheOuverte, setChercheOuverte] = useState(Boolean(recherche))
 
   return (
+    // `sticky top-0` et non `fixed` : collée, elle reste visible quand on
+    // descend, mais elle garde sa place dans le flux. En `fixed` elle sortirait
+    // du flux et se poserait PAR-DESSUS la première ligne de chaque page — il
+    // faudrait alors creuser un vide de sa hauteur sous elle, sur chaque
+    // écran, et le réajuster ici le jour où elle grandit. C'est le même défaut
+    // que la recherche qui recouvrait le logo, à l'échelle de l'application.
+    //
+    // Opaque, et pas seulement sombre : le contenu passe dessous, et une barre
+    // translucide laisserait lire deux écrans à la fois.
     <header
-      className="relative z-40 flex flex-shrink-0 flex-col"
+      className="sticky top-0 z-40 flex flex-shrink-0 flex-col"
       style={{ background: ENCRE, color: ENCRE_TEXTE }}
     >
       <div className="flex h-14 items-center gap-2.5 px-3.5 lg:h-16 lg:gap-[22px] lg:px-[26px]">
@@ -113,6 +122,7 @@ export function Entete({
             valeur={recherche}
             placeholder={t.recherchePlaceholder}
             etiquette={t.rechercher}
+            valider={t.rechercher}
             langue={langue}
             encre={ENCRE_TEXTE}
             encreDoux={ENCRE_DOUX}

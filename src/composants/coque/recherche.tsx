@@ -61,11 +61,23 @@ function useRecherche(valeur: string | undefined, langue: Langue) {
   return { texte, setTexte, lancer }
 }
 
-/** Grand écran : le champ de 290 px du canevas, toujours déplié. */
+/**
+ * Grand écran : le champ de 290 px du canevas, toujours déplié.
+ *
+ * Son bouton de validation n'apparaît qu'une fois quelque chose saisi, et
+ * c'est le seul endroit du produit où un bouton va et vient. La raison tient
+ * en une phrase : un champ vide n'a rien à valider. Posé en permanence, il
+ * occuperait la barre pour ne rien faire les neuf dixièmes du temps, et
+ * inviterait à cliquer sur un bouton qui ne répondrait pas.
+ *
+ * Il pousse vers l'espace libre du milieu, jamais vers la ville ni vers le
+ * compte : rien ne bouge sous la main au moment où l'on tape.
+ */
 export function RechercheBureau({
   valeur,
   placeholder,
   etiquette,
+  valider,
   langue,
   encre,
   encreDoux,
@@ -73,6 +85,7 @@ export function RechercheBureau({
   valeur?: string
   placeholder: string
   etiquette: string
+  valider: string
   langue: Langue
   encre: string
   encreDoux: string
@@ -85,23 +98,37 @@ export function RechercheBureau({
         e.preventDefault()
         lancer()
       }}
-      className="relative hidden w-[290px] items-center gap-[9px] rounded-[22px] px-3.5 py-2 lg:flex"
-      style={{ background: "rgb(238 241 247 / 0.1)", color: encreDoux }}
+      className="relative hidden items-center gap-2 lg:flex"
     >
-      <Loupe taille={15} />
-      <label htmlFor="q" className="sr-only">
-        {etiquette}
-      </label>
-      <input
-        id="q"
-        name="q"
-        type="search"
-        value={texte}
-        onChange={(e) => setTexte(e.target.value)}
-        placeholder={placeholder}
-        className="min-w-0 flex-1 border-0 bg-transparent text-[13.5px] outline-none"
-        style={{ color: encre }}
-      />
+      <div
+        className="flex w-[290px] items-center gap-[9px] rounded-[22px] px-3.5 py-2"
+        style={{ background: "rgb(238 241 247 / 0.1)", color: encreDoux }}
+      >
+        <Loupe taille={15} />
+        <label htmlFor="q" className="sr-only">
+          {etiquette}
+        </label>
+        <input
+          id="q"
+          name="q"
+          type="search"
+          value={texte}
+          onChange={(e) => setTexte(e.target.value)}
+          placeholder={placeholder}
+          className="min-w-0 flex-1 border-0 bg-transparent text-[13.5px] outline-none"
+          style={{ color: encre }}
+        />
+      </div>
+
+      {texte.trim() ? (
+        <button
+          type="submit"
+          className="shrink-0 rounded-[20px] px-3.5 py-[7px] text-[13px] font-medium"
+          style={{ background: encre, color: ENCRE }}
+        >
+          {valider}
+        </button>
+      ) : null}
     </form>
   )
 }
