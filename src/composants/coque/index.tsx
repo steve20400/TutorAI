@@ -3,7 +3,11 @@ import type { Entree } from "./menu-compte"
 import { chemin, dictionnaire, type Langue } from "@/langues"
 import { api } from "@/lib/api"
 
-export { ENCRE, ENCRE_TEXTE, ENCRE_DOUX } from "./entete"
+// Depuis `./encre` et non depuis `./entete` : celui-ci est passé au
+// navigateur, et une constante réexportée à travers une frontière client
+// revient au serveur sous forme de référence, pas de valeur. Le dossier lit
+// ces couleurs pendant son rendu serveur.
+export { ENCRE, ENCRE_TEXTE, ENCRE_DOUX } from "./encre"
 
 type Profil = {
   prenom: string | null

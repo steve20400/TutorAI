@@ -39,8 +39,6 @@ import { chemin, type Dictionnaire, type Langue } from "@/langues"
  * le seul endroit où chercher a un sens, et un champ qui ne chercherait que
  * sur la page courante tromperait partout ailleurs.
  */
-export { ENCRE, ENCRE_TEXTE, ENCRE_DOUX } from "./encre"
-
 export function Entete({
   prenom,
   nom,
