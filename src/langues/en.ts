@@ -425,6 +425,29 @@ export const en: Dictionnaire = {
         detail: "Read the reason below, fix it, then submit again.",
       },
     },
+    pieces: {
+      titre: "Your documents",
+      detail:
+        "These are what get you into the directory. Until they are checked, no family can see your profile.",
+      requise: "Required",
+      facultative: "Optional",
+      deposer: "Upload",
+      remplacer: "Replace",
+      envoi: "Sending…",
+      absente: "Not uploaded yet",
+      deposee: "Uploaded on {date} — awaiting review",
+      lisible: "Checked on {date}",
+      illisible: "Unreadable — please redo",
+      refusee: "Refused",
+      motif: "Reason: {motif}",
+      verrou:
+        "Your file is approved. To change a document, write to the administration — replacing one after the check would mean being verified on a document nobody saw.",
+      tropLourde: "This file is over 8 MB. Take the photo at a smaller size.",
+      mauvaisType: "Accepted formats: JPEG, PNG, WebP, HEIC or PDF.",
+      echec: "The upload failed. Try again in a moment.",
+      aide:
+        "Photograph the document flat, well lit, all four corners visible. An unreadable document will be sent back to you.",
+    },
   },
 
   /** Keys are the values actually stored in the database — never translate them. */

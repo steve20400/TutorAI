@@ -452,6 +452,29 @@ export const fr = {
           "Consultez le motif ci-dessous, corrigez, puis soumettez à nouveau.",
       },
     },
+    pieces: {
+      titre: "Vos pièces",
+      detail:
+        "Ce sont elles qui vous font entrer dans l'annuaire. Tant qu'elles ne sont pas contrôlées, votre fiche n'est visible par aucune famille.",
+      requise: "Obligatoire",
+      facultative: "Facultative",
+      deposer: "Déposer",
+      remplacer: "Remplacer",
+      envoi: "Envoi…",
+      absente: "Pas encore déposée",
+      deposee: "Déposée le {date} — en attente d'examen",
+      lisible: "Contrôlée le {date}",
+      illisible: "Illisible — à refaire",
+      refusee: "Refusée",
+      motif: "Motif : {motif}",
+      verrou:
+        "Votre dossier est validé. Pour changer une pièce, écrivez à l'administration — remplacer un document après le contrôle reviendrait à être vérifié sur une pièce que personne n'a vue.",
+      tropLourde: "Ce fichier dépasse 8 Mo. Reprenez la photo en plus petit.",
+      mauvaisType: "Formats acceptés : JPEG, PNG, WebP, HEIC ou PDF.",
+      echec: "L'envoi a échoué. Réessayez dans un moment.",
+      aide:
+        "Photographiez le document à plat, bien éclairé, les quatre coins visibles. Un document illisible vous sera renvoyé.",
+    },
   },
 
   /**

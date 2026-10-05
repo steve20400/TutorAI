@@ -8,6 +8,7 @@ import { api } from "@/lib/api"
 import { supabaseServeur } from "@/lib/supabase/server"
 import { FormulaireProfil } from "./formulaire"
 import { lireReferentiel } from "@/lib/referentiel"
+import { PiecesRepetiteur, type Piece } from "@/composants/pieces-repetiteur"
 
 /** Un statut inconnu en base ne doit pas faire disparaître le bandeau. */
 const STATUTS = ["brouillon", "en_attente", "verifie", "refuse"] as const
@@ -81,6 +82,20 @@ export default async function PageProfilRepetiteur({
   // peut pas appeler le service lui-même.
   const referentiel = await lireReferentiel()
 
+  // Les pièces justificatives.
+  //
+  // Elles décident de tout : tant qu'elles ne sont pas contrôlées, la fiche
+  // n'entre pas dans l'annuaire et aucune famille ne la voit. Rien ne
+  // permettait de les déposer jusqu'ici — un répétiteur pouvait s'inscrire,
+  // tout remplir, et rester invisible sans comprendre pourquoi.
+  let pieces: Piece[] = []
+  try {
+    const r = await api<{ donnees: Piece[] }>("/v1/repetiteur/pieces")
+    pieces = r.donnees ?? []
+  } catch {
+    pieces = []
+  }
+
   if (!fiche) redirect(chemin(langue, "/"))
 
   const brutStatut = fiche?.statut ?? "brouillon"
@@ -122,6 +137,15 @@ export default async function PageProfilRepetiteur({
             </p>
           ) : null}
         </section>
+
+        {pieces.length > 0 ? (
+          <PiecesRepetiteur
+            pieces={pieces}
+            verrouille={statut === "verifie"}
+            langue={langue}
+            d={d}
+          />
+        ) : null}
 
         <FormulaireProfil
           referentiel={referentiel}
