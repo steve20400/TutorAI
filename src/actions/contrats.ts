@@ -2,7 +2,9 @@
 
 import { revalidatePath } from "next/cache"
 
-import { dictionnaire, langueDeFormulaire } from "@/langues"
+import { redirect } from "next/navigation"
+
+import { chemin, dictionnaire, langueDeFormulaire } from "@/langues"
 import { api, ErreurApi } from "@/lib/api"
 
 export type EtatProposition = { erreur?: string; info?: string }
@@ -89,4 +91,41 @@ export async function repondreProposition(
 
   revalidatePath("/", "layout")
   return {}
+}
+
+/**
+ * Ouvrir — ou retrouver — le fil avec un répétiteur.
+ *
+ * Seul un parent le peut : un répétiteur qui écrirait le premier démarcherait
+ * les familles de l'annuaire. La base le refuse, cette action ne fait que
+ * porter la demande.
+ *
+ * Elle rend le fil existant plutôt que d'en créer un second : reprendre une
+ * question trois semaines plus tard, c'est la même conversation.
+ */
+export async function ouvrirConversation(
+  _precedent: EtatProposition,
+  donnees: FormData,
+): Promise<EtatProposition> {
+  const langue = langueDeFormulaire(donnees)
+  const d = dictionnaire(langue)
+  const repetiteurId = String(donnees.get("repetiteur") ?? "")
+
+  if (!repetiteurId) return { erreur: d.erreurs.generique }
+
+  let id: string
+  try {
+    const r = await api<{ id: string }>("/v1/messagerie", {
+      methode: "POST",
+      corps: { repetiteurId },
+    })
+    id = r.id
+  } catch (erreur) {
+    return {
+      erreur:
+        erreur instanceof ErreurApi ? erreur.message : d.erreurs.generique,
+    }
+  }
+
+  redirect(chemin(langue, `/messages/${id}`))
 }

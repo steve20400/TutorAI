@@ -10,6 +10,7 @@ import {
 } from "@/langues"
 import { api } from "@/lib/api"
 import { Proposer, type EnfantChoisissable } from "./proposer"
+import { Questionner } from "./questionner"
 import { supabaseServeur } from "@/lib/supabase/server"
 
 type Fiche = {
@@ -357,20 +358,9 @@ export default async function PageDossier({
             d={d}
           />
 
-          <button
-            type="button"
-            disabled
-            className="bt3 mt-2.5 block w-full px-4 py-3 text-[14.5px] opacity-50"
-          >
-            {t.question}
-          </button>
-
-          <p
-            className="mt-2.5 text-[11.5px] leading-relaxed"
-            style={{ color: "var(--texte-doux)" }}
-          >
-            {t.bientot}
-          </p>
+          {enfants.length > 0 ? (
+            <Questionner repetiteurId={fiche.id} langue={langue} d={d} />
+          ) : null}
         </div>
 
         <p

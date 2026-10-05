@@ -364,6 +364,23 @@ export const en: Dictionnaire = {
     },
   },
 
+  messagerie: {
+    etiquette: "Messages",
+    titre: "My messages",
+    aucun:
+      "No messages. You can write to a tutor from their file, in the directory.",
+    aucunRepetiteur:
+      "No messages. A family will write to you from your file — you cannot approach a family yourself, and that is deliberate.",
+    nonLus: { one: "{n} unread", other: "{n} unread" },
+    vide: "Thread opened. Write your question.",
+    champ: "Your message",
+    envoyer: "Send",
+    retour: "Back",
+    echec: "The message did not go through. Try again in a moment.",
+    cadre:
+      "You are writing to a checked adult. Your child does not see these messages and has no access to them — if they have a question, it goes through you or through the classroom.",
+  },
+
   parent: {
     bonjour: "Hello {prenom}",
     espace: "Adult area",

@@ -388,6 +388,24 @@ export const fr = {
     },
   },
 
+  messagerie: {
+    etiquette: "Messages",
+    titre: "Mes messages",
+    aucun:
+      "Aucun message. Vous pouvez écrire à un répétiteur depuis son dossier, dans l'annuaire.",
+    aucunRepetiteur:
+      "Aucun message. Une famille vous écrira depuis votre dossier — vous ne pouvez pas aborder une famille vous-même, c'est voulu.",
+    nonLus: { one: "{n} non lu", other: "{n} non lus" },
+    vide: "Fil ouvert. Écrivez votre question.",
+    champ: "Votre message",
+    envoyer: "Envoyer",
+    retour: "Retour",
+    echec: "Le message n'est pas parti. Réessayez dans un moment.",
+    // Dit une fois, en haut du fil, et pas à chaque message.
+    cadre:
+      "Vous écrivez à un adulte vérifié. Votre enfant ne voit pas ces messages et n'y a pas accès — s'il a une question, elle passe par vous ou par la salle de cours.",
+  },
+
   parent: {
     bonjour: "Bonjour {prenom}",
 

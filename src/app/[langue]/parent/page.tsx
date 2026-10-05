@@ -132,6 +132,12 @@ export default async function AccueilParent({
               taille={32}
             />
           </Link>
+          <Link
+            href={chemin(langue, "/messages")}
+            className="doux text-sm underline underline-offset-4"
+          >
+            {d.messagerie.etiquette}
+          </Link>
           <ReglagesRapides />
           <BoutonDeconnexion langue={langue} />
         </header>

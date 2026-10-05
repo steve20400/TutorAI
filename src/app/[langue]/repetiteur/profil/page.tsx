@@ -14,6 +14,7 @@ import {
   type Proposition,
 } from "@/composants/propositions-repetiteur"
 import { TempsReel } from "@/composants/temps-reel"
+import Link from "next/link"
 
 /** Un statut inconnu en base ne doit pas faire disparaître le bandeau. */
 const STATUTS = ["brouillon", "en_attente", "verifie", "refuse"] as const
@@ -129,6 +130,12 @@ export default async function PageProfilRepetiteur({
               {profil?.prenom} {profil?.nom ?? ""}
             </p>
           </div>
+          <Link
+            href={chemin(langue, "/messages")}
+            className="doux text-sm underline underline-offset-4"
+          >
+            {d.messagerie.etiquette}
+          </Link>
           <ReglagesRapides />
           <BoutonDeconnexion langue={langue} />
         </header>
