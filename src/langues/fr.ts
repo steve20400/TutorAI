@@ -18,6 +18,10 @@ export const fr = {
   },
 
   coque: {
+    roleEleve: "Élève",
+    roleParent: "Adulte",
+    roleRepetiteur: "Répétiteur",
+    monCompte: "Mon compte",
     rechercher: "Rechercher",
     recherchePlaceholder: "Un nom, une matière…",
     ville: "Ville",

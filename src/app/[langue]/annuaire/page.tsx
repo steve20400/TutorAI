@@ -1,4 +1,5 @@
 import Link from "next/link"
+import { redirect } from "next/navigation"
 
 import { Coque } from "@/composants/coque"
 import { Fiche, type Repetiteur } from "./fiche"
@@ -62,6 +63,18 @@ export default async function PageAnnuaire({
   const requete = new URLSearchParams({ page: String(numero), parPage: "20" })
   for (const [k, v] of Object.entries(etat)) {
     if (v !== undefined && v !== "") requete.set(k, String(v))
+  }
+
+  // Un enfant n'engage pas de répétiteur, et l'annuaire est une liste
+  // d'adultes avec leurs photographies. On ne la lui ouvre pas : ce n'est pas
+  // dangereux — ils sont vérifiés, et il ne peut écrire à personne — mais
+  // cela ne lui sert à rien, et un écran qui ne sert à rien finit par servir à
+  // autre chose.
+  try {
+    const moi = await api<{ role: string }>("/v1/moi")
+    if (moi.role === "eleve") redirect(chemin(langue, "/"))
+  } catch {
+    // Pas de session, ou service muet : l'annuaire reste lisible.
   }
 
   const [reponse, referentiel, villes, bornes] = await Promise.all([

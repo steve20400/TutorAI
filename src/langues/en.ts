@@ -22,6 +22,10 @@ export const en: Dictionnaire = {
   },
 
   coque: {
+    roleEleve: "Pupil",
+    roleParent: "Adult",
+    roleRepetiteur: "Tutor",
+    monCompte: "My account",
     rechercher: "Search",
     recherchePlaceholder: "A name, a subject…",
     ville: "City",

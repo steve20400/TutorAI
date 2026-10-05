@@ -96,10 +96,13 @@ export async function Coque({
   // L'enfant n'a que son compte. Pas de messagerie : il ne doit jamais avoir
   // de canal écrit vers un adulte hors de la plateforme.
 
+  // Les libellés de l'inscription — « Je suis adulte », « Je suis un
+  // enfant » — sont écrits pour des boutons de choix. Dans un menu, sous un
+  // prénom, ils sonnent faux : on y attend un rôle, pas une phrase.
   const roles: Record<string, string> = {
-    parent: d.inscription.roles.parent.titre,
-    repetiteur: d.inscription.roles.repetiteur.titre,
-    eleve: d.inscription.roles.eleve.titre,
+    parent: t.roleParent,
+    repetiteur: t.roleRepetiteur,
+    eleve: t.roleEleve,
   }
 
   return (

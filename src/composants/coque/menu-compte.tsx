@@ -75,7 +75,7 @@ export function MenuCompte({
         onClick={() => setOuvert((o) => !o)}
         aria-expanded={ouvert}
         aria-haspopup="menu"
-        aria-label={d.compte.titreAdulte}
+        aria-label={d.coque.monCompte}
         className="flex items-center gap-2 p-0.5 lg:gap-[9px] lg:px-0.5 lg:py-1"
       >
         <Avatar nom={prenom ?? "?"} photoUrl={photoUrl} taille={32} />
