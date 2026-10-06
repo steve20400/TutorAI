@@ -320,7 +320,7 @@ export default async function PageDossier({
                 {fiche.matieres.map((m, i) => (
                   <div
                     key={m}
-                    className="py-[9px] lg:flex lg:gap-7 lg:py-3"
+                    className="py-[9px] lg:flex lg:gap-[26px] lg:py-3"
                     style={
                       i < fiche.matieres.length - 1
                         ? { borderBottom: "1px solid var(--bordure)" }
@@ -449,7 +449,7 @@ export default async function PageDossier({
 
           {fiche.annees_experience ? (
             <div
-              className="mt-2 rounded-[10px] px-2 py-3.5 text-center lg:mt-[18px]"
+              className="mt-2 rounded-[10px] px-1.5 py-3.5 text-center lg:mt-[18px]"
               style={{
                 background: "color-mix(in srgb, var(--texte) 5%, var(--fond))",
               }}

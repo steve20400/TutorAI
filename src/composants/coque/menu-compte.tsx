@@ -223,7 +223,7 @@ export function MenuCompte({
         >
           <div
             role="menu"
-            className="feuille w-full rounded-t-[18px] pb-6 pt-2"
+            className="feuille w-full rounded-t-[18px] pb-[22px] pt-2"
             style={{
               background: "var(--surface)",
               color: "var(--texte)",
@@ -310,6 +310,11 @@ export function MenuCompte({
               <BasculeMode />
             </div>
 
+            {/* `MenuTel.dc.html` donne 16 px de haut et de bas à cette ligne,
+                comme aux entrées au-dessus. Elle en avait 4 : le texte faisait
+                quinze points, la zone touchable vingt-sept, et il en faut
+                quarante-quatre pour un doigt. On visait « Se déconnecter » et
+                on manquait. */}
             <form
               action={seDeconnecter}
               onSubmit={sortie.quitter}
@@ -318,7 +323,7 @@ export function MenuCompte({
               <input type="hidden" name="langue" value={langue} />
               <BoutonAction
                 occupe={sortie.enCours}
-                className="w-full py-1 text-left text-[15px]"
+                className="w-full py-4 text-left text-[15px]"
                 style={{ color: "var(--voyant)" }}
               >
                 <span className="flex w-full items-center gap-3.5">
