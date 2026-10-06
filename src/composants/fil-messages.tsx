@@ -120,6 +120,21 @@ export function FilMessages({
             avant.some((m) => m.id === arrive.id) ? avant : [...avant, arrive],
           )
 
+          // Arrivé pendant qu'on lit le fil : il est lu, et il faut le dire.
+          //
+          // La page marquait les messages lus à son ouverture, ce qui
+          // suffisait tant que chaque message rejouait la page entière. Ce
+          // rafraîchissement a disparu — il faisait sauter la vue et vidait le
+          // champ en cours de frappe — et il portait aussi cette écriture.
+          // Sans elle, la pastille de non-lus ment sur un écran grand ouvert.
+          if (arrive.auteur_id !== moi) {
+            void fetch("/api/messages-lus", {
+              method: "POST",
+              headers: { "content-type": "application/json" },
+              body: JSON.stringify({ conversation: conversationId }),
+            }).catch(() => {})
+          }
+
           // Le mien revient : l'exemplaire en attente n'a plus lieu d'être.
           // Comparé sur l'auteur et le texte — deux envois identiques à la
           // suite retirent le plus ancien, ce qui est exactement juste.
