@@ -399,6 +399,7 @@ export const en: Dictionnaire = {
   },
 
   annuaire: {
+
     etiquette: "Directory",
     titre: "Tutors",
     controles: { one: "{n} checked", other: "{n} checked" },
@@ -423,6 +424,19 @@ export const en: Dictionnaire = {
       trierTarif: "Lowest rate",
       compte: { one: "{n} tutor", other: "{n} tutors" },
       tousControles: "all checked",
+
+      langueCours: "Language of the lesson",
+      languesCours: {
+        fr: "In French",
+        en: "In English",
+      },
+      moment: "When they are free",
+      moments: {
+        semaine_apres_ecole: "Weekdays, after school",
+        semaine_soir: "Weekday evenings",
+        samedi: "Saturdays",
+        dimanche: "Sundays",
+      },
     },
     tousLesFiltres: "Show all",
     verifie: "File checked",
@@ -664,6 +678,12 @@ export const en: Dictionnaire = {
     enregistrement: "Saving…",
     pieces:
       "Uploading your documents — ID, police record, certificates — comes at the next step.",
+    langueDuCours: "Which language you teach in",
+    langueDuCoursAide:
+      "Tick both if you teach in both. Families filter the directory on this, and a box ticked wrongly is paid for at the first lesson.",
+    quandVousPouvez: "Roughly when you are free",
+    quandVousPouvezAide:
+      "So families can filter. The detail stays in the “availability” line above, which is what they will read on your file.",
   },
 
   tuteur: {

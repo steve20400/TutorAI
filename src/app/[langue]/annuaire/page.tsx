@@ -56,6 +56,8 @@ export default async function PageAnnuaire({
     prixMin: sp.prixMin ? Number(sp.prixMin) : undefined,
     prixMax: sp.prixMax ? Number(sp.prixMax) : undefined,
     experienceMin: sp.experienceMin ? Number(sp.experienceMin) : undefined,
+    langueCours: sp.langueCours || undefined,
+    moment: sp.moment || undefined,
     tri: sp.tri || undefined,
   }
 

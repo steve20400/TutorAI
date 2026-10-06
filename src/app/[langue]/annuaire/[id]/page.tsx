@@ -28,6 +28,8 @@ type Fiche = {
   tarif_mensuel: number | null
   annees_experience: number | null
   disponibilites_texte: string | null
+  langues_cours: string[] | null
+  moments: string[] | null
   verifie_le: string | null
 }
 
@@ -342,13 +344,54 @@ export default async function PageDossier({
             </>
           ) : null}
 
+          {/* La langue du cours, avant les disponibilités : dans les régions
+              anglophones c'est la première chose qu'on vérifie, et une famille
+              qui lit le dossier jusqu'au bout pour la découvrir à la fin a
+              déjà perdu son temps. */}
+          {(fiche.langues_cours ?? []).length > 0 ? (
+            <>
+              <Titre>{d.annuaire.rail.langueCours}</Titre>
+              <p className="mb-6 text-[13.5px] lg:mb-[34px] lg:text-[15px]">
+                {(fiche.langues_cours ?? [])
+                  .map(
+                    (c) =>
+                      d.annuaire.rail.languesCours[
+                        c as keyof typeof d.annuaire.rail.languesCours
+                      ] ?? c,
+                  )
+                  .join(" · ")}
+              </p>
+            </>
+          ) : null}
+
           <Titre>{t.libre}</Titre>
           <p
-            className="mb-6 text-[13px] leading-[1.75] lg:mb-0 lg:text-[15px] lg:leading-[1.8]"
+            className="text-[13px] leading-[1.75] lg:text-[15px] lg:leading-[1.8]"
             style={{ color: "var(--texte-doux)" }}
           >
             {fiche.disponibilites_texte || t.libreInconnu}
           </p>
+
+          {/* Les moments, sous la phrase et non à sa place : elle dit mieux
+              les choses, eux disent ce que l'annuaire a filtré. */}
+          {(fiche.moments ?? []).length > 0 ? (
+            <div className="mb-6 mt-2 flex flex-wrap gap-[5px] lg:mb-0">
+              {(fiche.moments ?? []).map((m) => (
+                <span
+                  key={m}
+                  className="rounded-[20px] border px-[11px] py-[5px] text-[12px]"
+                  style={{
+                    borderColor: "var(--bordure)",
+                    color: "var(--texte-doux)",
+                  }}
+                >
+                  {d.annuaire.rail.moments[
+                    m as keyof typeof d.annuaire.rail.moments
+                  ] ?? m}
+                </span>
+              ))}
+            </div>
+          ) : null}
         </div>
 
         {/* La colonne de droite : le tarif, les deux actions, et ce qui est

@@ -430,6 +430,7 @@ export const fr = {
   },
 
   annuaire: {
+
     etiquette: "Annuaire",
     titre: "Répétiteurs",
     // Le nombre vient de la base. « contrôlés » et non « inscrits » : c'est
@@ -462,6 +463,26 @@ export const fr = {
         other: "{n} répétiteurs",
       },
       tousControles: "tous contrôlés",
+
+      // La langue du cours et les moments : deux filtres du canevas qui ne
+      // filtraient rien, faute de colonnes. La migration 071 les a posées.
+      //
+      // Les clés `fr`/`en` et les quatre moments sont les valeurs stockées en
+      // base : elles ne se traduisent jamais, seules leurs étiquettes le sont.
+      // Sans quoi la traduction entrerait dans l'adresse, et un lien partagé
+      // cesserait de filtrer en changeant de langue.
+      langueCours: "Langue du cours",
+      languesCours: {
+        fr: "En français",
+        en: "En anglais",
+      },
+      moment: "Disponibilité",
+      moments: {
+        semaine_apres_ecole: "En semaine, après l'école",
+        semaine_soir: "En semaine, le soir",
+        samedi: "Le samedi",
+        dimanche: "Le dimanche",
+      },
     },
     tousLesFiltres: "Tout afficher",
     // « Dossier contrôlé » et non « Identité, casier, diplôme ».
@@ -748,6 +769,15 @@ export const fr = {
     enregistrement: "Enregistrement…",
     pieces:
       "L'envoi des pièces justificatives — identité, casier judiciaire, diplômes — viendra à l'étape suivante.",
+    // La langue du cours. Pas un confort : le Nord-Ouest et le Sud-Ouest
+    // travaillent en anglais, et un parent de Bamenda qui tombe sur un
+    // répétiteur francophone n'a pas trouvé quelqu'un.
+    langueDuCours: "Dans quelle langue vous faites cours",
+    langueDuCoursAide:
+      "Cochez les deux si vous enseignez dans les deux. Les familles filtrent l'annuaire là-dessus, et une case cochée à tort se paie à la première séance.",
+    quandVousPouvez: "Quand vous pouvez, en gros",
+    quandVousPouvezAide:
+      "Pour que les familles puissent filtrer. Le détail reste dans la ligne « disponibilités » ci-dessus, qui est ce qu'elles liront sur votre dossier.",
   },
 
   tuteur: {

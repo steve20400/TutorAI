@@ -31,6 +31,8 @@ type ReponseProfil = {
     tarif_mensuel: number | null
     annees_experience: number | null
     disponibilites_texte: string | null
+    langues_cours: string[] | null
+    moments: string[] | null
     statut: string
     motif_refus: string | null
     verifie_le: string | null
@@ -186,6 +188,8 @@ export default async function PageProfilRepetiteur({
             tarif_mensuel: fiche?.tarif_mensuel ?? null,
             annees_experience: fiche?.annees_experience ?? null,
             disponibilites_texte: fiche?.disponibilites_texte ?? "",
+            langues_cours: fiche?.langues_cours ?? [],
+            moments: fiche?.moments ?? [],
           }}
         />
       </main>

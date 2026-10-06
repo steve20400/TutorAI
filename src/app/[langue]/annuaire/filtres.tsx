@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation"
 import { useState, useTransition } from "react"
 
 import { francs } from "./fiche"
+import { LANGUES_COURS, MOMENTS } from "@/lib/criteres"
 import { chemin, remplir, type Dictionnaire, type Langue } from "@/langues"
 
 export type Etat = {
@@ -14,6 +15,10 @@ export type Etat = {
   prixMin?: number
   prixMax?: number
   experienceMin?: number
+  /** « fr » ou « en » — la valeur stockée, jamais son étiquette. */
+  langueCours?: string
+  /** « semaine_apres_ecole », « samedi »… idem. */
+  moment?: string
   tri?: string
 }
 
@@ -30,11 +35,19 @@ export type Ville = { ville: string; n: number }
  * dizaine à Douala » — serait exactement le genre de donnée inventée que ce
  * projet refuse.
  *
- * Deux filtres du canevas manquent ici, et c'est volontaire : « disponibilité »
- * et « langue du cours » n'ont aucune colonne derrière eux. Le répétiteur
- * écrit ses disponibilités en texte libre, et la langue du cours n'existe pas
- * en base. Les dessiner quand même aurait donné des pastilles qui ne filtrent
- * rien.
+ * « Langue du cours » et « Disponibilité » y figurent enfin. Ils manquaient
+ * faute de colonnes — le répétiteur écrivait ses disponibilités en texte
+ * libre, et la langue du cours n'existait nulle part — et les dessiner quand
+ * même aurait donné des pastilles qui ne filtrent rien. La migration 071 les
+ * a posées.
+ *
+ * La langue n'est pas un confort ici : le Nord-Ouest et le Sud-Ouest
+ * travaillent en anglais, et un parent de Bamenda qui tombe sur un répétiteur
+ * francophone n'a pas trouvé quelqu'un, il a perdu son temps.
+ *
+ * Le texte libre des disponibilités reste sur le dossier — « je peux décaler
+ * une séance manquée dans la même semaine » ne tient dans aucune case. Les
+ * quatre moments ne servent qu'à filtrer.
  */
 export function Filtres({
   etat,
@@ -210,7 +223,69 @@ export function Filtres({
           aller({ experienceMin: etat.experienceMin === n ? undefined : n })
         }}
       />
+
+      <Espace />
+      <Titre>{t.langueCours}</Titre>
+      <PastillesClef
+        valeurs={LANGUES_COURS.map((c) => ({ cle: c, libelle: t.languesCours[c] }))}
+        actif={etat.langueCours}
+        surChoix={(c) => aller({ langueCours: c })}
+      />
+
+      <Espace />
+      <Titre>{t.moment}</Titre>
+      <PastillesClef
+        valeurs={MOMENTS.map((c) => ({ cle: c, libelle: t.moments[c] }))}
+        actif={etat.moment}
+        surChoix={(c) => aller({ moment: c })}
+      />
     </aside>
+  )
+}
+
+/**
+ * Les mêmes pastilles, mais pour des valeurs qui ont une étiquette.
+ *
+ * `Pastilles` affiche ce qu'il filtre : une matière s'appelle
+ * « Mathématiques » des deux côtés. Ici l'adresse porte « semaine_apres_ecole »
+ * et l'écran lit « En semaine, après l'école ». Les confondre mettrait la
+ * traduction dans l'URL, et un lien partagé cesserait de filtrer en changeant
+ * de langue.
+ */
+function PastillesClef({
+  valeurs,
+  actif,
+  surChoix,
+}: {
+  valeurs: { cle: string; libelle: string }[]
+  actif?: string
+  surChoix: (v: string | undefined) => void
+}) {
+  return (
+    <div className="flex flex-wrap gap-[5px]">
+      {valeurs.map((v) => {
+        const choisi = actif === v.cle
+        return (
+          <button
+            key={v.cle}
+            type="button"
+            onClick={() => surChoix(choisi ? undefined : v.cle)}
+            className="rounded-[20px] border px-[11px] py-[5px] text-[12.5px]"
+            style={
+              choisi
+                ? {
+                    borderColor: "var(--accent)",
+                    background: "var(--accent)",
+                    color: "var(--accent-texte)",
+                  }
+                : { borderColor: "var(--bordure)", color: "var(--texte)" }
+            }
+          >
+            {v.libelle}
+          </button>
+        )
+      })}
+    </div>
   )
 }
 
@@ -502,6 +577,27 @@ export function BandePastilles({
             remplir(t.rail.ansEtPlus, { n }),
             etat.experienceMin === n,
             () => aller({ experienceMin: etat.experienceMin === n ? undefined : n }),
+          ),
+        )}
+
+        {/* La langue avant les moments : dans les régions anglophones, c'est
+            le premier tri qu'une famille fait, et sur une bande qui défile ce
+            qui compte doit se voir sans pousser. */}
+        {LANGUES_COURS.map((c) =>
+          pastille(
+            `l-${c}`,
+            t.rail.languesCours[c],
+            etat.langueCours === c,
+            () => aller({ langueCours: etat.langueCours === c ? undefined : c }),
+          ),
+        )}
+
+        {MOMENTS.map((c) =>
+          pastille(
+            `d-${c}`,
+            t.rail.moments[c],
+            etat.moment === c,
+            () => aller({ moment: etat.moment === c ? undefined : c }),
           ),
         )}
       </div>

@@ -6,6 +6,7 @@ import { PhotoProfil } from "@/composants/photo-profil"
 import { useLangue } from "@/langues/contexte"
 import { Message } from "../../(auth)/champs"
 import { enregistrerProfil, type EtatProfil } from "@/actions/repetiteur"
+import { LANGUES_COURS, MOMENTS } from "@/lib/criteres"
 import type { Referentiel } from "@/lib/referentiel"
 
 const ETAT_INITIAL: EtatProfil = {}
@@ -19,6 +20,10 @@ type Valeurs = {
   tarif_mensuel: number | null
   annees_experience: number | null
   disponibilites_texte: string
+  /** « fr », « en ». Plusieurs possibles. */
+  langues_cours: string[]
+  /** « semaine_apres_ecole », « samedi »… pour le filtre de l'annuaire. */
+  moments: string[]
 }
 
 export function FormulaireProfil({
@@ -122,6 +127,37 @@ export function FormulaireProfil({
           defaultValue={valeurs.disponibilites_texte}
           placeholder={f.disponibilitesPlaceholder}
         />
+      </Section>
+
+      {/* La langue du cours, et c'est tout sauf un détail de confort.
+
+          Le Nord-Ouest et le Sud-Ouest travaillent en anglais. Un parent de
+          Bamenda qui tombe sur un répétiteur francophone n'a pas trouvé
+          quelqu'un : il a perdu son temps, et nous notre crédit. Plusieurs
+          cases, parce que beaucoup enseignent dans les deux — devoir choisir
+          en écarterait la moitié d'une recherche sur l'autre. */}
+      <Section titre={f.langueDuCours}>
+        <Cases
+          nom="langues_cours"
+          options={[...LANGUES_COURS]}
+          etiquettes={d.annuaire.rail.languesCours}
+          cochees={valeurs.langues_cours}
+        />
+        <p className="doux text-xs leading-relaxed">{f.langueDuCoursAide}</p>
+      </Section>
+
+      {/* Les moments ne remplacent pas la phrase écrite plus haut : ils ne
+          servent qu'au filtre de l'annuaire. « Je peux décaler une séance
+          manquée dans la même semaine » ne tient dans aucune case, et c'est
+          pourtant ce qu'une famille retient. */}
+      <Section titre={f.quandVousPouvez}>
+        <Cases
+          nom="moments"
+          options={[...MOMENTS]}
+          etiquettes={d.annuaire.rail.moments}
+          cochees={valeurs.moments}
+        />
+        <p className="doux text-xs leading-relaxed">{f.quandVousPouvezAide}</p>
       </Section>
 
       <Message erreur={etat.erreur} info={etat.info} />

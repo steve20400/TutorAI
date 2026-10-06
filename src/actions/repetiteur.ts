@@ -5,6 +5,7 @@ import { revalidatePath } from "next/cache"
 import { chemin, langueDeFormulaire } from "@/langues"
 import { api, ErreurApi } from "@/lib/api"
 import { supabaseServeur } from "@/lib/supabase/server"
+import { LANGUES_COURS, MOMENTS } from "@/lib/criteres"
 
 export type EtatProfil = { erreur?: string; info?: string }
 
@@ -64,6 +65,17 @@ export async function enregistrerProfil(
           annees_experience: experience || null,
           disponibilites_texte:
             String(donnees.get("disponibilites_texte") ?? "").trim() || null,
+          // Filtrées contre les listes fermées avant de partir : le service
+          // les refuserait, mais un refus pour une valeur que l'écran n'offre
+          // pas serait incompréhensible côté répétiteur.
+          langues_cours: donnees
+            .getAll("langues_cours")
+            .map(String)
+            .filter((v) => (LANGUES_COURS as readonly string[]).includes(v)),
+          moments: donnees
+            .getAll("moments")
+            .map(String)
+            .filter((v) => (MOMENTS as readonly string[]).includes(v)),
         },
       },
     )
