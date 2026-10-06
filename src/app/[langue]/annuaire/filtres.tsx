@@ -527,8 +527,9 @@ export function BandePastilles({
   )
 
   return (
+    <div className="relative -mx-3 mb-3 lg:hidden">
     <div
-      className="-mx-3 mb-3 overflow-x-auto px-3 pb-1 transition-opacity lg:hidden"
+      className="overflow-x-auto px-3 pb-1 transition-opacity"
       style={{ scrollbarWidth: "none", opacity: enCours ? 0.55 : 1 }}
       aria-busy={enCours}
     >
@@ -601,6 +602,24 @@ export function BandePastilles({
           ),
         )}
       </div>
+    </div>
+
+    {/* Le dégradé du canevas, 34 px au bord droit.
+
+        Sans lui, une bande coupée net ressemble à une bande qui finit là. Avec
+        lui, on voit qu'elle continue — et il y a maintenant onze pastilles à
+        faire défiler. C'est aussi pour ça que Steve avait cru que « les
+        filtres se limitent aux matières ».
+
+        Hors du conteneur qui défile : à l'intérieur, il défilerait avec les
+        pastilles et masquerait la mauvaise. */}
+    <div
+      aria-hidden
+      className="pointer-events-none absolute bottom-1 right-0 top-0 w-[34px]"
+      style={{
+        background: "linear-gradient(to left, var(--fond) 22%, transparent)",
+      }}
+    />
     </div>
   )
 }

@@ -395,7 +395,9 @@ input.avec-bascule {
   position: relative;
   overflow: hidden;
   border-radius: 11px;
-  padding: 12px 13px 12px 12px;
+  /* Zéro à gauche, comme sur grand écran : c'est la photo qui porte sa marge,
+     et le texte qui repasse sous elle doit atteindre le bord. */
+  padding: 12px 13px 12px 0;
   background: color-mix(in srgb, var(--texte) 5%, var(--fond));
 }
 
@@ -412,7 +414,7 @@ input.avec-bascule {
   float: left;
   width: 104px;
   height: 112px;
-  margin: 0 11px 0 0;
+  margin: 0 11px 0 10px;
   position: relative;
   border-radius: 9px;
   overflow: hidden;
@@ -432,9 +434,14 @@ input.avec-bascule {
 }
 
 @media (min-width: 1024px) {
+  /* Le canevas écrit `padding:20px 22px 20px 0` et porte les 18 px de marge
+     gauche sur la PHOTO, pas sur la carte. Les mettre sur la carte revient au
+     même pour la photo, et décale de 18 px tout le texte qui repasse SOUS
+     elle — la dernière ligne de la présentation, les matières, les niveaux.
+     C'est le « padding left qui n'est pas respecté » que Steve avait vu. */
   .fiche {
     border-radius: 14px;
-    padding: 20px 22px 20px 18px;
+    padding: 20px 22px 20px 0;
   }
 
   .fiche-trait {
@@ -444,7 +451,7 @@ input.avec-bascule {
   .fiche-photo {
     width: 206px;
     height: 168px;
-    margin: 0 20px 0 0;
+    margin: 0 20px 0 18px;
     border-radius: 10px;
     shape-outside: polygon(0 0, 100% 0, 74% 100%, 0 100%);
     shape-margin: 14px;
