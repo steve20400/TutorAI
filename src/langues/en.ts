@@ -762,6 +762,11 @@ ajouter: "Add",
     enregistrement: "This lesson is being recorded",
     horsLigne: "Offline — your strokes are kept and will send themselves",
     cameraBientot: "camera",
+
+    estSurLaFeuille: "{prenom} is on sheet {feuille}",
+    rejoindreFeuille: "Join them",
+    ajouterFeuille: "Add a sheet — {outil}",
+    enoncePlaceholder: "The question, the plan, the correction…",
   },
 
   seance: {

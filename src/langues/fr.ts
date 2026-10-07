@@ -872,6 +872,14 @@ ajouter: "Ajouter",
     // à une application qui a cessé de répondre, et on recommence son trait.
     horsLigne: "Hors ligne — vos traits sont gardés et repartiront tout seuls",
     cameraBientot: "caméra",
+
+    // Chacun regarde la feuille qu'il veut, et c'est voulu. Sans cette ligne,
+    // le répétiteur dit « regarde la courbe » à quelqu'un resté sur l'énoncé,
+    // et les deux parlent de choses différentes pendant cinq minutes.
+    estSurLaFeuille: "{prenom} est sur la feuille {feuille}",
+    rejoindreFeuille: "Le rejoindre",
+    ajouterFeuille: "Ajouter une feuille — {outil}",
+    enoncePlaceholder: "L'énoncé, le plan, la correction…",
   },
 
   seance: {

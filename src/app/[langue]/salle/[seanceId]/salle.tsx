@@ -4,9 +4,12 @@ import { useEffect, useRef, useState } from "react"
 import type * as Y from "yjs"
 import type { Awareness } from "y-protocols/awareness"
 
+import { supabaseNavigateur } from "@/lib/supabase/client"
 import { ouvrirFeuille, type EtatTransport, type Salon } from "@/lib/salle/transport"
-import { type Dictionnaire } from "@/langues"
+import { usePresenceSalle } from "@/lib/salle/presence-salle"
+import { remplir, type Dictionnaire } from "@/langues"
 import { MainLevee } from "./main-levee"
+import { Texte } from "./texte"
 
 export type Feuille = {
   id: string
@@ -63,7 +66,11 @@ export function Salle({
 }) {
   const t = d.salle
 
-  const [active, poserActive] = useState(feuilles[0]?.id ?? null)
+  // La liste vit : une feuille ajoutée par l'autre doit apparaître sans
+  // recharger, et celle qu'on vient d'ajouter soi-même tout de suite.
+  const [liste, poserListe] = useState(feuilles)
+  const [active, poserActive] = useState<string | null>(feuilles[0]?.id ?? null)
+  const [ajoute, poserAjoute] = useState(false)
   const [salon, poserSalon] = useState<{ doc: Y.Doc; presence: Awareness } | null>(null)
   const [etat, poserEtat] = useState<EtatTransport>("attente")
   const ouvert = useRef<Salon | null>(null)
@@ -108,16 +115,80 @@ export function Salle({
     }
   }, [active, seanceId, moi.nom, couleur])
 
-  const feuilleActive = feuilles.find((f) => f.id === active)
+  const feuilleActive = liste.find((f) => f.id === active)
 
-  // Qui est là, et sur quelle feuille. Le prénom vient de la présence : on ne
-  // le demande pas au serveur, il voyage déjà avec le curseur.
-  const autres = salon
-    ? [...salon.presence.getStates().entries()]
-        .filter(([id]) => id !== salon.doc.clientID)
-        .map(([, e]) => (e as { qui?: { nom: string } }).qui?.nom)
-        .filter((n): n is string => Boolean(n))
-    : []
+  // ── Qui est là, et sur quelle feuille ───────────────────────────────────
+  const dansLaSalle = usePresenceSalle({
+    seanceId,
+    moi: { id: moi.id, nom: moi.nom },
+    feuilleId: active,
+  })
+
+  // Celui qui est ailleurs. C'est le piège connu : le répétiteur dit
+  // « regarde la courbe », l'élève est resté sur l'énoncé, et les deux parlent
+  // de choses différentes pendant cinq minutes.
+  const ailleurs = dansLaSalle.find(
+    (q) => q.feuilleId && q.feuilleId !== active,
+  )
+  const feuilleDeLautre = ailleurs
+    ? liste.find((f) => f.id === ailleurs.feuilleId)
+    : undefined
+
+  // ── Les feuilles ajoutées par l'autre ───────────────────────────────────
+  useEffect(() => {
+    const supabase = supabaseNavigateur()
+    const canal = supabase
+      .channel(`salle:${seanceId}:feuilles`)
+      .on(
+        "postgres_changes",
+        {
+          event: "INSERT",
+          schema: "public",
+          table: "feuilles",
+          filter: `seance_id=eq.${seanceId}`,
+        },
+        (charge) => {
+          const f = charge.new as Feuille
+          poserListe((avant) =>
+            avant.some((x) => x.id === f.id)
+              ? avant
+              : [...avant, f].sort((a, b) => a.rang - b.rang),
+          )
+        },
+      )
+      .subscribe()
+
+    return () => {
+      void supabase.removeChannel(canal)
+    }
+  }, [seanceId])
+
+  async function ajouterFeuille(outil: string) {
+    if (lecture || ajoute) return
+    poserAjoute(true)
+    try {
+      const supabase = supabaseNavigateur()
+      const rang = liste.reduce((m, f) => Math.max(m, f.rang), -1) + 1
+      const { data, error } = await supabase
+        .from("feuilles")
+        .insert({ seance_id: seanceId, rang, outil })
+        .select("id, rang, titre, outil")
+        .maybeSingle()
+      if (error || !data) throw new Error(error?.message ?? "feuille")
+
+      const f = data as Feuille
+      poserListe((avant) =>
+        avant.some((x) => x.id === f.id) ? avant : [...avant, f],
+      )
+      // On la regarde : on vient de la demander, on ne la cherche pas dans la
+      // bande ensuite.
+      poserActive(f.id)
+    } catch (erreur) {
+      console.error("[salle] feuille impossible à ouvrir :", erreur)
+    } finally {
+      poserAjoute(false)
+    }
+  }
 
   return (
     <div
@@ -141,7 +212,9 @@ export function Salle({
 
       {/* ── Le plan de travail. La page EST le plan de travail. ── */}
       <div className="relative min-h-0 flex-1" style={{ background: "#101a2e" }}>
-        {salon ? (
+        {salon && feuilleActive?.outil === "texte" ? (
+          <Texte doc={salon.doc} lecture={lecture} placeholder={t.enoncePlaceholder} />
+        ) : salon ? (
           <MainLevee
             doc={salon.doc}
             presence={salon.presence}
@@ -181,8 +254,35 @@ export function Salle({
         ) : null}
       </div>
 
-      {/* ── Qui est là ── */}
-      {autres.length > 0 ? (
+      {/* ── Où est l'autre ──
+
+          Le bandeau ambré de la maquette, 38 px. C'est le garde-fou de la
+          séance : chacun choisit sa feuille librement, et sans cette ligne le
+          répétiteur dit « regarde la courbe » à quelqu'un qui est resté sur
+          l'énoncé. Le bouton y mène, il n'y traîne personne de force. */}
+      {ailleurs ? (
+        <div
+          className="flex shrink-0 items-center gap-3 px-3.5 py-2.5 text-[11.5px]"
+          style={{ background: "#181105", color: "#e8b366" }}
+        >
+          <span className="min-w-0 flex-1 truncate">
+            {remplir(t.estSurLaFeuille, {
+              prenom: ailleurs.nom,
+              feuille: feuilleDeLautre
+                ? String(feuilleDeLautre.rang + 1)
+                : "—",
+            })}
+          </span>
+          <button
+            type="button"
+            onClick={() => poserActive(ailleurs.feuilleId)}
+            className="shrink-0 rounded-[6px] border px-2.5 py-1 text-[11px]"
+            style={{ borderColor: "#e8b366" }}
+          >
+            {t.rejoindreFeuille}
+          </button>
+        </div>
+      ) : dansLaSalle.length > 0 ? (
         <div
           className="flex shrink-0 items-center gap-2 px-3.5 py-2 text-[11.5px]"
           style={{ background: "#0a1220", color: "#8fa4c9" }}
@@ -192,7 +292,7 @@ export function Salle({
             className="h-1.5 w-1.5 rounded-full"
             style={{ background: "#6fd3ab" }}
           />
-          {autres.join(" · ")}
+          {dansLaSalle.map((q) => q.nom).join(" · ")}
         </div>
       ) : null}
 
@@ -201,7 +301,7 @@ export function Salle({
         className="flex shrink-0 gap-2 overflow-x-auto px-3.5 py-3"
         style={{ background: "#0a1220", scrollbarWidth: "none" }}
       >
-        {feuilles.map((f) => {
+        {liste.map((f) => {
           const choisie = f.id === active
           return (
             <button
@@ -222,6 +322,30 @@ export function Salle({
             </button>
           )
         })}
+
+        {/* Le « + » de la maquette, 38×38. Une salle se divise en feuilles
+            pendant la séance, comme un enseignant divise son tableau à la
+            craie — pas en l'ayant prévu à l'avance. */}
+        {!lecture ? (
+          <div className="flex shrink-0 gap-1.5">
+            {(["main_levee", "texte"] as const).map((outil) => (
+              <button
+                key={outil}
+                type="button"
+                disabled={ajoute}
+                onClick={() => void ajouterFeuille(outil)}
+                title={remplir(t.ajouterFeuille, {
+                  outil: t.outils[outil],
+                })}
+                className="h-[38px] w-[38px] shrink-0 rounded-[6px] text-[9.5px] leading-tight disabled:opacity-40"
+                style={{ border: "1px dashed #2e3c58", color: "#8fa4c9" }}
+              >
+                +
+                <span className="block truncate px-0.5">{t.outils[outil]}</span>
+              </button>
+            ))}
+          </div>
+        ) : null}
       </div>
 
       {/* ── Les outils ── */}
