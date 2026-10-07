@@ -834,6 +834,28 @@ ajouter: "Ajouter",
    * Peu de mots, et c'est volontaire : la page EST le plan de travail. Chaque
    * phrase qu'on y pose prend la place de ce qu'on est venu écrire.
    */
+  /**
+   * Les cours en cours, et la porte de la salle.
+   *
+   * Deux rôles, deux phrases, et ce n'est pas symétrique : le répétiteur
+   * ouvre, l'élève et le parent rejoignent. Le parent ne peut pas clore une
+   * séance — une séance qu'on peut terminer sans trace est une séance qu'on
+   * peut effacer.
+   */
+  cours: {
+    titre: "Vos cours",
+    detail:
+      "La séance se tient dans la salle de TUTELA. Elle est enregistrée, et l'enregistrement reste consultable.",
+    avecEleve: "avec {prenom}",
+    avecRepetiteur: "avec {prenom}",
+    enCours: "Séance en cours",
+    ouvrir: "Ouvrir la séance",
+    rejoindre: "Rejoindre",
+    attendre: "Le répétiteur ouvre la séance",
+    echecOuverture:
+      "La séance n'a pas pu s'ouvrir. Réessayez dans un moment — rien n'est perdu.",
+  },
+
   salle: {
     titre: "Séance",
     feuille: "Feuille",

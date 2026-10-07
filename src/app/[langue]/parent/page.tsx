@@ -1,5 +1,7 @@
 import { redirect } from "next/navigation"
 import Link from "next/link"
+import { MesCours } from "@/composants/mes-cours"
+import { lireMesCours } from "@/lib/cours"
 
 import { Registre } from "@/composants/registre"
 import {
@@ -99,6 +101,8 @@ export default async function AccueilParent({
     serviceMuet = true
   }
 
+  const cours = await lireMesCours()
+
   return (
     <Registre>
       {/* L'enfant accepte le rattachement, ou demande son mot de passe :
@@ -110,6 +114,12 @@ export default async function AccueilParent({
       <Coque langue={langue} />
 
       <main className="mx-auto flex w-full max-w-2xl flex-col gap-5 px-4 pb-10 pt-6 lg:px-6">
+        {/* Le parent ne démarre pas la séance et ne la clôt pas — une séance
+            qu'on peut terminer sans trace est une séance qu'on peut effacer.
+            Il la rejoint, et c'est tout ce dont il a besoin ici. */}
+        {cours.length > 0 ? (
+          <MesCours cours={cours} langue={langue} d={d} />
+        ) : null}
         <header className="pt-2">
           <h1 className="text-[27px] font-medium tracking-[-0.02em] lg:text-[34px]">
             {remplir(d.parent.bonjour, { prenom: profil.prenom ?? "" })}

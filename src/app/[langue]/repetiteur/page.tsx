@@ -6,6 +6,8 @@ import {
   PropositionsRepetiteur,
   type Proposition,
 } from "@/composants/propositions-repetiteur"
+import { MesCours } from "@/composants/mes-cours"
+import { lireMesCours } from "@/lib/cours"
 import { TempsReel } from "@/composants/temps-reel"
 import { francs, initiales } from "../annuaire/fiche"
 import {
@@ -104,13 +106,14 @@ export default async function PageEspaceRepetiteur({
   // ne lui renvoie rien. Cela suffit à écarter un parent tombé sur l'adresse.
   if (!fiche) redirect(chemin(langue, "/"))
 
-  const [pieces, propositions] = await Promise.all([
+  const [pieces, propositions, cours] = await Promise.all([
     api<{ donnees: Piece[] }>("/v1/repetiteur/pieces")
       .then((r) => r.donnees ?? [])
       .catch(() => [] as Piece[]),
     api<{ donnees: Proposition[] }>("/v1/contrats/propositions")
       .then((r) => r.donnees ?? [])
       .catch(() => [] as Proposition[]),
+    lireMesCours(),
   ])
 
   const statut: Statut = (STATUTS as readonly string[]).includes(fiche.statut)
@@ -256,6 +259,14 @@ export default async function PageEspaceRepetiteur({
                 </p>
               ) : null}
             </section>
+          ) : null}
+
+          {/* Les cours avant le dossier : quand une séance est ouverte, c'est
+              la seule chose qui compte sur cet écran. */}
+          {cours.length > 0 ? (
+            <div className="mb-6 lg:mb-[34px]">
+              <MesCours cours={cours} langue={langue} d={d} />
+            </div>
           ) : null}
 
           {propositions.length > 0 ? (

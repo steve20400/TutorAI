@@ -2,6 +2,8 @@ import Link from "next/link"
 import { Reconnaitre, type DemandeARecconnaitre } from "./reconnaitre"
 import { TempsReel } from "@/composants/temps-reel"
 import { redirect } from "next/navigation"
+import { MesCours } from "@/composants/mes-cours"
+import { lireMesCours } from "@/lib/cours"
 
 import {
   chemin,
@@ -97,6 +99,8 @@ export default async function Accueil({
     aReconnaitre = []
   }
 
+  const cours = await lireMesCours()
+
   return (
     <div className="flex min-h-dvh flex-col">
       {/* La coque porte désormais l'avatar, les réglages et la sortie. Chaque
@@ -111,6 +115,13 @@ export default async function Accueil({
           </h1>
           <p className="doux mt-1 text-sm">{d.accueil.question}</p>
         </header>
+
+        {/* Une séance ouverte passe devant tout le reste : c'est la seule
+            chose à faire à cet instant, et la chercher sous les cartes du
+            tuteur serait la manquer. */}
+        {cours.length > 0 ? (
+          <MesCours cours={cours} langue={langue} d={d} />
+        ) : null}
 
       {/* La demande d'un adulte arrive pendant que l'enfant est sur cet
           écran : il ne doit pas avoir à recharger pour la découvrir. */}

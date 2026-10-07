@@ -734,6 +734,20 @@ ajouter: "Add",
     pays: { CM: "Cameroon", CI: "Ivory Coast" },
   },
 
+  cours: {
+    titre: "Your lessons",
+    detail:
+      "The lesson takes place in the TUTELA room. It is recorded, and the recording stays available to you.",
+    avecEleve: "with {prenom}",
+    avecRepetiteur: "with {prenom}",
+    enCours: "Lesson in progress",
+    ouvrir: "Open the lesson",
+    rejoindre: "Join",
+    attendre: "The tutor opens the lesson",
+    echecOuverture:
+      "The lesson could not be opened. Try again in a moment — nothing is lost.",
+  },
+
   salle: {
     titre: "Lesson",
     feuille: "Sheet",
