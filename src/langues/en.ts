@@ -767,6 +767,11 @@ ajouter: "Add",
     rejoindreFeuille: "Join them",
     ajouterFeuille: "Add a sheet — {outil}",
     enoncePlaceholder: "The question, the plan, the correction…",
+    traceurPlaceholder: "(2x+1)/(x-1)",
+    tracer: "Plot",
+    retirerCourbe: "Remove this curve",
+    zoomer: "Zoom in",
+    dezoomer: "Zoom out",
   },
 
   seance: {

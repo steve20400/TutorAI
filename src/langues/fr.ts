@@ -880,6 +880,11 @@ ajouter: "Ajouter",
     rejoindreFeuille: "Le rejoindre",
     ajouterFeuille: "Ajouter une feuille — {outil}",
     enoncePlaceholder: "L'énoncé, le plan, la correction…",
+    traceurPlaceholder: "(2x+1)/(x-1)",
+    tracer: "Tracer",
+    retirerCourbe: "Retirer cette courbe",
+    zoomer: "Agrandir",
+    dezoomer: "Réduire",
   },
 
   seance: {

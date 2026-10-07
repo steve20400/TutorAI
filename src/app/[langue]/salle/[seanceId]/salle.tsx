@@ -10,6 +10,7 @@ import { usePresenceSalle } from "@/lib/salle/presence-salle"
 import { remplir, type Dictionnaire } from "@/langues"
 import { MainLevee } from "./main-levee"
 import { Texte } from "./texte"
+import { Traceur } from "./traceur"
 
 export type Feuille = {
   id: string
@@ -212,7 +213,9 @@ export function Salle({
 
       {/* ── Le plan de travail. La page EST le plan de travail. ── */}
       <div className="relative min-h-0 flex-1" style={{ background: "#101a2e" }}>
-        {salon && feuilleActive?.outil === "texte" ? (
+        {salon && feuilleActive?.outil === "traceur" ? (
+          <Traceur doc={salon.doc} couleur={couleur} lecture={lecture} d={d} />
+        ) : salon && feuilleActive?.outil === "texte" ? (
           <Texte doc={salon.doc} lecture={lecture} placeholder={t.enoncePlaceholder} />
         ) : salon ? (
           <MainLevee
@@ -328,7 +331,7 @@ export function Salle({
             craie — pas en l'ayant prévu à l'avance. */}
         {!lecture ? (
           <div className="flex shrink-0 gap-1.5">
-            {(["main_levee", "texte"] as const).map((outil) => (
+            {(["main_levee", "texte", "traceur"] as const).map((outil) => (
               <button
                 key={outil}
                 type="button"
