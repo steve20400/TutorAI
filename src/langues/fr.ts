@@ -828,6 +828,30 @@ ajouter: "Ajouter",
     pays: { CM: "Cameroun", CI: "Côte d'Ivoire" } as Record<string, string>,
   },
 
+  /**
+   * La salle de cours.
+   *
+   * Peu de mots, et c'est volontaire : la page EST le plan de travail. Chaque
+   * phrase qu'on y pose prend la place de ce qu'on est venu écrire.
+   */
+  salle: {
+    titre: "Séance",
+    feuille: "Feuille",
+    outils: {
+      main_levee: "main levée",
+      texte: "énoncé",
+      calcul: "calcul",
+      traceur: "traceur",
+      ecran: "écran",
+    },
+    annuler: "Annuler le dernier trait",
+    enregistrement: "La séance est enregistrée",
+    // Dit, et pas seulement montré : sans cette phrase, une coupure ressemble
+    // à une application qui a cessé de répondre, et on recommence son trait.
+    horsLigne: "Hors ligne — vos traits sont gardés et repartiront tout seuls",
+    cameraBientot: "caméra",
+  },
+
   seance: {
     ecrisTaReponse: "Écris ta réponse…",
     envoyer: "Envoyer",

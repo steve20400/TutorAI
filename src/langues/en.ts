@@ -734,6 +734,22 @@ ajouter: "Add",
     pays: { CM: "Cameroon", CI: "Ivory Coast" },
   },
 
+  salle: {
+    titre: "Lesson",
+    feuille: "Sheet",
+    outils: {
+      main_levee: "freehand",
+      texte: "text",
+      calcul: "working",
+      traceur: "plotter",
+      ecran: "screen",
+    },
+    annuler: "Undo the last stroke",
+    enregistrement: "This lesson is being recorded",
+    horsLigne: "Offline — your strokes are kept and will send themselves",
+    cameraBientot: "camera",
+  },
+
   seance: {
     ecrisTaReponse: "Write your answer…",
     envoyer: "Send",
