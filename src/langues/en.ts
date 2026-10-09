@@ -772,6 +772,10 @@ ajouter: "Add",
     retirerCourbe: "Remove this curve",
     zoomer: "Zoom in",
     dezoomer: "Zoom out",
+    calculPlaceholder: "\\lim_{x \\to +\\infty} f(x)",
+    calculVide: "The symbols are below. Each line you set down stays in the notebook.",
+    poserLigne: "Set down",
+    retirerLigne: "Remove this line",
   },
 
   seance: {

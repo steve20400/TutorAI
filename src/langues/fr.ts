@@ -885,6 +885,10 @@ ajouter: "Ajouter",
     retirerCourbe: "Retirer cette courbe",
     zoomer: "Agrandir",
     dezoomer: "Réduire",
+    calculPlaceholder: "\\lim_{x \\to +\\infty} f(x)",
+    calculVide: "Les symboles sont en dessous. Chaque ligne posée reste dans le cahier.",
+    poserLigne: "Poser",
+    retirerLigne: "Retirer cette ligne",
   },
 
   seance: {
