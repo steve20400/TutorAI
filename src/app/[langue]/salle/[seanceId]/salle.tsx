@@ -8,6 +8,7 @@ import { supabaseNavigateur } from "@/lib/supabase/client"
 import { ouvrirFeuille, type EtatTransport, type Salon } from "@/lib/salle/transport"
 import { usePresenceSalle } from "@/lib/salle/presence-salle"
 import { remplir, type Dictionnaire } from "@/langues"
+import { type Role } from "@/lib/salle/couleurs"
 import { MainLevee } from "./main-levee"
 import { Texte } from "./texte"
 import { Traceur } from "./traceur"
@@ -82,7 +83,7 @@ export function Salle({
    * et c'est ce qu'un parent relit après coup. Le rouge reste réservé au seul
    * enregistrement.
    */
-  const couleur = moi.estRepetiteur ? "#c9a227" : "#1f6b45"
+  const role: Role = moi.estRepetiteur ? "rep" : "ele"
 
   // ── Ouvrir la feuille active, fermer la précédente ───────────────────────
   useEffect(() => {
@@ -93,7 +94,7 @@ export function Salle({
       const salonOuvert = await ouvrirFeuille({
         feuilleId: active,
         seanceId,
-        moi: { nom: moi.nom, couleur },
+        moi: { nom: moi.nom, role },
         surEtat: (e) => {
           if (vivant) poserEtat(e)
         },
@@ -115,7 +116,7 @@ export function Salle({
       // coûter les deux dernières secondes de la précédente.
       if (a) void a.fermer()
     }
-  }, [active, seanceId, moi.nom, couleur])
+  }, [active, seanceId, moi.nom, role])
 
   const feuilleActive = liste.find((f) => f.id === active)
 
@@ -195,17 +196,17 @@ export function Salle({
   return (
     <div
       className="flex h-dvh flex-col overflow-hidden"
-      style={{ background: "#0d1524", color: "#e6ecf7" }}
+      style={{ background: "var(--salle-fond)", color: "var(--salle-encre)" }}
     >
       {/* ── La barre du haut : 44 px à la maquette ── */}
       <header
         className="flex h-11 shrink-0 items-center gap-3 px-3.5"
-        style={{ background: "#08101d" }}
+        style={{ background: "var(--salle-barre)" }}
       >
         <span className="min-w-0 flex-1 truncate text-[13px] font-medium">
           {titre}
         </span>
-        <span className="shrink-0 text-[11.5px]" style={{ color: "#8fa4c9" }}>
+        <span className="shrink-0 text-[11.5px]" style={{ color: "var(--salle-encre-douce)" }}>
           {feuilleActive
             ? `${t.feuille} ${feuilleActive.rang + 1} · ${t.outils[feuilleActive.outil as keyof typeof t.outils] ?? feuilleActive.outil}`
             : ""}
@@ -213,24 +214,24 @@ export function Salle({
       </header>
 
       {/* ── Le plan de travail. La page EST le plan de travail. ── */}
-      <div className="relative min-h-0 flex-1" style={{ background: "#101a2e" }}>
+      <div className="relative min-h-0 flex-1" style={{ background: "var(--salle-plan)" }}>
         {salon && feuilleActive?.outil === "calcul" ? (
           <Calcul
             doc={salon.doc}
             presence={salon.presence}
-            couleur={couleur}
+            role={role}
             lecture={lecture}
             d={d}
           />
         ) : salon && feuilleActive?.outil === "traceur" ? (
-          <Traceur doc={salon.doc} couleur={couleur} lecture={lecture} d={d} />
+          <Traceur doc={salon.doc} role={role} lecture={lecture} d={d} />
         ) : salon && feuilleActive?.outil === "texte" ? (
           <Texte doc={salon.doc} lecture={lecture} placeholder={t.enoncePlaceholder} />
         ) : salon ? (
           <MainLevee
             doc={salon.doc}
             presence={salon.presence}
-            couleur={couleur}
+            role={role}
             lecture={lecture}
           />
         ) : (
@@ -246,7 +247,7 @@ export function Salle({
             <div
               key={i}
               className="grid h-11 w-[58px] place-items-center rounded-[8px] text-[9px]"
-              style={{ background: "#18243c", color: "#4e5e7d" }}
+              style={{ background: "var(--salle-vignette)", color: "var(--salle-encre-douce)" }}
             >
               {t.cameraBientot}
             </div>
@@ -259,7 +260,7 @@ export function Salle({
         {etat !== "ouvert" ? (
           <div
             className="absolute bottom-3 left-3 rounded-[8px] px-2.5 py-1.5 text-[11px]"
-            style={{ background: "#181105", color: "#e8b366" }}
+            style={{ background: "var(--salle-ambre-fond)", color: "var(--salle-ambre)" }}
           >
             {t.horsLigne}
           </div>
@@ -275,7 +276,7 @@ export function Salle({
       {ailleurs ? (
         <div
           className="flex shrink-0 items-center gap-3 px-3.5 py-2.5 text-[11.5px]"
-          style={{ background: "#181105", color: "#e8b366" }}
+          style={{ background: "var(--salle-ambre-fond)", color: "var(--salle-ambre)" }}
         >
           <span className="min-w-0 flex-1 truncate">
             {remplir(t.estSurLaFeuille, {
@@ -289,7 +290,7 @@ export function Salle({
             type="button"
             onClick={() => poserActive(ailleurs.feuilleId)}
             className="shrink-0 rounded-[6px] border px-2.5 py-1 text-[11px]"
-            style={{ borderColor: "#e8b366" }}
+            style={{ borderColor: "var(--salle-ambre)" }}
           >
             {t.rejoindreFeuille}
           </button>
@@ -297,12 +298,12 @@ export function Salle({
       ) : dansLaSalle.length > 0 ? (
         <div
           className="flex shrink-0 items-center gap-2 px-3.5 py-2 text-[11.5px]"
-          style={{ background: "#0a1220", color: "#8fa4c9" }}
+          style={{ background: "var(--salle-bande)", color: "var(--salle-encre-douce)" }}
         >
           <span
             aria-hidden
             className="h-1.5 w-1.5 rounded-full"
-            style={{ background: "#6fd3ab" }}
+            style={{ background: "var(--salle-eleve)" }}
           />
           {dansLaSalle.map((q) => q.nom).join(" · ")}
         </div>
@@ -311,7 +312,7 @@ export function Salle({
       {/* ── La bande des feuilles : vignettes de 54×38 ── */}
       <div
         className="flex shrink-0 gap-2 overflow-x-auto px-3.5 py-3"
-        style={{ background: "#0a1220", scrollbarWidth: "none" }}
+        style={{ background: "var(--salle-bande)", scrollbarWidth: "none" }}
       >
         {liste.map((f) => {
           const choisie = f.id === active
@@ -322,9 +323,9 @@ export function Salle({
               onClick={() => poserActive(f.id)}
               className="h-[38px] w-[54px] shrink-0 rounded-[6px] text-[9.5px] leading-tight"
               style={{
-                background: "#141f36",
+                background: "var(--salle-vignette)",
                 border: choisie ? "1px solid #e6ecf7" : "1px solid transparent",
-                color: choisie ? "#e6ecf7" : "#8fa4c9",
+                color: choisie ? "var(--salle-encre)" : "var(--salle-encre-douce)",
               }}
             >
               {f.rang + 1}
@@ -350,7 +351,7 @@ export function Salle({
                   outil: t.outils[outil],
                 })}
                 className="h-[38px] w-[38px] shrink-0 rounded-[6px] text-[9.5px] leading-tight disabled:opacity-40"
-                style={{ border: "1px dashed #2e3c58", color: "#8fa4c9" }}
+                style={{ border: "1px dashed #2e3c58", color: "var(--salle-encre-douce)" }}
               >
                 +
                 <span className="block truncate px-0.5">{t.outils[outil]}</span>
@@ -363,7 +364,7 @@ export function Salle({
       {/* ── Les outils ── */}
       <div
         className="flex shrink-0 items-center gap-2 px-3.5 py-3"
-        style={{ background: "#08101d" }}
+        style={{ background: "var(--salle-barre)" }}
       >
         <button
           type="button"
@@ -378,14 +379,14 @@ export function Salle({
             traits.delete(traits.length - 1, 1)
           }}
           className="rounded-[8px] px-3 py-2 text-[12px] disabled:opacity-40"
-          style={{ background: "#16223a", color: "#e6ecf7" }}
+          style={{ background: "var(--salle-bouton)", color: "var(--salle-encre)" }}
         >
           {t.annuler}
         </button>
 
         <span
           className="ml-auto h-2 w-2 shrink-0 rounded-full"
-          style={{ background: "#e04a32" }}
+          style={{ background: "var(--salle-voyant)" }}
           aria-label={t.enregistrement}
           title={t.enregistrement}
         />

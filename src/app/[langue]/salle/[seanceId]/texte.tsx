@@ -97,7 +97,7 @@ export function Texte({
       onChange={(e) => saisir(e.target.value)}
       spellCheck={false}
       className="absolute inset-0 h-full w-full resize-none border-0 bg-transparent p-4 text-[14.5px] leading-[1.7] outline-none"
-      style={{ color: "#e6ecf7", fontFamily: "ui-monospace, monospace" }}
+      style={{ color: "var(--salle-encre)", fontFamily: "ui-monospace, monospace" }}
     />
   )
 }

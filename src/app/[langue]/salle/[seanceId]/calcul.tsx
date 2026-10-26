@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react"
 import type * as Y from "yjs"
 import type { Awareness } from "y-protocols/awareness"
 
+import { varDe, type Role } from "@/lib/salle/couleurs"
 import { type Dictionnaire } from "@/langues"
 
 /**
@@ -63,13 +64,13 @@ const TOUCHES: { libelle: string; latex: string; recul?: number }[] = [
 export function Calcul({
   doc,
   presence,
-  couleur,
+  role,
   lecture,
   d,
 }: {
   doc: Y.Doc
   presence: Awareness
-  couleur: string
+  role: Role
   lecture: boolean
   d: Dictionnaire
 }) {
@@ -78,7 +79,7 @@ export function Calcul({
   const [saisie, poserSaisie] = useState("")
   const [, redessiner] = useState(0)
 
-  const lignes = doc.getArray<{ l: string; c: string }>("lignes")
+  const lignes = doc.getArray<{ l: string; r: Role }>("lignes")
 
   useEffect(() => {
     const rafraichir = () => redessiner((n) => n + 1)
@@ -97,9 +98,9 @@ export function Calcul({
     if (lecture) return
     presence.setLocalStateField(
       "calcul",
-      saisie.trim() ? { l: saisie, c: couleur } : null,
+      saisie.trim() ? { l: saisie, r: role } : null,
     )
-  }, [saisie, couleur, presence, lecture])
+  }, [saisie, role, presence, lecture])
 
   function inserer(touche: (typeof TOUCHES)[number]) {
     const c = champ.current
@@ -122,29 +123,29 @@ export function Calcul({
 
   const enVol = [...presence.getStates().entries()]
     .filter(([id]) => id !== doc.clientID)
-    .map(([, e]) => (e as { calcul?: { l: string; c: string } }).calcul)
-    .filter((v): v is { l: string; c: string } => Boolean(v))
+    .map(([, e]) => (e as { calcul?: { l: string; r: Role } }).calcul)
+    .filter((v): v is { l: string; r: Role } => Boolean(v))
 
   return (
     <div className="absolute inset-0 flex flex-col">
       {/* Les lignes posées. */}
       <div className="min-h-0 flex-1 overflow-y-auto px-4 py-3">
         {lignes.length === 0 && enVol.length === 0 ? (
-          <p className="text-[12.5px]" style={{ color: "#4e5e7d" }}>
+          <p className="text-[12.5px]" style={{ color: "var(--salle-encre-douce)" }}>
             {t.calculVide}
           </p>
         ) : null}
 
         {lignes.toArray().map((ligne, i) => (
           <div key={i} className="group flex items-start gap-2 py-1.5">
-            <Formule latex={ligne.l} couleur={ligne.c} />
+            <Formule latex={ligne.l} couleur={varDe(ligne.r)} />
             {!lecture ? (
               <button
                 type="button"
                 onClick={() => lignes.delete(i, 1)}
                 aria-label={t.retirerLigne}
                 className="ml-auto shrink-0 px-1 text-[13px] opacity-0 transition group-hover:opacity-100 focus:opacity-100"
-                style={{ color: "#8fa4c9" }}
+                style={{ color: "var(--salle-encre-douce)" }}
               >
                 ×
               </button>
@@ -157,7 +158,7 @@ export function Calcul({
             qu'on pourrait effacer. */}
         {enVol.map((v, i) => (
           <div key={`vol-${i}`} className="py-1.5 opacity-50">
-            <Formule latex={v.l} couleur={v.c} />
+            <Formule latex={v.l} couleur={varDe(v.r)} />
           </div>
         ))}
       </div>
@@ -177,7 +178,7 @@ export function Calcul({
                 type="button"
                 onClick={() => inserer(touche)}
                 className="h-[30px] min-w-[30px] shrink-0 rounded-[6px] px-1.5 text-[13px]"
-                style={{ background: "#141f36", color: "#e6ecf7" }}
+                style={{ background: "var(--salle-vignette)", color: "var(--salle-encre)" }}
               >
                 {touche.libelle}
               </button>
@@ -189,7 +190,7 @@ export function Calcul({
               e.preventDefault()
               const l = saisie.trim()
               if (!l) return
-              lignes.push([{ l, c: couleur }])
+              lignes.push([{ l, r: role }])
               poserSaisie("")
               champ.current?.focus()
             }}
@@ -204,8 +205,8 @@ export function Calcul({
               autoCapitalize="none"
               className="min-w-0 flex-1 rounded-[6px] px-2.5 py-1.5 text-[12.5px] outline-none"
               style={{
-                background: "#141f36",
-                color: "#e6ecf7",
+                background: "var(--salle-vignette)",
+                color: "var(--salle-encre)",
                 // Chasse fixe à la SAISIE seulement : on corrige un calcul, et
                 // un 1 qui ressemble à un l coûte une minute à chaque fois.
                 fontFamily: "ui-monospace, monospace",
@@ -215,7 +216,7 @@ export function Calcul({
               type="submit"
               disabled={!saisie.trim()}
               className="shrink-0 rounded-[6px] px-3 py-1.5 text-[12px] disabled:opacity-40"
-              style={{ background: "#16223a", color: "#e6ecf7" }}
+              style={{ background: "var(--salle-bouton)", color: "var(--salle-encre)" }}
             >
               {t.poserLigne}
             </button>
@@ -225,7 +226,7 @@ export function Calcul({
               poser. Sans lui, on pose pour voir, on efface, on recommence. */}
           {saisie.trim() ? (
             <div className="shrink-0 px-4 pb-2">
-              <Formule latex={saisie} couleur={couleur} />
+              <Formule latex={saisie} couleur={varDe(role)} />
             </div>
           ) : null}
         </>
@@ -255,7 +256,7 @@ function Formule({ latex, couleur }: { latex: string; couleur: string }) {
       try {
         katex.default.render(latex, noeud.current, {
           throwOnError: false,
-          errorColor: "#e04a32",
+          errorColor: "var(--salle-voyant)",
         })
       } catch {
         noeud.current.textContent = latex

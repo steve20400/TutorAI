@@ -459,6 +459,99 @@ input.avec-bascule {
   }
 }
 
+/* --- La salle de cours ------------------------------------------------------
+   Deux maquettes versionnées, `maquettes/salle-de-cours-telephone.svg` et sa
+   variante claire. La salle était figée sur la sombre quel que soit le thème
+   choisi — ce qui revenait à décider à la place de l'utilisateur sur le seul
+   écran où il passe cinquante minutes d'affilée.
+
+   Ces jetons ne sortent pas du thème général, et c'est voulu : le plan de
+   travail n'est pas une page, c'est une surface sur laquelle on trace, et les
+   règles y sont différentes.
+
+   TROIS RÈGLES, TIRÉES DE LA DÉCISION DU 22 SEPTEMBRE.
+
+   Le quadrillage est à peine visible, et les axes seulement deux tons plus
+   foncés — jamais noirs. Sur fond sombre tout ressort ; sur fond clair tout se
+   vaut, et un quadrillage franc se met devant la courbe qu'il sert.
+
+   Le vert profond pour l'élève, l'ocre pour le répétiteur. Pas de bleu : le
+   bleu est déjà l'encre de l'application et celle de ses boutons, et une
+   courbe bleue se lirait comme un élément d'interface.
+
+   Le rouge est réservé au SEUL enregistrement. Jamais une erreur, jamais une
+   alerte. C'est le seul point de l'écran qui dit « on vous filme », et il perd
+   ce sens le jour où il sert aussi à dire « champ mal rempli ».
+
+   La bande des feuilles reste à l'encre dans les deux thèmes, comme la barre
+   latérale de l'administration : les vignettes s'y lisent comme une
+   pellicule, et c'est le cadre, pas le plan de travail.                      */
+
+:root {
+  --salle-fond: #ffffff;
+  --salle-barre: #fbfaf7;
+  --salle-plan: #fdfcfa;
+  --salle-outils: #f4f2ec;
+  --salle-encre: #14203a;
+  --salle-encre-douce: #6a7386;
+  --salle-bouton: #eceae4;
+  --salle-bordure: #d9d3c7;
+  --salle-quadrillage: #f1ede4;
+  --salle-axes: #d5cfc2;
+  --salle-ambre-fond: #fdf6e9;
+  --salle-ambre: #a8761a;
+  --salle-voyant: #c2402c;
+
+  /* Qui écrit quoi : on voit qui a trouvé quoi, et c'est ce qu'un parent
+     relit après coup. */
+  --salle-repetiteur: #a8761a;
+  --salle-eleve: #1b6b45;
+
+  /* La bande des feuilles, à l'encre dans les deux thèmes. */
+  --salle-bande: #0a1220;
+  --salle-vignette: #141f36;
+  --salle-vignette-texte: #8fa4c9;
+  --salle-vignette-active: #e6ecf7;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-mode="clair"]) {
+    --salle-fond: #0d1524;
+    --salle-barre: #08101d;
+    --salle-plan: #101a2e;
+    --salle-outils: #08101d;
+    --salle-encre: #e6ecf7;
+    --salle-encre-douce: #8fa4c9;
+    --salle-bouton: #16223a;
+    --salle-bordure: #2e3c58;
+    --salle-quadrillage: rgb(143 164 201 / 0.12);
+    --salle-axes: rgb(143 164 201 / 0.45);
+    --salle-ambre-fond: #181105;
+    --salle-ambre: #e8b366;
+    --salle-voyant: #e04a32;
+    --salle-repetiteur: #c9a227;
+    --salle-eleve: #6fd3ab;
+  }
+}
+
+:root[data-mode="sombre"] {
+  --salle-fond: #0d1524;
+  --salle-barre: #08101d;
+  --salle-plan: #101a2e;
+  --salle-outils: #08101d;
+  --salle-encre: #e6ecf7;
+  --salle-encre-douce: #8fa4c9;
+  --salle-bouton: #16223a;
+  --salle-bordure: #2e3c58;
+  --salle-quadrillage: rgb(143 164 201 / 0.12);
+  --salle-axes: rgb(143 164 201 / 0.45);
+  --salle-ambre-fond: #181105;
+  --salle-ambre: #e8b366;
+  --salle-voyant: #e04a32;
+  --salle-repetiteur: #c9a227;
+  --salle-eleve: #6fd3ab;
+}
+
 /* La glissière à deux poignées : deux `range` natifs superposés sur une même
    piste. Chacun garde sa poignée et son accessibilité au clavier ; seule la
    piste est effacée, puisqu'elle est dessinée derrière eux.               */

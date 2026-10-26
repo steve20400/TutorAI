@@ -4,6 +4,8 @@ import { useEffect, useRef, useState } from "react"
 import type * as Y from "yjs"
 import type { Awareness } from "y-protocols/awareness"
 
+import { couleurDe, type Role } from "@/lib/salle/couleurs"
+
 /**
  * La feuille à main levée, partagée.
  *
@@ -40,8 +42,8 @@ import type { Awareness } from "y-protocols/awareness"
  */
 
 export type Trait = {
-  /** Couleur du traceur, celle de la personne. */
-  c: string
+  /** QUI a tracé, pas de quelle couleur : voir `lib/salle/couleurs.ts`. */
+  r: Role
   /** Épaisseur, relative à la largeur de la feuille. */
   e: number
   /** x0, y0, x1, y1… entre 0 et 1. */
@@ -51,12 +53,12 @@ export type Trait = {
 export function MainLevee({
   doc,
   presence,
-  couleur,
+  role,
   lecture,
 }: {
   doc: Y.Doc
   presence: Awareness
-  couleur: string
+  role: Role
   /** Vrai pour qui regarde sans tenir la séance : le parent, l'administration. */
   lecture: boolean
 }) {
@@ -100,7 +102,9 @@ export function MainLevee({
 
       const tracer = (trait: Trait) => {
         if (trait.p.length < 4) return
-        ctx.strokeStyle = trait.c
+        // Résolue ici, à chaque peinture : le cahier suit le thème du moment
+        // plutôt que celui du jour où il a été écrit.
+        ctx.strokeStyle = couleurDe(trait.r, boite)
         ctx.lineWidth = Math.max(1, trait.e * l)
         ctx.beginPath()
         ctx.moveTo(trait.p[0] * l, trait.p[1] * h)
@@ -154,7 +158,7 @@ export function MainLevee({
 
     enCours.current = [...enCours.current, x, y]
     presence.setLocalStateField("trace", {
-      c: couleur,
+      r: role,
       e: 0.006,
       p: enCours.current,
     })
@@ -167,7 +171,7 @@ export function MainLevee({
     presence.setLocalStateField("trace", null)
     // Un point isolé n'est pas un trait : c'est un doigt posé par erreur.
     if (points.length < 4) return
-    doc.getArray<Trait>("traits").push([{ c: couleur, e: 0.006, p: points }])
+    doc.getArray<Trait>("traits").push([{ r: role, e: 0.006, p: points }])
   }
 
   return (

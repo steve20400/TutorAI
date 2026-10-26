@@ -2,6 +2,7 @@ import * as Y from "yjs"
 import { Awareness, applyAwarenessUpdate, encodeAwarenessUpdate } from "y-protocols/awareness"
 
 import { supabaseNavigateur } from "@/lib/supabase/client"
+import { type Role } from "./couleurs"
 import { depuisHexa, enHexa, enOctets, enTexte } from "./octets"
 
 /**
@@ -90,8 +91,14 @@ export async function ouvrirFeuille({
 }: {
   feuilleId: string
   seanceId: string
-  /** Ce que les autres verront de nous : prénom et couleur. */
-  moi: { nom: string; couleur: string }
+  /**
+   * Ce que les autres verront de nous : un prénom et un rôle.
+   *
+   * Un rôle et non une couleur, pour la même raison que les traits : la
+   * couleur se décide au moment de peindre, d'après le thème du moment. Voir
+   * `couleurs.ts`.
+   */
+  moi: { nom: string; role: Role }
   surEtat?: (etat: EtatTransport) => void
 }): Promise<Salon> {
   const supabase = supabaseNavigateur()

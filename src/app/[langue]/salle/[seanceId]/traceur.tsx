@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react"
 import type * as Y from "yjs"
 
+import { couleurDe, jetonDe, varDe, type Role } from "@/lib/salle/couleurs"
 import { lireExpression } from "@/lib/salle/expression"
 import { type Dictionnaire } from "@/langues"
 
@@ -34,19 +35,19 @@ import { type Dictionnaire } from "@/langues"
  * que l'élève reste sur la vue d'ensemble, « regarde ici » ne désigne rien.
  */
 
-type Courbe = { expr: string; couleur: string }
+type Courbe = { expr: string; r: Role }
 type Vue = { xmin: number; xmax: number; ymin: number; ymax: number }
 
 const VUE_INITIALE: Vue = { xmin: -10, xmax: 10, ymin: -6, ymax: 6 }
 
 export function Traceur({
   doc,
-  couleur,
+  role,
   lecture,
   d,
 }: {
   doc: Y.Doc
-  couleur: string
+  role: Role
   lecture: boolean
   d: Dictionnaire
 }) {
@@ -104,7 +105,7 @@ export function Traceur({
       // un quadrillage franc se met devant la courbe qu'il sert.
       const pas = choisirLePas(vue.xmax - vue.xmin)
       ctx.lineWidth = 1
-      ctx.strokeStyle = "rgba(143,164,201,0.12)"
+      ctx.strokeStyle = jetonDe("--salle-quadrillage", boite, "#f1ede4")
       ctx.beginPath()
       for (let x = Math.ceil(vue.xmin / pas) * pas; x <= vue.xmax; x += pas) {
         ctx.moveTo(versX(x), 0)
@@ -118,7 +119,7 @@ export function Traceur({
 
       // Les axes, deux tons plus clairs que le quadrillage. Jamais blancs :
       // ils situent, ils ne se lisent pas.
-      ctx.strokeStyle = "rgba(143,164,201,0.45)"
+      ctx.strokeStyle = jetonDe("--salle-axes", boite, "#d5cfc2")
       ctx.beginPath()
       ctx.moveTo(0, versY(0))
       ctx.lineTo(L, versY(0))
@@ -130,7 +131,7 @@ export function Traceur({
       for (const courbe of courbes.toArray()) {
         const f = lireExpression(courbe.expr)
         if (!f) continue
-        ctx.strokeStyle = courbe.couleur
+        ctx.strokeStyle = couleurDe(courbe.r, boite)
         ctx.lineWidth = 2
         ctx.beginPath()
 
@@ -207,7 +208,10 @@ export function Traceur({
             <span
               key={`${c.expr}-${i}`}
               className="flex items-center gap-1.5 rounded-[6px] px-2 py-1 text-[11px]"
-              style={{ background: "#141f36", color: c.couleur }}
+              style={{
+                background: "var(--salle-vignette)",
+                color: varDe(c.r),
+              }}
             >
               <span className="font-mono">{c.expr}</span>
               {!lecture ? (
@@ -215,7 +219,7 @@ export function Traceur({
                   type="button"
                   onClick={() => courbes.delete(i, 1)}
                   aria-label={t.retirerCourbe}
-                  style={{ color: "#8fa4c9" }}
+                  style={{ color: "var(--salle-encre-douce)" }}
                 >
                   ×
                 </button>
@@ -230,12 +234,12 @@ export function Traceur({
           onSubmit={(e) => {
             e.preventDefault()
             if (!valide) return
-            courbes.push([{ expr: saisie.trim(), couleur }])
+            courbes.push([{ expr: saisie.trim(), r: role }])
             poserSaisie("")
           }}
           className="flex items-center gap-2 px-3 pb-2"
         >
-          <span className="shrink-0 font-mono text-[12.5px]" style={{ color: "#8fa4c9" }}>
+          <span className="shrink-0 font-mono text-[12.5px]" style={{ color: "var(--salle-encre-douce)" }}>
             f(x) =
           </span>
           <input
@@ -246,8 +250,8 @@ export function Traceur({
             autoCapitalize="none"
             className="min-w-0 flex-1 rounded-[6px] px-2.5 py-1.5 font-mono text-[12.5px] outline-none"
             style={{
-              background: "#141f36",
-              color: "#e6ecf7",
+              background: "var(--salle-vignette)",
+              color: "var(--salle-encre)",
               // Rouge seulement quand on a écrit quelque chose : un champ vide
               // n'est pas une erreur, c'est un champ vide.
               border:
@@ -260,7 +264,7 @@ export function Traceur({
             type="submit"
             disabled={!valide}
             className="shrink-0 rounded-[6px] px-3 py-1.5 text-[12px] disabled:opacity-40"
-            style={{ background: "#16223a", color: "#e6ecf7" }}
+            style={{ background: "var(--salle-bouton)", color: "var(--salle-encre)" }}
           >
             {t.tracer}
           </button>
@@ -268,7 +272,7 @@ export function Traceur({
             type="button"
             onClick={() => zoomer(1.4)}
             className="shrink-0 rounded-[6px] px-2.5 py-1.5 text-[12px]"
-            style={{ background: "#16223a", color: "#e6ecf7" }}
+            style={{ background: "var(--salle-bouton)", color: "var(--salle-encre)" }}
             aria-label={t.dezoomer}
           >
             −
@@ -277,7 +281,7 @@ export function Traceur({
             type="button"
             onClick={() => zoomer(1 / 1.4)}
             className="shrink-0 rounded-[6px] px-2.5 py-1.5 text-[12px]"
-            style={{ background: "#16223a", color: "#e6ecf7" }}
+            style={{ background: "var(--salle-bouton)", color: "var(--salle-encre)" }}
             aria-label={t.zoomer}
           >
             +
