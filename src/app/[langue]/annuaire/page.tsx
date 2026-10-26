@@ -11,8 +11,21 @@ import {
   LANGUE_PAR_DEFAUT,
   pluriel,
 } from "@/langues"
-import { api } from "@/lib/api"
+import { api, ErreurApi } from "@/lib/api"
 import { lireReferentiel } from "@/lib/referentiel"
+
+/**
+ * Ce qu'on écrit au journal quand un appel échoue.
+ *
+ * Le code et le message du service, pas seulement « erreur » : « la colonne
+ * langues_cours n'existe pas » se corrige en une migration, « le service est
+ * injoignable » en attendant qu'il se réveille. Les deux donnaient le même
+ * écran, et sans cette ligne on ne pouvait pas les distinguer.
+ */
+function decrire(e: unknown): string {
+  if (e instanceof ErreurApi) return `${String(e.statut)} ${e.code} — ${e.message}`
+  return e instanceof Error ? e.message : String(e)
+}
 
 type Reponse = {
   donnees: Repetiteur[]
@@ -100,17 +113,37 @@ export default async function PageAnnuaire({
     }
   }
 
+  // Les quatre appels DISENT pourquoi ils échouent.
+  //
+  // Ils ne le disaient pas, et c'est ce qui a coûté le plus de temps le jour
+  // où l'annuaire s'est vidé : l'écran affichait « réessayez dans un moment »
+  // pendant que la vraie cause — une colonne absente — était effacée par un
+  // `catch` muet. Les filtres continuaient de s'afficher, puisqu'ils viennent
+  // de fonctions SQL qui ne touchent pas à cette colonne, et l'écran avait
+  // l'air à moitié vivant sans qu'on sache de quelle moitié.
+  //
+  // Le message à l'écran ne change pas : un visiteur n'a que faire du nom
+  // d'une colonne. C'est le journal du serveur qui reçoit le détail.
   const [reponse, referentiel, villes, bornes] = await Promise.all([
     api<Reponse>(`/v1/repetiteurs?${requete.toString()}`, {
       sansSession: true,
-    }).catch(() => null),
+    }).catch((e: unknown) => {
+      console.error("[annuaire] liste impossible :", decrire(e))
+      return null
+    }),
     lireReferentiel(),
     api<{ donnees: Ville[] }>("/v1/repetiteurs/villes", { sansSession: true })
       .then((r) => r.donnees ?? [])
-      .catch(() => [] as Ville[]),
+      .catch((e: unknown) => {
+        console.error("[annuaire] villes impossibles :", decrire(e))
+        return [] as Ville[]
+      }),
     api<{ bas: number; haut: number }>("/v1/repetiteurs/bornes", {
       sansSession: true,
-    }).catch(() => ({ bas: 0, haut: 0 })),
+    }).catch((e: unknown) => {
+      console.error("[annuaire] bornes impossibles :", decrire(e))
+      return { bas: 0, haut: 0 }
+    }),
   ])
 
   const actifs = Object.values(etat).filter(
