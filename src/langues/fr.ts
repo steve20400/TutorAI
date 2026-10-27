@@ -893,6 +893,9 @@ ajouter: "Ajouter",
 
   seance: {
     ecrisTaReponse: "Écris ta réponse…",
+    terminer: "Terminer",
+    retour: "Retour",
+    terminee: "Séance terminée.",
     envoyer: "Envoyer",
     envoiEchoue: "L'envoi a échoué. Réessaie.",
     pasDeConnexion: "Pas de connexion. Vérifie ton réseau et réessaie.",

@@ -780,6 +780,9 @@ ajouter: "Add",
 
   seance: {
     ecrisTaReponse: "Write your answer…",
+    terminer: "End",
+    retour: "Back",
+    terminee: "Session over.",
     envoyer: "Send",
     envoiEchoue: "Sending failed. Try again.",
     pasDeConnexion: "No connection. Check your network and try again.",

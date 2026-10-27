@@ -1,6 +1,6 @@
 import Link from "next/link"
 import { redirect } from "next/navigation"
-import { chemin, estLangue, LANGUE_PAR_DEFAUT } from "@/langues"
+import { chemin, dictionnaire, estLangue, LANGUE_PAR_DEFAUT } from "@/langues"
 import { supabaseServeur } from "@/lib/supabase/server"
 import { terminerSeance } from "@/actions/seance"
 import { Conversation } from "./conversation"
@@ -12,6 +12,7 @@ export default async function PageSeance({
 }) {
   const { langue: brut, seanceId } = await params
   const langue = estLangue(brut) ? brut : LANGUE_PAR_DEFAUT
+  const t = dictionnaire(langue).seance
   const supabase = await supabaseServeur()
 
   const {
@@ -40,11 +41,31 @@ export default async function PageSeance({
   const terminee = seance.statut !== "en_cours"
 
   return (
+    /*
+     * Une séance est un écran immersif, comme la salle.
+     *
+     * Pas de `Coque` ici, et c'est délibéré : la barre de l'application porte
+     * une recherche et un sélecteur de ville, qui n'ont rien à faire devant un
+     * enfant au milieu d'une leçon, et elle prendrait de la hauteur à la seule
+     * chose qui compte — le fil. La salle a tranché ainsi, et une séance avec
+     * le tuteur et une séance avec un répétiteur sont le même geste pour
+     * l'élève : deux en-têtes différents sur le même geste seraient
+     * l'incohérence.
+     *
+     * `h-dvh` et non `min-h-dvh` : le fil défile DANS la page, et l'en-tête
+     * comme le champ de saisie restent où ils sont. Sur un téléphone, un champ
+     * de saisie qui s'en va quand on remonte lire une réponse oblige à
+     * redescendre pour répondre.
+     */
     <main className="mx-auto flex h-dvh max-w-md flex-col px-4">
-      <header className="flex items-center justify-between border-b border-black/10 py-3 dark:border-white/10">
-        <div>
-          <div className="font-medium">{tuteur.matiere}</div>
-          <div className="text-xs opacity-60">
+      {/* 44 px, comme la barre de la salle. */}
+      <header
+        className="flex h-11 shrink-0 items-center justify-between gap-3 border-b"
+        style={{ borderColor: "var(--bordure)" }}
+      >
+        <div className="min-w-0">
+          <div className="truncate text-[13px] font-medium">{tuteur.matiere}</div>
+          <div className="doux truncate text-[11px]">
             {seance.lecon_titre ?? tuteur.niveau}
           </div>
         </div>
@@ -52,19 +73,19 @@ export default async function PageSeance({
         {terminee ? (
           <Link
             href={chemin(langue, "/tuteur")}
-            className="text-sm opacity-60 underline underline-offset-4"
+            className="doux shrink-0 text-[12.5px] underline underline-offset-4"
           >
-            Retour
+            {t.retour}
           </Link>
         ) : (
-          <form action={terminerSeance}>
+          <form action={terminerSeance} className="shrink-0">
             <input type="hidden" name="langue" value={langue} />
-          <input type="hidden" name="seanceId" value={seance.id} />
+            <input type="hidden" name="seanceId" value={seance.id} />
             <button
               type="submit"
-              className="text-sm opacity-60 underline underline-offset-4 hover:opacity-100"
+              className="doux text-[12.5px] underline underline-offset-4 transition hover:opacity-100"
             >
-              Terminer
+              {t.terminer}
             </button>
           </form>
         )}
@@ -72,14 +93,22 @@ export default async function PageSeance({
 
       {terminee ? (
         <>
-          <div className="flex flex-1 flex-col gap-3 overflow-y-auto py-4">
+          <div className="flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto py-4">
             {(messages ?? []).map((m) => (
               <div
                 key={m.id}
                 className={
                   m.auteur === "eleve"
-                    ? "max-w-[85%] self-end rounded-2xl rounded-br-sm bg-amber-700 px-4 py-2.5 text-white"
-                    : "max-w-[90%] self-start rounded-2xl rounded-bl-sm bg-black/[0.05] px-4 py-2.5 dark:bg-white/[0.08]"
+                    ? "max-w-[85%] self-end rounded-2xl rounded-br-sm px-4 py-2.5"
+                    : "max-w-[92%] self-start rounded-2xl rounded-bl-sm px-4 py-2.5"
+                }
+                style={
+                  m.auteur === "eleve"
+                    ? { background: "var(--accent)", color: "var(--accent-texte)" }
+                    : {
+                        background:
+                          "color-mix(in srgb, var(--texte) 6%, var(--fond))",
+                      }
                 }
               >
                 <p className="whitespace-pre-wrap leading-relaxed">
@@ -88,8 +117,8 @@ export default async function PageSeance({
               </div>
             ))}
           </div>
-          <p className="mb-4 text-center text-sm opacity-60">
-            Séance terminée.
+          <p className="doux mb-4 shrink-0 text-center text-[12.5px]">
+            {t.terminee}
           </p>
         </>
       ) : (

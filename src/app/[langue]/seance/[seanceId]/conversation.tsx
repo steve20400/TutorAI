@@ -91,26 +91,36 @@ export function Conversation({
 
   return (
     <>
-      <div className="flex flex-1 flex-col gap-3 overflow-y-auto py-4">
+      <div className="flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto py-4">
         {bulles.map((b) => (
           <div
             key={b.id}
             className={
               b.auteur === "eleve"
-                ? "max-w-[85%] self-end rounded-2xl rounded-br-sm bg-amber-700 px-4 py-2.5 text-white"
-                : "max-w-[90%] self-start rounded-2xl rounded-bl-sm bg-black/[0.05] px-4 py-2.5 dark:bg-white/[0.08]"
+                ? "max-w-[85%] self-end rounded-2xl rounded-br-sm px-4 py-2.5"
+                : "max-w-[92%] self-start rounded-2xl rounded-bl-sm px-4 py-2.5"
+            }
+            style={
+              b.auteur === "eleve"
+                ? { background: "var(--accent)", color: "var(--accent-texte)" }
+                : {
+                    background:
+                      "color-mix(in srgb, var(--texte) 6%, var(--fond))",
+                  }
             }
           >
             <TexteMathematique texte={b.contenu} />
           </div>
         ))}
 
+        {/* Le même cercle que l'écran d'essai, et non une phrase.
+            « Ton tuteur réfléchit… » était écrit en français en dur : un élève
+            de Bamenda lisait trois mots qu'il ne comprend pas au milieu de sa
+            séance. Le cercle n'a pas de langue, et il porte son libellé pour
+            les lecteurs d'écran. */}
         {enAttente && (
-          <div
-            aria-live="polite"
-            className="max-w-[90%] self-start rounded-2xl rounded-bl-sm bg-black/[0.05] px-4 py-2.5 text-sm opacity-60 dark:bg-white/[0.08]"
-          >
-            Ton tuteur réfléchit…
+          <div className="self-start px-2 py-1" aria-live="polite">
+            <span className="cercle-attente" aria-label={d.commun.enCours} />
           </div>
         )}
 
@@ -120,7 +130,11 @@ export function Conversation({
       {erreur && (
         <p
           role="status"
-          className="mb-2 rounded-lg bg-red-600/10 px-3 py-2 text-sm text-red-700 dark:text-red-400"
+          className="mb-2 shrink-0 rounded-[10px] px-3 py-2.5 text-[13px] leading-relaxed"
+          style={{
+            background: "color-mix(in srgb, var(--erreur-texte) 10%, transparent)",
+            color: "var(--erreur-texte)",
+          }}
         >
           {erreur}
         </p>
@@ -130,7 +144,7 @@ export function Conversation({
         onSubmit={(e) => {
           void envoyer(e)
         }}
-        className="flex items-end gap-2 pb-4"
+        className="flex shrink-0 items-end gap-2 pb-4"
       >
         {/* À côté du champ, comme sur l'écran d'essai : au moment où la
             question « est-ce que je peux continuer ? » se pose, et non dans
@@ -149,13 +163,15 @@ export function Conversation({
           }}
           rows={1}
           placeholder={d.seance.ecrisTaReponse}
-          className="max-h-40 flex-1 resize-none rounded-2xl border border-black/15 bg-transparent px-4 py-2.5 text-base outline-none transition focus:border-amber-600/60 dark:border-white/20"
+          className="max-h-40 flex-1 resize-none rounded-2xl border bg-transparent px-4 py-2.5 text-base outline-none transition"
+          style={{ borderColor: "var(--bordure)", color: "var(--texte)" }}
         />
         <button
           type="submit"
           disabled={enAttente || saisie.trim() === ""}
           aria-label={d.seance.envoyer}
-          className="rounded-full bg-amber-700 px-4 py-2.5 font-medium text-white transition hover:bg-amber-800 disabled:opacity-40"
+          className="rounded-full px-4 py-2.5 font-medium transition hover:opacity-90 disabled:opacity-40"
+          style={{ background: "var(--accent)", color: "var(--accent-texte)" }}
         >
           →
         </button>
