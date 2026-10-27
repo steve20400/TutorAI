@@ -158,7 +158,14 @@ export default async function PageProfilRepetiteur({
           <div className="font-medium">{etape.titre}</div>
           <p className="doux mt-1 text-sm leading-relaxed">{etape.detail}</p>
           {fiche?.motif_refus ? (
-            <p className="mt-2 rounded-lg bg-red-600/10 px-3 py-2 text-sm text-red-700 dark:text-red-400">
+            <p
+              className="mt-2 rounded-[10px] px-3 py-2.5 text-[13px] leading-relaxed"
+              style={{
+                background:
+                  "color-mix(in srgb, var(--erreur-texte) 10%, transparent)",
+                color: "var(--erreur-texte)",
+              }}
+            >
               {fiche.motif_refus}
             </p>
           ) : null}
