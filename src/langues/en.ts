@@ -344,7 +344,9 @@ export const en: Dictionnaire = {
     compteCree:
       "Account created. Open the email sent to {email} to confirm, then sign in.",
     dossierSoumis:
-      "Your file has been submitted. First confirm your address using the email sent to {email}, then wait while our team checks your documents: you will be told by email, accepted or refused, with the reasons.",
+      "Your account is created and your documents are deposited. Confirm your address using the email sent to {email}. One step is left: say where you teach, which subjects and at which levels — that is when your file goes for verification.",
+    dossierACompleter:
+      "Your documents are deposited. One step is left before verification: say where you teach, which subjects and at which levels. Until that is done, nobody looks at your file.",
   },
 
   inscriptionPieces: {
@@ -556,6 +558,13 @@ export const en: Dictionnaire = {
   },
 
   repetiteurProfil: {
+      manque: {
+        ville: "Your city",
+        matieres: "The subjects you teach",
+        niveaux: "The levels you take",
+        bio: "How you work",
+      },
+      completer: "Complete my file",
     titre: "My profile",
     statuts: {
       brouillon: {

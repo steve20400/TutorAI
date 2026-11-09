@@ -122,6 +122,21 @@ export default async function PageEspaceRepetiteur({
     : "brouillon"
   const etape = d.repetiteurProfil.statuts[statut]
 
+  // Les quatre champs qui font passer un dossier de brouillon à « en
+  // attente ». Ce sont exactement ceux que le service vérifie avant de
+  // changer le statut : les lister ailleurs les ferait diverger, et c'est la
+  // copie oubliée qui laisserait quelqu'un attendre pour rien.
+  const manquants = (
+    [
+      ["ville", Boolean(fiche.ville)],
+      ["matieres", (fiche.matieres?.length ?? 0) > 0],
+      ["niveaux", (fiche.niveaux?.length ?? 0) > 0],
+      ["bio", Boolean(fiche.bio)],
+    ] as const
+  )
+    .filter(([, rempli]) => !rempli)
+    .map(([cle]) => cle)
+
   const nomComplet = [profil?.prenom, profil?.nom].filter(Boolean).join(" ")
   const dateLongue = (iso: string | null) =>
     iso
@@ -259,6 +274,40 @@ export default async function PageEspaceRepetiteur({
               <p className="doux mt-1 text-[13px] leading-relaxed">
                 {etape.detail}
               </p>
+
+              {/* CE QUI MANQUE, nommé.
+
+                  « Complétez votre profil » ne dit pas quoi, et un dossier
+                  en brouillon n'arrive JAMAIS chez l'administration : il
+                  faut une ville, des matières, des niveaux et une
+                  présentation pour qu'il parte en vérification. Sans cette
+                  liste, le répétiteur attend un examen qui n'aura pas lieu —
+                  c'est exactement ce qui s'est produit. */}
+              {statut === "brouillon" && manquants.length > 0 ? (
+                <>
+                  <ul className="mt-3 flex flex-col gap-1.5">
+                    {manquants.map((m) => (
+                      <li
+                        key={m}
+                        className="flex items-center gap-2 text-[13px]"
+                      >
+                        <span
+                          aria-hidden
+                          className="h-1.5 w-1.5 shrink-0 rounded-full"
+                          style={{ background: "var(--voyant)" }}
+                        />
+                        {d.repetiteurProfil.manque[m]}
+                      </li>
+                    ))}
+                  </ul>
+                  <Link
+                    href={versProfil}
+                    className="bt1 mt-3 inline-flex px-4 py-2 text-[13px]"
+                  >
+                    {d.repetiteurProfil.completer}
+                  </Link>
+                </>
+              ) : null}
               {fiche.motif_refus ? (
                 <p
                   className="mt-2 rounded-[10px] px-3 py-2.5 text-[13px] leading-relaxed"

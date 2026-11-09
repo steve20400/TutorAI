@@ -428,6 +428,22 @@ export async function sInscrire(
   }
 
   revalidatePath("/", "layout")
+
+  // Un répétiteur va DIRECTEMENT au formulaire de son dossier.
+  //
+  // Il atterrissait sur son espace, avec un message lui disant d'attendre la
+  // vérification — alors que son dossier était en brouillon et que personne
+  // n'allait le regarder. Il manquait quatre champs : la ville, les matières,
+  // les niveaux, la présentation. Ce sont eux qui font passer le dossier en
+  // attente, et sans eux l'administration ne voit rien arriver.
+  //
+  // On enchaîne donc, tant qu'il est encore en train de s'inscrire. Lui faire
+  // trouver tout seul un bouton « Modifier mon dossier » après coup, c'est le
+  // laisser croire qu'il a fini.
+  if (role === "repetiteur") {
+    redirect(`${chemin(langue, "/repetiteur/profil")}?nouveau=1`)
+  }
+
   redirect(chemin(langue, ACCUEIL_PAR_ROLE[role]))
 }
 

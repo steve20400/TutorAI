@@ -366,8 +366,15 @@ export const fr = {
     // part en vérification, et c'est l'administration qui ouvre la porte.
     // Lui dire « connecte-toi » l'envoyait buter contre un espace vide sans
     // comprendre ce qu'il attendait.
+    // Il disait « Votre dossier est soumis » et c'était faux : un dossier ne
+    // part en vérification que lorsqu'il porte une ville, des matières, des
+    // niveaux et une présentation. Sans eux il reste en brouillon, personne
+    // ne le regarde, et le répétiteur attend un courriel qui ne viendra
+    // jamais. On dit donc ce qui manque, et c'est tout ce qui compte ici.
     dossierSoumis:
-      "Votre dossier est soumis. Confirmez d'abord votre adresse par l'email envoyé à {email}, puis attendez la vérification de vos pièces par notre équipe : vous serez prévenu par email, accepté ou refusé, avec les raisons.",
+      "Votre compte est créé et vos pièces sont déposées. Confirmez votre adresse par l'email envoyé à {email}. Il restera une étape : dire où vous enseignez, quelles matières et à quels niveaux — c'est à ce moment-là que votre dossier partira en vérification.",
+    dossierACompleter:
+      "Vos pièces sont déposées. Il reste une étape avant la vérification : dites où vous enseignez, quelles matières et à quels niveaux. Tant que ce n'est pas fait, personne n'examine votre dossier.",
   },
 
   /**
@@ -624,6 +631,13 @@ export const fr = {
   },
 
   repetiteurProfil: {
+      manque: {
+        ville: "Votre ville",
+        matieres: "Les matières que vous enseignez",
+        niveaux: "Les niveaux que vous prenez",
+        bio: "Votre façon de travailler",
+      },
+      completer: "Compléter mon dossier",
     titre: "Mon profil",
     statuts: {
       brouillon: {
