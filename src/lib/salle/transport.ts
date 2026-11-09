@@ -87,6 +87,8 @@ export async function ouvrirFeuille({
   feuilleId,
   seanceId,
   moi,
+  debutMs,
+  enregistre,
   surEtat,
 }: {
   feuilleId: string
@@ -98,7 +100,17 @@ export async function ouvrirFeuille({
    * couleur se décide au moment de peindre, d'après le thème du moment. Voir
    * `couleurs.ts`.
    */
-  moi: { nom: string; role: Role }
+  moi: { id: string; nom: string; role: Role }
+  /**
+   * L'heure d'ouverture de la séance, en millisecondes.
+   *
+   * La trace garde une POSITION dans le cours, pas un horodatage absolu :
+   * c'est « à la douzième minute » qu'on rejoue, et les horloges des deux
+   * navigateurs ne sont pas d'accord à la seconde près.
+   */
+  debutMs: number
+  /** Le module d'enregistrement est-il allumé ? La base le revérifie. */
+  enregistre: boolean
   surEtat?: (etat: EtatTransport) => void
 }): Promise<Salon> {
   const supabase = supabaseNavigateur()
@@ -142,12 +154,29 @@ export async function ouvrirFeuille({
     void canal.send({ type: "broadcast", event: "y", payload: message })
   }
 
+  // Ce qui part sur le réseau, et ce qui entre dans la trace.
+  //
   // `origine` distingue ce qui vient de nous de ce qui vient du réseau : sans
   // elle, appliquer une mise à jour reçue la rediffuserait aussitôt, et les
   // deux navigateurs se renverraient la balle indéfiniment.
+  //
+  // Chacun n'enregistre QUE ses propres gestes. La politique l'impose
+  // (`auteur = auth.uid()`), et c'est ce qui protège l'enfant : sans cela, le
+  // répétiteur pourrait déposer une trace au nom de l'élève, et la pièce
+  // censée le protéger se retournerait contre lui. Les deux moitiés se
+  // recollent à la relecture, remises dans l'ordre par leur position.
   doc.on("update", (maj: Uint8Array, origine: unknown) => {
     if (origine === "reseau" || origine === "base") return
     diffuser({ type: "maj", charge: enTexte(maj) })
+    if (enregistre) {
+      aTracer.push({
+        seance_id: seanceId,
+        feuille_id: feuilleId,
+        t_ms: Math.max(0, Date.now() - debutMs),
+        auteur: moi.id,
+        maj: enHexa(maj),
+      })
+    }
   })
 
   presence.on("update", (
@@ -200,8 +229,18 @@ export async function ouvrirFeuille({
   })
 
   // ── 3. L'enregistrement ─────────────────────────────────────────────────
+  //
+  // Deux choses différentes partent d'ici, et il ne faut pas les confondre.
+  // L'ÉTAT est le cahier : il s'écrase, il dit à quoi ressemble la feuille
+  // maintenant. La TRACE est la pièce : elle s'ajoute, elle dit ce qui s'est
+  // passé. Un cahier se relit, une pièce se rejoue.
+  const aTracer: LigneDeTrace[] = []
   let aEcrire = false
+
   const minuterie = setInterval(() => {
+    // La trace d'abord : c'est elle qui ne se rattrape pas. Un état perdu se
+    // réécrira au prochain trait ; un geste perdu l'est pour de bon.
+    void deposerLaTrace(aTracer)
     if (!aEcrire) return
     aEcrire = false
     void enregistrer(doc, feuilleId)
@@ -219,11 +258,55 @@ export async function ouvrirFeuille({
       clearInterval(minuterie)
       presence.destroy()
       await supabase.removeChannel(canal)
+      // Les derniers gestes, avant tout le reste : fermer l'onglet ne doit pas
+      // coûter les deux dernières secondes de la pièce.
+      await deposerLaTrace(aTracer)
       // Un dernier enregistrement, toujours : fermer l'onglet ne doit pas
       // coûter les deux dernières secondes.
       await enregistrer(doc, feuilleId)
       doc.destroy()
     },
+  }
+}
+
+/** Une ligne de la trace, telle qu'elle part en base. */
+type LigneDeTrace = {
+  seance_id: string
+  feuille_id: string
+  t_ms: number
+  auteur: string
+  maj: string
+}
+
+/**
+ * Dépose les gestes accumulés, et vide le tampon.
+ *
+ * Le tampon est vidé AVANT l'écriture, pas après : si l'écriture échoue, les
+ * gestes sont perdus plutôt que redéposés en double au vidage suivant. Une
+ * trace qui contient deux fois le même trait rejouerait un cours qui n'a pas
+ * eu lieu — et c'est une pièce, pas un brouillon. Mieux vaut un trou, dit
+ * bruyamment, qu'une invention silencieuse.
+ *
+ * Une seule insertion pour tous les gestes d'une bouffée : un trait de stylet
+ * en produit plusieurs par seconde, et autant d'allers-retours tueraient une
+ * connexion mobile camerounaise bien avant la base.
+ */
+async function deposerLaTrace(tampon: LigneDeTrace[]): Promise<void> {
+  if (tampon.length === 0) return
+  const lot = tampon.splice(0, tampon.length)
+  try {
+    const supabase = supabaseNavigateur()
+    const { error } = await supabase.from("traces_salle").insert(lot)
+    if (error) throw error
+  } catch (erreur) {
+    // Bruyant, et sans interrompre la séance : le cours continue, et ce qui
+    // est à l'écran reste juste. Mais le dire, parce qu'une séance qu'on
+    // croit enregistrée et qui ne l'est pas est pire qu'une séance dont on
+    // sait qu'elle ne l'est pas.
+    console.error(
+      `[salle] ${String(lot.length)} geste(s) non enregistré(s) :`,
+      erreur,
+    )
   }
 }
 

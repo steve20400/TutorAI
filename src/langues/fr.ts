@@ -859,6 +859,7 @@ ajouter: "Ajouter",
 
   salle: {
     titre: "Séance",
+    sansEnregistrement: "Cette séance n'est pas enregistrée.",
     feuille: "Feuille",
     outils: {
       main_levee: "main levée",

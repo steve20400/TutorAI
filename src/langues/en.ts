@@ -751,6 +751,7 @@ ajouter: "Add",
 
   salle: {
     titre: "Lesson",
+    sansEnregistrement: "This session is not being recorded.",
     feuille: "Sheet",
     outils: {
       main_levee: "freehand",

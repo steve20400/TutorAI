@@ -1,6 +1,7 @@
 import { notFound, redirect } from "next/navigation"
 
 import { chemin, dictionnaire, estLangue, LANGUE_PAR_DEFAUT } from "@/langues"
+import { lireParametres } from "@/lib/parametres"
 import { supabaseServeur } from "@/lib/supabase/server"
 import { Salle, type Feuille } from "./salle"
 
@@ -43,7 +44,7 @@ export default async function PageSalle({
   // `notFound` ne dit pas si elle existe ailleurs.
   const { data: seance } = await supabase
     .from("seances_humaines")
-    .select("id, terminee_le, lecon_id, contrat:contrats!inner (matiere, repetiteur_id, eleve_id)")
+    .select("id, terminee_le, demarree_le, lecon_id, contrat:contrats!inner (matiere, repetiteur_id, eleve_id)")
     .eq("id", seanceId)
     .maybeSingle()
 
@@ -88,9 +89,20 @@ export default async function PageSalle({
     (contrat?.matiere as string | null) ??
     d.salle.titre
 
+  // L'enregistrement est-il allumé ?
+  //
+  // Lu ici et non deviné dans le navigateur : c'est ce qui décide si le
+  // voyant rouge dit la vérité. La base le revérifie de son côté — une
+  // politique refuse la trace si le module est éteint — mais l'écran doit
+  // déjà le dire juste, sans quoi on annonce à une famille un enregistrement
+  // qui n'a pas lieu.
+  const parametres = await lireParametres()
+
   return (
     <Salle
       seanceId={seanceId}
+      enregistre={parametres.enregistrement_actif}
+      debutLe={(seance.demarree_le as string | null) ?? null}
       feuilles={feuilles}
       moi={{
         id: user.id,

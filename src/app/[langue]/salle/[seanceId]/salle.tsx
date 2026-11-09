@@ -59,6 +59,8 @@ export function Salle({
   lecture,
   titre,
   sortieVers,
+  enregistre,
+  debutLe,
   d,
 }: {
   seanceId: string
@@ -69,9 +71,33 @@ export function Salle({
   titre: string
   /** Où l'on atterrit en quittant la salle si rien ne précède dans l'histoire. */
   sortieVers: string
+  /**
+   * Le module d'enregistrement est-il allumé ?
+   *
+   * Il décide du voyant. Le voyant brillait sans condition, alors que le
+   * module est éteint par défaut — on annonçait donc un enregistrement à une
+   * famille pendant que rien n'était capté. C'est exactement le genre de
+   * mensonge qu'une application de protection ne peut pas se permettre.
+   */
+  enregistre: boolean
+  /**
+   * L'ouverture de la séance, en ISO, ou `null` si elle n'a pas démarré.
+   *
+   * Une date et non des millisecondes : lire l'horloge est impur, et le
+   * serveur n'a pas à le faire pendant son rendu. C'est le navigateur qui
+   * convertit — et lui seul a besoin de savoir l'heure qu'il est.
+   */
+  debutLe: string | null
   d: Dictionnaire
 }) {
   const t = d.salle
+
+  // L'origine des temps de la trace. `useState` avec une fonction : on la lit
+  // UNE fois, au montage, et non à chaque rendu — sans quoi chaque re-rendu
+  // décalerait la position des gestes suivants.
+  const [debutMs] = useState(() =>
+    debutLe ? new Date(debutLe).getTime() : Date.now(),
+  )
 
   // La liste vit : une feuille ajoutée par l'autre doit apparaître sans
   // recharger, et celle qu'on vient d'ajouter soi-même tout de suite.
@@ -98,7 +124,11 @@ export function Salle({
       const salonOuvert = await ouvrirFeuille({
         feuilleId: active,
         seanceId,
-        moi: { nom: moi.nom, role },
+        moi: { id: moi.id, nom: moi.nom, role },
+        debutMs,
+        // Celui qui regarde sans écrire n'enregistre rien : il n'a pas de
+        // geste à déposer, et la politique le refuserait de toute façon.
+        enregistre: enregistre && !lecture,
         surEtat: (e) => {
           if (vivant) poserEtat(e)
         },
@@ -120,7 +150,7 @@ export function Salle({
       // coûter les deux dernières secondes de la précédente.
       if (a) void a.fermer()
     }
-  }, [active, seanceId, moi.nom, role])
+  }, [active, seanceId, moi.id, moi.nom, role, debutMs, enregistre, lecture])
 
   const feuilleActive = liste.find((f) => f.id === active)
 
@@ -393,11 +423,22 @@ export function Salle({
           {t.annuler}
         </button>
 
+        {/* Le voyant, et il ne brille que si quelque chose est capté.
+
+            Il brillait sans condition. Le module est éteint par défaut : on
+            affichait donc « La séance est enregistrée » à un enfant et à un
+            répétiteur pendant que rien ne l'était. Et dans l'autre sens, le
+            jour où le module s'allume, les deux doivent le savoir — on ne
+            capte pas quelqu'un en silence. */}
         <span
           className="ml-auto h-2 w-2 shrink-0 rounded-full"
-          style={{ background: "var(--salle-voyant)" }}
-          aria-label={t.enregistrement}
-          title={t.enregistrement}
+          style={{
+            background: enregistre
+              ? "var(--salle-voyant)"
+              : "var(--salle-bordure)",
+          }}
+          aria-label={enregistre ? t.enregistrement : t.sansEnregistrement}
+          title={enregistre ? t.enregistrement : t.sansEnregistrement}
         />
       </div>
     </div>
