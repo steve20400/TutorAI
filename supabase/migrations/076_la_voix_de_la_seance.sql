@@ -79,9 +79,19 @@ on conflict (id) do update
  * « cahier » — c'est même l'état par défaut après la migration 075 — et dans
  * ce cas aucun micro ne doit pouvoir déposer quoi que ce soit.
  */
-drop function if exists son_capte();
-
-create function son_capte()
+-- `create or replace`, et surtout PAS `drop` : des politiques dépendent de
+-- cette fonction, et Postgres refuse alors de la supprimer (2BP01). La
+-- migration échouait donc à son deuxième passage — transaction annulée, donc
+-- sans dégât, mais une migration qui ne se rejoue pas n'en est pas une.
+--
+-- La règle, et elle est plus fine que « toujours supprimer d'abord » :
+--   • le type de retour NE CHANGE PAS  →  `create or replace`, toujours ;
+--   • le type de retour change          →  supprimer, mais il faut alors
+--     recréer tout ce qui en dépendait.
+--
+-- Ici le retour est un booléen et le restera. La 071 était l'autre cas : on
+-- ajoutait deux colonnes au retour d'une fonction, donc son type changeait.
+create or replace function son_capte()
 returns boolean
 language sql
 stable

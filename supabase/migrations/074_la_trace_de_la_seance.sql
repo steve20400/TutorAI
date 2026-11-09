@@ -105,12 +105,19 @@ alter table traces_salle enable row level security;
  * Et dans l'autre sens — c'est celui qui compte — une famille à qui on a dit
  * « rien n'est enregistré » doit pouvoir le tenir pour vrai.
  */
--- Supprimée d'abord : `create or replace` ne sait pas changer le type de
--- retour d'une fonction, et l'échec annulerait la migration ENTIÈRE,
--- table comprise. Leçon de la 071.
-drop function if exists enregistrement_allume();
-
-create function enregistrement_allume()
+-- `create or replace`, et surtout PAS `drop` : des politiques dépendent de
+-- cette fonction, et Postgres refuse alors de la supprimer (2BP01). La
+-- migration échouait donc à son deuxième passage — transaction annulée, donc
+-- sans dégât, mais une migration qui ne se rejoue pas n'en est pas une.
+--
+-- La règle, et elle est plus fine que « toujours supprimer d'abord » :
+--   • le type de retour NE CHANGE PAS  →  `create or replace`, toujours ;
+--   • le type de retour change          →  supprimer, mais il faut alors
+--     recréer tout ce qui en dépendait.
+--
+-- Ici le retour est un booléen et le restera. La 071 était l'autre cas : on
+-- ajoutait deux colonnes au retour d'une fonction, donc son type changeait.
+create or replace function enregistrement_allume()
 returns boolean
 language sql
 stable
