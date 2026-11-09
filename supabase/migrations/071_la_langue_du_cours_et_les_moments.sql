@@ -88,7 +88,20 @@ update repetiteurs set langues_cours = array['fr'] where langues_cours = '{}';
 -- 2. LE DOSSIER PUBLIC LES REND
 -- =============================================================================
 
-create or replace function repetiteur_public(rid uuid)
+-- On la SUPPRIME avant de la recréer.
+--
+-- `create or replace` ne sait pas changer le type de retour d'une fonction :
+-- Postgres refuse par 42P13 « cannot change return type of existing
+-- function », et comme tout est dans une transaction, la migration entière
+-- est annulée — colonnes comprises. Or on ajoute ici deux colonnes à ce que
+-- la fonction rend, donc son type de retour change forcément.
+--
+-- `if exists` pour que la migration passe aussi sur une base neuve, où la
+-- fonction n'a jamais existé. Les droits sont réaccordés juste après : une
+-- fonction recréée repart sans aucun grant.
+drop function if exists repetiteur_public(uuid);
+
+create function repetiteur_public(rid uuid)
 returns table (
   id uuid,
   prenom text,
