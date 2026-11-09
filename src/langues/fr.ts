@@ -1046,6 +1046,15 @@ ajouter: "Ajouter",
       retirerCachet: "Retirer le cachet",
     },
     familles: {
+      enregistrement: {
+        titre: "L'enregistrement des séances",
+        ouvert:
+          "Ouvert sur ce compte. Le parent peut l'accepter ou le refuser depuis ses réglages.",
+        ferme:
+          "Fermé sur ce compte. Le parent ne peut pas le remettre lui-même — ce sera l'abonnement qui rouvrira.",
+        ouvrir: "Ouvrir",
+        fermer: "Fermer",
+      },
       detailFamille: "Famille",
       leParent: "Le parent",
       rattachements: "Tentatives de rattachement",

@@ -36,3 +36,35 @@ export async function choisirEnregistrement(
 
   revalidatePath("/", "layout")
 }
+
+/**
+ * L'administration ouvre ou ferme l'enregistrement sur un compte précis.
+ *
+ * C'est l'interrupteur que le paiement actionnera. Tant que l'abonnement
+ * n'existe pas, il s'actionne à la main — et le jour venu, c'est la même
+ * fonction que le paiement appellera, pas une seconde écrite en urgence.
+ *
+ * La base revérifie que l'appelant est bien de l'administration : un écran
+ * n'est pas une sécurité, et celui-ci commande une fonctionnalité qui
+ * protège des enfants.
+ */
+export async function permettreEnregistrement(
+  donnees: FormData,
+): Promise<{ erreur?: string } | void> {
+  const compte = String(donnees.get("compte") ?? "")
+  const valeur = String(donnees.get("valeur") ?? "") === "true"
+  if (!compte) return { erreur: "compte_manquant" }
+
+  const supabase = await supabaseServeur()
+  const { error } = await supabase.rpc("admin_permet_l_enregistrement", {
+    compte,
+    valeur,
+  })
+
+  if (error) {
+    console.error("[enregistrement] bascule administration refusée :", error)
+    return { erreur: "refuse" }
+  }
+
+  revalidatePath("/", "layout")
+}

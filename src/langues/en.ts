@@ -922,6 +922,15 @@ ajouter: "Add",
       retirerCachet: "Remove the stamp",
     },
     familles: {
+      enregistrement: {
+        titre: "Recording of lessons",
+        ouvert:
+          "Open on this account. The parent can accept or refuse it from their settings.",
+        ferme:
+          "Closed on this account. The parent cannot turn it back on — the subscription will reopen it.",
+        ouvrir: "Open",
+        fermer: "Close",
+      },
       detailFamille: "Family",
       leParent: "Parent",
       rattachements: "Link attempts",

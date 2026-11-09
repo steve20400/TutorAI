@@ -3,6 +3,7 @@ import { BoutonAction } from "@/composants/bouton-action"
 
 import { desactiverCompte, reactiverCompte } from "@/actions/admin"
 import { EnteteAdmin, RienEncore } from "@/composants/admin/entete"
+import { PermisEnregistrement } from "@/composants/admin/permis-enregistrement"
 import { Avatar } from "@/composants/avatar"
 import {
   chemin,
@@ -20,6 +21,8 @@ type Personne = {
   prenom: string | null
   nom: string | null
   identifiant: string | null
+  /** Seul le parent le porte : c'est lui qui consent pour sa famille. */
+  enregistrement_permis?: boolean | null
   telephone?: string | null
   pays?: string | null
   cree_le?: string | null
@@ -196,6 +199,19 @@ export default async function PageFamille({
               </form>
             )}
           </div>
+
+          {/* La porte du futur abonnement.
+
+              L'enregistrement sera payant : le jour venu, c'est cette même
+              fonction que le paiement appellera. Elle est posée maintenant
+              pour qu'il n'y ait alors qu'un fil à brancher.
+
+              Elle AUTORISE, elle n'impose pas : le parent garde son choix
+              par-dessus, et l'interrupteur global reste au-dessus des deux. */}
+          <PermisEnregistrement
+            compte={parent.id}
+            permis={parent.enregistrement_permis !== false}
+          />
         </section>
 
         {/* Les tentatives de rattachement.
