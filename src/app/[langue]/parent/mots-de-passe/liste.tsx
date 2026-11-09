@@ -1,6 +1,7 @@
 "use client"
 
 import { useActionState } from "react"
+import { BoutonAction } from "@/composants/bouton-action"
 
 import { dictionnaire, remplir, type Langue } from "@/langues"
 import {
@@ -108,9 +109,9 @@ function Carte({
       <form action={renvoyerLaDemande} className="mt-2">
         <input type="hidden" name="langue" value={langue} />
         <input type="hidden" name="eleve" value={demande.eleve_id} />
-        <button type="submit" className="doux text-[12px] underline underline-offset-4">
+        <BoutonAction className="doux text-[12px] underline underline-offset-4">
           {t.renvoyer}
-        </button>
+        </BoutonAction>
       </form>
     </section>
   )

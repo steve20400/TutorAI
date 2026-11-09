@@ -1,5 +1,6 @@
 import Link from "next/link"
 import { redirect } from "next/navigation"
+import { BoutonAction } from "@/composants/bouton-action"
 import { Coque } from "@/composants/coque"
 import { chemin, dictionnaire, estLangue, LANGUE_PAR_DEFAUT } from "@/langues"
 import { supabaseServeur } from "@/lib/supabase/server"
@@ -93,12 +94,11 @@ export default async function PageSeance({
           <form action={terminerSeance} className="shrink-0">
             <input type="hidden" name="langue" value={langue} />
             <input type="hidden" name="seanceId" value={seance.id} />
-            <button
-              type="submit"
-              className="doux text-[12.5px] underline underline-offset-4 transition hover:opacity-100"
-            >
+            {/* Il clôt la séance — un geste qu'on ne défait pas — et il ne
+                disait rien pendant qu'il partait. On recliquait. */}
+            <BoutonAction className="doux text-[12.5px] underline underline-offset-4 transition hover:opacity-100">
               {t.terminer}
-            </button>
+            </BoutonAction>
           </form>
         )}
       </header>

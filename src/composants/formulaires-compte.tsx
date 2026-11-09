@@ -1,6 +1,7 @@
 "use client"
 
 import { useActionState, useState } from "react"
+import { BoutonAction } from "@/composants/bouton-action"
 
 import {
   changerMotDePasse,
@@ -156,13 +157,12 @@ export function FormulairesCompte({
             </p>
           ) : null}
 
-          <button
-            type="submit"
-            className="bt1 self-start"
-            disabled={identiteEnCours}
-          >
+          {/* Le bouton était seulement grisé pendant l'envoi : un gris ne se
+              distingue pas d'un bouton désactivé pour une autre raison. Le
+              cercle, lui, dit que ça travaille. */}
+          <BoutonAction className="bt1 self-start" occupe={identiteEnCours}>
             {t.enregistrer}
-          </button>
+          </BoutonAction>
         </form>
       </section>
 
@@ -217,9 +217,9 @@ export function FormulairesCompte({
             </p>
           ) : null}
 
-          <button type="submit" className="bt2 self-start" disabled={mdpEnCours}>
+          <BoutonAction className="bt2 self-start" occupe={mdpEnCours}>
             {t.changerMotDePasse}
-          </button>
+          </BoutonAction>
         </form>
       </section>
     </div>

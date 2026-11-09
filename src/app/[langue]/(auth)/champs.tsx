@@ -122,9 +122,24 @@ export function Bouton({
     <button
       type="submit"
       disabled={enCours || desactive}
-      className="bouton mt-1 w-full px-4 py-3.5 text-[15px]"
+      aria-busy={enCours}
+      className="bouton mt-1 inline-flex w-full items-center justify-center gap-2.5 px-4 py-3.5 text-[15px]"
     >
-      {enCours ? d.commun.enCours : children}
+      {/* Le libellé RESTE, et un cercle tourne devant lui.
+
+          Il était remplacé par « Un instant… ». On perdait alors de vue ce
+          qu'on avait demandé — et sur le service endormi, qui met jusqu'à
+          cinquante secondes à se réveiller, cinquante secondes devant un
+          bouton qui ne dit plus « Se connecter » donnent l'impression d'avoir
+          cliqué ailleurs.
+
+          C'est la règle déjà tenue par `BoutonAction` côté administration.
+          Deux boutons d'attente qui ne se comportent pas pareil dans la même
+          application, c'est un de trop. */}
+      {enCours ? <span aria-hidden className="cercle-attente" /> : null}
+      {children}
+      {/* Pour les lecteurs d'écran : le cercle ne dit rien, cette phrase si. */}
+      {enCours ? <span className="sr-only">{d.commun.enCours}</span> : null}
     </button>
   )
 }

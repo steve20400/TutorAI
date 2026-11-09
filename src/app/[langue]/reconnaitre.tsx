@@ -1,4 +1,5 @@
 import { Avatar } from "@/composants/avatar"
+import { BoutonAction } from "@/composants/bouton-action"
 import { remplir, type Langue, dictionnaire } from "@/langues"
 import { repondreAuRattachement } from "@/actions/liens"
 
@@ -70,18 +71,18 @@ export function Reconnaitre({
                 <input type="hidden" name="langue" value={langue} />
                 <input type="hidden" name="demande" value={demande.id} />
                 <input type="hidden" name="oui" value="1" />
-                <button type="submit" className="bt1 px-4 py-2">
+                <BoutonAction className="bt1 px-4 py-2">
                   {t.oui}
-                </button>
+                </BoutonAction>
               </form>
 
               <form action={repondreAuRattachement}>
                 <input type="hidden" name="langue" value={langue} />
                 <input type="hidden" name="demande" value={demande.id} />
                 <input type="hidden" name="oui" value="0" />
-                <button type="submit" className="bt2 px-4 py-2">
+                <BoutonAction className="bt2 px-4 py-2">
                   {t.non}
-                </button>
+                </BoutonAction>
               </form>
             </div>
 

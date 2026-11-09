@@ -1,6 +1,7 @@
 import Link from "next/link"
 import { redirect } from "next/navigation"
 
+import { BoutonAction } from "@/composants/bouton-action"
 import { Retour } from "@/composants/retour"
 import { chemin, dictionnaire, estLangue, LANGUE_PAR_DEFAUT } from "@/langues"
 import { exigerModulePage } from "@/lib/parametres"
@@ -86,9 +87,13 @@ export default async function PageTuteur({
         <form action={demarrerSeance}>
           <input type="hidden" name="tuteurId" value={tuteur.id} />
           <input type="hidden" name="langue" value={langue} />
-          <button type="submit" className="bouton w-full px-4 py-4">
+          {/* Commencer une séance appelle le modèle : sur un service endormi,
+              cela prend des dizaines de secondes. Muet, le bouton se faisait
+              cliquer trois fois — donc trois séances ouvertes, et des jetons
+              consommés pour rien. */}
+          <BoutonAction className="bouton w-full px-4 py-4">
             {d.tuteur.commencer}
-          </button>
+          </BoutonAction>
         </form>
       )}
 
