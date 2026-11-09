@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useRef, useState } from "react"
+import { Reflexion } from "@/composants/reflexion"
 
 import { Jauge } from "@/composants/jauge"
 import { TexteMathematique } from "@/composants/texte-mathematique"
@@ -167,11 +168,7 @@ export function Essai({ langue }: { langue: Langue }) {
             </div>
           ))}
 
-          {enAttente ? (
-            <div className="self-start px-2 py-1">
-              <span className="cercle-attente" aria-label={d.commun.enCours} />
-            </div>
-          ) : null}
+          {enAttente ? <Reflexion /> : null}
 
           <div ref={fin} />
         </div>

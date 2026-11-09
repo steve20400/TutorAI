@@ -51,6 +51,7 @@ export const fr = {
   },
 
   commun: {
+    reflexion: "Le tuteur réfléchit…",
     retour: "Retour",
     choisirPhoto: "Choisir une photo",
     changerPhoto: "Changer la photo",

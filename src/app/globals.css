@@ -188,6 +188,39 @@ body {
   }
 }
 
+/* Les trois points de la réflexion.
+
+   Un cercle de 14 px au bord de l'écran ne se voit pas : on croyait la
+   fenêtre figée pendant que le tuteur cherchait. Trois points qui rebondent
+   dans une bulle, à la place même où la réponse arrivera, disent deux choses
+   d'un coup — ça travaille, et ça arrivera ICI. */
+.points-reflexion > span {
+  display: inline-block;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: currentColor;
+  opacity: 0.35;
+  animation: rebond-point 1.25s ease-in-out infinite;
+}
+.points-reflexion > span:nth-child(2) { animation-delay: 0.16s; }
+.points-reflexion > span:nth-child(3) { animation-delay: 0.32s; }
+
+@keyframes rebond-point {
+  0%, 62%, 100% { opacity: 0.35; transform: translateY(0); }
+  31%           { opacity: 1;    transform: translateY(-3.5px); }
+}
+
+/* Moins de mouvement : ils pulsent sur place. L'information demeure. */
+@media (prefers-reduced-motion: reduce) {
+  .points-reflexion > span {
+    animation: pulse-point 1.5s ease-in-out infinite;
+  }
+  @keyframes pulse-point {
+    50% { opacity: 1; }
+  }
+}
+
 .cercle-attente {
   width: 14px;
   height: 14px;

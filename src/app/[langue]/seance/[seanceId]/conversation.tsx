@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react"
 import { JaugeEleve } from "@/composants/jauge-eleve"
+import { Reflexion } from "@/composants/reflexion"
 import { TexteMathematique } from "@/composants/texte-mathematique"
 
 import { useLangue } from "@/langues/contexte"
@@ -118,11 +119,7 @@ export function Conversation({
             de Bamenda lisait trois mots qu'il ne comprend pas au milieu de sa
             séance. Le cercle n'a pas de langue, et il porte son libellé pour
             les lecteurs d'écran. */}
-        {enAttente && (
-          <div className="self-start px-2 py-1" aria-live="polite">
-            <span className="cercle-attente" aria-label={d.commun.enCours} />
-          </div>
-        )}
+        {enAttente && <Reflexion />}
 
         <div ref={bas} />
       </div>

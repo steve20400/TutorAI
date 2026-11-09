@@ -1,5 +1,6 @@
 import Link from "next/link"
 import { redirect } from "next/navigation"
+import { Coque } from "@/composants/coque"
 import { chemin, dictionnaire, estLangue, LANGUE_PAR_DEFAUT } from "@/langues"
 import { supabaseServeur } from "@/lib/supabase/server"
 import { terminerSeance } from "@/actions/seance"
@@ -57,7 +58,18 @@ export default async function PageSeance({
      * de saisie qui s'en va quand on remonte lire une réponse oblige à
      * redescendre pour répondre.
      */
-    <main className="mx-auto flex h-dvh max-w-md flex-col px-4">
+    <div className="flex h-dvh flex-col">
+      {/* La barre de l'application, ici aussi.
+
+          Elle n'y était pas : j'avais jugé qu'un écran immersif devait garder
+          sa hauteur pour le fil. C'était un mauvais calcul — l'écran avait
+          l'air d'une page orpheline, sans marque, sans sortie, sans compte, et
+          un enfant qui veut quitter sa séance n'a que « Terminer », qui clôt
+          la séance au lieu de le ramener. Les cent points qu'elle prend sont
+          moins chers que ça. */}
+      <Coque langue={langue} />
+
+      <main className="mx-auto flex min-h-0 w-full max-w-md flex-1 flex-col px-4">
       {/* 44 px, comme la barre de la salle. */}
       <header
         className="flex h-11 shrink-0 items-center justify-between gap-3 border-b"
@@ -131,6 +143,7 @@ export default async function PageSeance({
           }))}
         />
       )}
-    </main>
+      </main>
+    </div>
   )
 }

@@ -2,6 +2,8 @@
 
 import { useEffect, useRef } from "react"
 
+import { enLignes } from "@/lib/texte-riche"
+
 // La feuille de style de KaTeX. Déclarée en haut plutôt qu'importée à la
 // demande : Next l'assemble alors avec le reste du CSS de la page, en une
 // seule requête. Sans elle, KaTeX rend un empilement illisible — pire que le
@@ -101,10 +103,10 @@ export function TexteMathematique({ texte }: { texte: string }) {
   }, [texte, aDesFormules])
 
   return (
-    <p ref={conteneur} className="whitespace-pre-wrap leading-relaxed">
+    <div ref={conteneur} className="leading-relaxed">
       {morceaux.map((m, i) =>
         m.type === "texte" ? (
-          <span key={i}>{m.valeur}</span>
+          <Riche key={i} texte={m.valeur} />
         ) : (
           <span
             key={i}
@@ -119,6 +121,74 @@ export function TexteMathematique({ texte }: { texte: string }) {
           </span>
         ),
       )}
-    </p>
+    </div>
+  )
+}
+
+/**
+ * Le texte ordinaire, mis en forme.
+ *
+ * Gras, italique, code, puces, titres — et les correspondances de clavier
+ * remplacées par les signes de l'école. Voir `lib/texte-riche.ts` pour le
+ * pourquoi : un enfant du primaire doit reconnaître ce qu'il voit au tableau,
+ * pas apprendre une convention avant sa leçon.
+ *
+ * Rendu en ligne (`display: inline`) : un morceau de texte peut être suivi
+ * d'une formule dans la même phrase, et les couper en blocs ferait sauter la
+ * formule à la ligne au milieu d'une explication.
+ */
+function Riche({ texte }: { texte: string }) {
+  return (
+    <>
+      {enLignes(texte).map((ligne, i) => {
+        if (ligne.t === "vide") return <br key={i} />
+
+        const contenu = ligne.contenu.map((bout, j) => {
+          if (bout.t === "gras") return <strong key={j} className="font-semibold">{bout.v}</strong>
+          if (bout.t === "italique") return <em key={j}>{bout.v}</em>
+          if (bout.t === "code") {
+            return (
+              <code
+                key={j}
+                className="rounded px-1 py-0.5 text-[0.92em]"
+                style={{ background: "color-mix(in srgb, currentColor 10%, transparent)" }}
+              >
+                {bout.v}
+              </code>
+            )
+          }
+          return <span key={j}>{bout.v}</span>
+        })
+
+        if (ligne.t === "titre") {
+          return (
+            <span key={i} className="mt-2 block font-semibold">
+              {contenu}
+            </span>
+          )
+        }
+        if (ligne.t === "puce") {
+          return (
+            <span key={i} className="flex gap-2">
+              <span aria-hidden>•</span>
+              <span className="min-w-0">{contenu}</span>
+            </span>
+          )
+        }
+        if (ligne.t === "numero") {
+          return (
+            <span key={i} className="flex gap-2">
+              <span aria-hidden className="shrink-0 tabular-nums">{ligne.n}.</span>
+              <span className="min-w-0">{contenu}</span>
+            </span>
+          )
+        }
+        return (
+          <span key={i} className="block">
+            {contenu}
+          </span>
+        )
+      })}
+    </>
   )
 }

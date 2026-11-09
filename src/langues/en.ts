@@ -55,6 +55,7 @@ export const en: Dictionnaire = {
   },
 
   commun: {
+    reflexion: "The tutor is thinking…",
     retour: "Back",
     choisirPhoto: "Choose a photo",
     changerPhoto: "Change photo",
