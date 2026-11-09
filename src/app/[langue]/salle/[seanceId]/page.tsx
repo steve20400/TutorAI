@@ -98,10 +98,32 @@ export default async function PageSalle({
   // qui n'a pas lieu.
   const parametres = await lireParametres()
 
+  // L'enregistrement se décide POUR CETTE SÉANCE, pas pour la plateforme.
+  //
+  // Trois niveaux : l'administration allume globalement, l'administration
+  // permet compte par compte, et le parent choisit pour sa famille. Il suffit
+  // d'un non pour que rien ne soit capté — on ne capte jamais la voix d'un
+  // enfant « par défaut d'opposition de l'un des trois ».
+  //
+  // La règle est écrite une seule fois, en base, et les politiques
+  // l'appliquent de leur côté : si l'écran se trompait, la base refuserait
+  // quand même le dépôt.
+  let enregistreCetteSeance = false
+  try {
+    const { data } = await supabase.rpc("enregistrement_de_la_seance", {
+      cible: seanceId,
+    })
+    enregistreCetteSeance = data === true
+  } catch (erreur) {
+    // Dans le doute, on n'enregistre pas et on le dit. Capter par accident
+    // est pire que ne pas capter.
+    console.error("[salle] règle d'enregistrement illisible :", erreur)
+  }
+
   return (
     <Salle
       seanceId={seanceId}
-      enregistre={parametres.enregistrement_actif}
+      enregistre={enregistreCetteSeance}
       modeEnregistrement={parametres.mode_enregistrement}
       debitAudio={parametres.debit_audio}
       debutLe={(seance.demarree_le as string | null) ?? null}

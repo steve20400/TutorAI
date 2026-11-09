@@ -14,6 +14,7 @@ import { MesAdultes, type AdulteRattache } from "./mes-adultes"
 import { FormulairesCompte } from "@/composants/formulaires-compte"
 
 import { ChoixCompte } from "./choix"
+import { ChoixEnregistrement } from "@/composants/choix-enregistrement"
 import { Coque } from "@/composants/coque"
 import { Retour } from "@/composants/retour"
 
@@ -76,6 +77,33 @@ export default async function PageCompte({
   //
   // Ni adresse ni téléphone, comme partout ailleurs : cet écran ne doit pas
   // devenir un moyen d'apprendre comment joindre un adulte hors d'ici.
+  // Le réglage d'enregistrement, pour un adulte seulement.
+  //
+  // Trois informations et pas une : allumé pour la plateforme, permis sur ce
+  // compte, choisi par lui. L'écran a besoin des trois pour dire la vérité —
+  // « ça n'existe pas », « ça existe et vous n'y avez pas droit », ou un
+  // interrupteur qui marche. Un enfant n'en voit rien : il ne consent pas
+  // pour lui-même, c'est son adulte qui le fait.
+  let enregistrement: { allume: boolean; permis: boolean; souhaite: boolean } | null =
+    null
+  if (adulte) {
+    try {
+      const { data } = await supabase.rpc("mon_enregistrement")
+      const ligne = Array.isArray(data) ? data[0] : data
+      if (ligne) {
+        enregistrement = {
+          allume: Boolean(ligne.allume),
+          permis: Boolean(ligne.permis),
+          souhaite: Boolean(ligne.souhaite),
+        }
+      }
+    } catch (erreur) {
+      // Muet à l'écran, bruyant au journal : mieux vaut ne rien proposer que
+      // proposer un interrupteur dont on ignore l'état.
+      console.error("[compte] règle d'enregistrement illisible :", erreur)
+    }
+  }
+
   let mesAdultes: AdulteRattache[] | null = adulte ? [] : null
   if (!adulte) {
     try {
@@ -159,6 +187,17 @@ export default async function PageCompte({
             />
           )}
         </section>
+      ) : null}
+
+      {/* Rien du tout si l'administration n'a pas allumé : pas grisé, pas
+          « bientôt » — absent. Montrer une fonctionnalité éteinte à
+          quelqu'un qui ne peut rien en faire, c'est lui promettre ce qu'on ne
+          tient pas. */}
+      {enregistrement?.allume ? (
+        <ChoixEnregistrement
+          souhaite={enregistrement.souhaite}
+          permis={enregistrement.permis}
+        />
       ) : null}
       </main>
     </div>

@@ -106,6 +106,17 @@ export const fr = {
   },
 
   compte: {
+    enregistrement: {
+      titre: "L'enregistrement des séances",
+      detail:
+        "Les séances de votre famille avec un répétiteur sont enregistrées : ce qui est écrit au tableau, et ce qui est dit. C'est ce qui fait qu'un enfant n'est jamais vraiment seul avec un adulte. L'enregistrement ne se modifie ni ne s'efface, par personne.",
+      actif: "Vos séances sont enregistrées.",
+      inactif: "Vos séances ne sont pas enregistrées.",
+      couper: "Ne plus enregistrer",
+      remettre: "Enregistrer à nouveau",
+      ferme:
+        "L'enregistrement n'est pas ouvert sur votre compte. Rapprochez-vous de l'administration.",
+    },
     titre: "Ton compte",
     titreAdulte: "Votre compte",
     prenom: "Prénom",

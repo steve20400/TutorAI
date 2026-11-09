@@ -101,6 +101,17 @@ export const en: Dictionnaire = {
   },
 
   compte: {
+    enregistrement: {
+      titre: "Recording of lessons",
+      detail:
+        "Your family's lessons with a tutor are recorded: what is written on the board, and what is said. That is what makes sure a child is never truly alone with an adult. A recording cannot be changed or erased, by anyone.",
+      actif: "Your lessons are being recorded.",
+      inactif: "Your lessons are not being recorded.",
+      couper: "Stop recording",
+      remettre: "Record again",
+      ferme:
+        "Recording is not open on your account. Please get in touch with the administration.",
+    },
     titre: "Your account",
     titreAdulte: "Your account",
     prenom: "First name",
