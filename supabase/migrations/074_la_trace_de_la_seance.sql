@@ -105,7 +105,12 @@ alter table traces_salle enable row level security;
  * Et dans l'autre sens — c'est celui qui compte — une famille à qui on a dit
  * « rien n'est enregistré » doit pouvoir le tenir pour vrai.
  */
-create or replace function enregistrement_allume()
+-- Supprimée d'abord : `create or replace` ne sait pas changer le type de
+-- retour d'une fonction, et l'échec annulerait la migration ENTIÈRE,
+-- table comprise. Leçon de la 071.
+drop function if exists enregistrement_allume();
+
+create function enregistrement_allume()
 returns boolean
 language sql
 stable
@@ -162,7 +167,12 @@ create policy "les deux parties deposent leur trace" on traces_salle
  * Un parent qui ouvre « les cours de mon enfant » veut d'abord savoir s'il y a
  * quelque chose à voir.
  */
-create or replace function sommaire_de_la_trace(cible uuid)
+-- Supprimée d'abord : `create or replace` ne sait pas changer le type de
+-- retour d'une fonction, et l'échec annulerait la migration ENTIÈRE,
+-- table comprise. Leçon de la 071.
+drop function if exists sommaire_de_la_trace(uuid);
+
+create function sommaire_de_la_trace(cible uuid)
 returns table (
   gestes       bigint,
   feuilles     bigint,

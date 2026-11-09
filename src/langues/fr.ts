@@ -913,7 +913,10 @@ ajouter: "Ajouter",
       ouvrirLePremier: "Ouvrir le premier",
       seancesEnDirect: { one: "séance en direct", other: "séances en direct" },
       enregistrementEteint: "enregistrement éteint",
-      enregistrementActif: "toutes enregistrées · {resolution}",
+      // Pas de résolution : ce qui est gardé n'est pas une vidéo, c'est
+      // la suite des gestes du cours. Annoncer « 720p » décrirait une
+      // chose qui n'existe pas.
+      enregistrementActif: "toutes enregistrées · le cahier, geste par geste",
       couverture: "Couverture",
       aucuneVille: "Aucune ville couverte pour l'instant.",
       familles: { one: "famille inscrite", other: "familles inscrites" },
@@ -1315,7 +1318,7 @@ modeleEssai: "Servi à qui essaie sans compte",
       "⚠ Aucune séance n'est enregistrée tant que c'est éteint.",
     resolutionTitre: "Résolution des enregistrements",
     resolutionDetail:
-      "Un enregistrement de sécurité doit être lisible, pas beau. Plus la résolution est basse, moins il coûte en stockage — et mieux il passe sur les réseaux de tes utilisateurs.",
+      "Ce réglage attend la caméra, qui n'est pas encore en place. Ce qui est enregistré aujourd'hui est le cahier lui-même — chaque trait, chaque formule, chaque frappe, remis dans l'ordre — et cela n'a pas de résolution. Un enregistrement de sécurité doit être lisible, pas beau : le jour où la vidéo arrivera, plus la résolution sera basse, mieux elle passera sur les réseaux de tes utilisateurs.",
     resolutionCout: "≈ {taille} par heure de cours.",
     journal:
       "Chaque changement est inscrit au journal d'administration, avec son auteur et son horodatage.",

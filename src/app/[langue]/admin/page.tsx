@@ -157,9 +157,7 @@ export default async function TableauDeBord({
             </div>
             <p className="doux mt-1.5 text-[12px]">
               {parametres.enregistrement_actif
-                ? remplir(t.enregistrementActif, {
-                    resolution: parametres.resolution_video,
-                  })
+                ? t.enregistrementActif
                 : t.enregistrementEteint}
             </p>
           </section>
