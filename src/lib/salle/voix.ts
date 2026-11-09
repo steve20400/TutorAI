@@ -5,6 +5,12 @@ import {
   formatPrefere,
   typeNu,
 } from "./formats-voix"
+import {
+  aJeterEnTete,
+  estUnRefus,
+  inutileDEssayer,
+  prochainDelai,
+} from "./reprise"
 
 /**
  * La parole de la séance, captée par morceaux.
@@ -45,9 +51,6 @@ import {
  */
 const MORCEAU_MS = 15_000
 
-/** Au-delà, on cesse de réessayer : le tampon ne doit pas devenir un trou noir. */
-const REESSAIS_MAX = 4
-
 export type EtatVoix =
   /** Le mode ne capte pas la parole. */
   | "eteinte"
@@ -61,6 +64,8 @@ export type EtatVoix =
   | "capte"
   /** Ça enregistre, mais des morceaux ne partent pas. */
   | "en_retard"
+  /** Le réseau est tombé : on enregistre, on garde, on attend. */
+  | "en_pause"
 
 type Morceau = {
   rang: number
@@ -155,6 +160,26 @@ export async function ouvrirLaVoix({
     // Un morceau vide arrive quand le micro n'a rien reçu : on ne dépose pas
     // du silence encodé, mais on avance quand même l'horloge.
     if (donnees.size > 0) {
+      // La vraie limite n'est pas un nombre d'essais, c'est la mémoire : un
+      // onglet qui enfle finit tué par le système, et il emporte la séance
+      // avec lui. Quand il faut jeter, on jette les PLUS ANCIENS — jeter les
+      // plus récents reviendrait à ne jamais rattraper le retard.
+      const jetes = aJeterEnTete(
+        attente.map((m) => m.donnees.size),
+        donnees.size,
+      )
+      if (jetes > 0) {
+        const perdus = attente.splice(0, jetes)
+        // Bruyamment, et en disant QUELLES secondes manquent : un
+        // enregistrement troué qui sait où sont ses trous reste une pièce ;
+        // un enregistrement troué qui l'ignore n'en est plus une.
+        console.error(
+          `[salle] mémoire saturée — ${String(jetes)} morceau(x) perdu(s), de ` +
+            `${String(Math.round((perdus[0]?.tMs ?? 0) / 1000))} s à ` +
+            `${String(Math.round(((perdus.at(-1)?.tMs ?? 0) + (perdus.at(-1)?.dureeMs ?? 0)) / 1000))} s`,
+        )
+      }
+
       attente.push({
         rang: rang++,
         tMs: Math.max(0, debutDuMorceau - debutMs),
@@ -173,68 +198,123 @@ export async function ouvrirLaVoix({
   }
 
   /**
-   * Dépose ce qui attend, dans l'ordre.
+   * Dépose ce qui attend, dans l'ordre, et ne renonce pas sur une coupure.
    *
-   * Un morceau qui échoue retourne en tête de file plutôt que d'être perdu :
-   * une coupure de trente secondes ne doit pas coûter trente secondes de
-   * parole. Au-delà de quelques essais on l'abandonne, bruyamment — un tampon
-   * qui grossit sans fin finirait par étouffer l'onglet, et l'onglet porte la
-   * séance.
+   * ── LA DIFFÉRENCE QUI COMPTE ──
+   *
+   * Une coupure n'est pas un refus. La première version les traitait pareil
+   * et abandonnait après quatre essais — soit une minute de réseau absent,
+   * ce qui est COURT ici. Dix minutes de coupure effaçaient dix minutes de
+   * parole, en silence, pendant que la salle affichait « micro actif ».
+   *
+   *   • Réseau tombé  → on garde, et on attend. Indéfiniment.
+   *   • Base qui dit non → on renonce, et on le dit. Insister ne la fera pas
+   *     changer d'avis, et pour un doublon ce serait même nuisible.
+   *
+   * ── UN SEUL VIDAGE À LA FOIS ──
+   *
+   * `enCoursDeVidage` empêche deux boucles concurrentes : la minuterie de
+   * reprise et l'arrivée d'un morceau peuvent se déclencher ensemble, et
+   * deux boucles sur la même file déposeraient deux fois le même morceau.
    */
+  let enCoursDeVidage = false
+  let minuterie: ReturnType<typeof setTimeout> | null = null
+
+  function replanifier(essais: number): void {
+    if (minuterie !== null || ferme) return
+    minuterie = setTimeout(() => {
+      minuterie = null
+      void vider()
+    }, prochainDelai(essais))
+  }
+
   async function vider(): Promise<void> {
-    if (attente.length === 0) return
-    const supabase = supabaseNavigateur()
+    if (enCoursDeVidage || attente.length === 0) return
 
-    while (attente.length > 0) {
-      const morceau = attente[0]
-      if (!morceau) break
-      const chemin = cheminDuMorceau(seanceId, moi, morceau.rang, extension)
+    // Hors ligne : inutile de brûler un essai. On le dit, et la minuterie
+    // reprendra — l'événement `online` la court-circuitera s'il arrive avant.
+    if (inutileDEssayer(navigator.onLine)) {
+      if (!ferme) surEtat?.("en_pause")
+      replanifier(0)
+      return
+    }
 
-      try {
-        const { error: erreurCoffre } = await supabase.storage
-          .from("voix")
-          .upload(chemin, morceau.donnees, {
-            contentType: typeFichier,
-            // Jamais d'écrasement : un morceau déposé est une pièce. Si le
-            // chemin existe déjà, c'est un doublon de reprise, pas une
-            // correction.
-            upsert: false,
-          })
-        if (erreurCoffre) throw erreurCoffre
+    enCoursDeVidage = true
+    try {
+      const supabase = supabaseNavigateur()
 
-        const { error: erreurLigne } = await supabase
-          .from("morceaux_voix")
-          .insert({
-            seance_id: seanceId,
-            auteur: moi,
-            rang: morceau.rang,
-            t_ms: morceau.tMs,
-            duree_ms: morceau.dureeMs,
-            chemin,
-            octets: morceau.donnees.size,
-          })
-        if (erreurLigne) throw erreurLigne
+      while (attente.length > 0) {
+        const morceau = attente[0]
+        if (!morceau) break
+        const chemin = cheminDuMorceau(seanceId, moi, morceau.rang, extension)
 
-        attente.shift()
-        if (attente.length === 0 && !ferme) surEtat?.("capte")
-      } catch (erreur) {
-        morceau.essais += 1
-        if (morceau.essais >= REESSAIS_MAX) {
-          console.error(
-            `[salle] morceau ${String(morceau.rang)} abandonné après ${String(
-              REESSAIS_MAX,
-            )} essais :`,
-            erreur,
-          )
+        try {
+          const { error: erreurCoffre } = await supabase.storage
+            .from("voix")
+            .upload(chemin, morceau.donnees, {
+              contentType: typeFichier,
+              // Jamais d'écrasement : un morceau déposé est une pièce. Si le
+              // chemin existe déjà, c'est un doublon de reprise, pas une
+              // correction — et le refus qui s'ensuit est la bonne réponse.
+              upsert: false,
+            })
+          if (erreurCoffre) throw erreurCoffre
+
+          const { error: erreurLigne } = await supabase
+            .from("morceaux_voix")
+            .insert({
+              seance_id: seanceId,
+              auteur: moi,
+              rang: morceau.rang,
+              t_ms: morceau.tMs,
+              duree_ms: morceau.dureeMs,
+              chemin,
+              octets: morceau.donnees.size,
+            })
+          if (erreurLigne) throw erreurLigne
+
           attente.shift()
-        } else {
-          console.error("[salle] morceau non déposé, il repassera :", erreur)
+          if (attente.length === 0 && !ferme) surEtat?.("capte")
+        } catch (erreur) {
+          if (estUnRefus(erreur)) {
+            // La base a tranché. On le dit, et on passe au suivant plutôt que
+            // de bloquer toute la file sur un morceau qu'elle ne prendra
+            // jamais.
+            console.error(
+              `[salle] morceau ${String(morceau.rang)} refusé, abandonné :`,
+              erreur,
+            )
+            attente.shift()
+            continue
+          }
+
+          // Le réseau. On GARDE, et on réessaiera — c'est tout l'objet de
+          // cette reprise.
+          morceau.essais += 1
+          console.warn(
+            `[salle] morceau ${String(morceau.rang)} en attente de réseau (essai ${String(morceau.essais)})`,
+          )
+          if (!ferme) {
+            surEtat?.(inutileDEssayer(navigator.onLine) ? "en_pause" : "en_retard")
+          }
+          replanifier(morceau.essais)
+          return
         }
-        if (!ferme) surEtat?.("en_retard")
-        return
       }
+    } finally {
+      enCoursDeVidage = false
     }
   }
+
+  // Le retour du réseau relance tout de suite, sans attendre la minuterie.
+  const auRetour = () => {
+    if (minuterie !== null) {
+      clearTimeout(minuterie)
+      minuterie = null
+    }
+    void vider()
+  }
+  window.addEventListener("online", auRetour)
 
   enregistreur.start(MORCEAU_MS)
   surEtat?.("capte")
@@ -242,6 +322,11 @@ export async function ouvrirLaVoix({
   return {
     async fermer() {
       ferme = true
+      window.removeEventListener("online", auRetour)
+      if (minuterie !== null) {
+        clearTimeout(minuterie)
+        minuterie = null
+      }
       try {
         if (enregistreur.state !== "inactive") {
           // `stop()` provoque un dernier `ondataavailable` : on l'attend,
