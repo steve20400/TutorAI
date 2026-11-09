@@ -3,6 +3,8 @@ import { redirect } from "next/navigation"
 import { chemin, type Langue } from "@/langues"
 import { api } from "./api"
 
+import { type ModeEnregistrement } from "./enregistrement"
+
 /**
  * Paramètres réglables depuis l'espace d'administration, sans redéploiement.
  *
@@ -16,6 +18,21 @@ export type Parametres = {
   enregistrement_actif: boolean
   portefeuille_actif: boolean
   resolution_video: "360p" | "480p" | "720p"
+  /**
+   * Ce qui est capté : le cahier, le cahier et le son, ou les trois.
+   *
+   * Un mode plutôt que trois cases : des cases indépendantes laisseraient
+   * composer des réglages qui n'ont pas de sens, comme filmer sans le son —
+   * cher, et sans valeur de preuve.
+   *
+   * Seul `cahier` a une capture aujourd'hui. Les deux autres attendent le
+   * micro et la caméra, et l'écran d'administration le dit.
+   */
+  mode_enregistrement: ModeEnregistrement
+  /** La parole, en kbit/s. */
+  debit_audio: number
+  /** L'image, en kbit/s. */
+  debit_video: number
   inscriptions_ouvertes: boolean
   /**
    * Deux par défaut : l'élève et son répétiteur. C'est la promesse du produit,
@@ -63,6 +80,9 @@ const DEFAUTS: Parametres = {
   enregistrement_actif: false,
   portefeuille_actif: false,
   resolution_video: "480p",
+  mode_enregistrement: "cahier",
+  debit_audio: 24,
+  debit_video: 300,
   inscriptions_ouvertes: true,
   participants_max: 2,
   ia_fournisseur: "anthropic",

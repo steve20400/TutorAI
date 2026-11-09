@@ -1,6 +1,12 @@
 "use server"
 
 import { redirect } from "next/navigation"
+// `MODES` est déjà pris ici par la monétisation : on nomme le nôtre.
+import {
+  DEBITS_AUDIO,
+  DEBITS_VIDEO,
+  MODES as MODES_ENREGISTREMENT,
+} from "@/lib/enregistrement"
 import { revalidatePath } from "next/cache"
 import { cookies } from "next/headers"
 
@@ -123,6 +129,45 @@ export async function changerResolution(donnees: FormData): Promise<void> {
 
   await exigerSession(langue)
   await agir("/v1/admin/parametres/resolution_video", { valeur })
+}
+
+/**
+ * Choisit ce qu'on capte d'une séance.
+ *
+ * Trois choix, du moins cher au plus fragile : le cahier, le cahier et le
+ * son, les trois. Voir `lib/enregistrement.ts` pour ce que chacun coûte — et
+ * surtout pour le débit montant qu'il exige, qui est la contrainte réelle au
+ * Cameroun.
+ */
+export async function changerModeEnregistrement(
+  donnees: FormData,
+): Promise<void> {
+  const langue = langueDeFormulaire(donnees)
+  const valeur = String(donnees.get("mode") ?? "")
+  if (!(MODES_ENREGISTREMENT as readonly string[]).includes(valeur)) return
+
+  await exigerSession(langue)
+  await agir("/v1/admin/parametres/mode_enregistrement", { valeur })
+}
+
+/**
+ * Choisit le débit de la parole ou de l'image.
+ *
+ * Une seule action pour les deux : elles font le même geste sur deux clés, et
+ * deux copies d'une même validation finissent par diverger — c'est la copie
+ * oubliée qui laisse passer une valeur absurde.
+ */
+export async function changerDebit(donnees: FormData): Promise<void> {
+  const langue = langueDeFormulaire(donnees)
+  const quoi = String(donnees.get("quoi") ?? "")
+  const valeur = Number(donnees.get("debit") ?? NaN)
+
+  const permis: readonly number[] =
+    quoi === "audio" ? DEBITS_AUDIO : quoi === "video" ? DEBITS_VIDEO : []
+  if (!permis.includes(valeur)) return
+
+  await exigerSession(langue)
+  await agir(`/v1/admin/parametres/debit_${quoi}`, { valeur })
 }
 
 /**

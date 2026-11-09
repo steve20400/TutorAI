@@ -7,6 +7,7 @@ import {
   estLangue,
   LANGUE_PAR_DEFAUT,
 } from "@/langues"
+import { remplir } from "@/langues"
 import { exigerAdmin } from "@/lib/admin"
 import { api } from "@/lib/api"
 import { lireParametres } from "@/lib/parametres"
@@ -14,10 +15,23 @@ import {
   basculerParametre,
   changerFournisseur,
   changerModeles,
+  changerDebit,
+  changerModeEnregistrement,
   changerResolution,
 } from "@/actions/admin"
 import { MODULES, type CleModule } from "@/lib/modules"
 import { BoutonAction } from "@/composants/bouton-action"
+import {
+  DEBITS_AUDIO,
+  DEBITS_VIDEO,
+  enTaille,
+  minimumPour,
+  MODES,
+  montantRequis,
+  poidsParHeure,
+  RESOLUTIONS,
+  resolutionTenable,
+} from "@/lib/enregistrement"
 
 /**
  * Modules qui ne peuvent pas s'allumer sans qu'une clé soit enregistrée.
@@ -30,7 +44,6 @@ const CLE_REQUISE: Partial<Record<CleModule, string>> = {
 
 
 
-const RESOLUTIONS = ["360p", "480p", "720p"] as const
 
 export default async function PageModule({
   params,
@@ -166,23 +179,153 @@ export default async function PageModule({
 
         {cle === "enregistrement_actif" ? (
           <section className="carte p-5">
-            <div className="text-[14px] font-medium">{t.resolutionTitre}</div>
+            <div className="text-[14px] font-medium">{t.captureTitre}</div>
+
+            {/* Ce qui existe, et ce qui n'existe pas. Dit AVANT les boutons.
+
+                `enregistrement_url` avait une colonne prête, une lecture
+                prête, et personne pour dire que rien n'écrivait — on a cru
+                pendant des mois que les séances étaient enregistrées. Un
+                réglage qui commande une capture absente referait exactement
+                la même chose, en pire : cette fois quelqu'un l'aurait
+                choisie. */}
             <p className="doux mt-1 text-[12px] leading-relaxed">
-              {d.admin.resolutionDetail}
+              {d.admin.captureDetail}
             </p>
-            <form action={changerResolution} className="mt-3 flex flex-wrap gap-2">
+
+            <form action={changerModeEnregistrement} className="mt-4 flex flex-col gap-2">
               <input type="hidden" name="langue" value={langue} />
-              {RESOLUTIONS.map((r) => (
-                <BoutonAction
-                  key={r}
-                  nom="resolution"
-                  valeur={r}
-                  className={parametres.resolution_video === r ? "bt1" : "bt2"}
-                >
-                  {r}
-                </BoutonAction>
-              ))}
+              {MODES.map((m) => {
+                const choisi = parametres.mode_enregistrement === m
+                const mo = poidsParHeure(
+                  m,
+                  parametres.debit_audio,
+                  parametres.debit_video,
+                )
+                const montant = montantRequis(
+                  m,
+                  parametres.debit_audio,
+                  parametres.debit_video,
+                )
+                return (
+                  <BoutonAction
+                    key={m}
+                    nom="mode"
+                    valeur={m}
+                    className={`${choisi ? "bt1" : "bt2"} justify-between text-left`}
+                  >
+                    <span className="flex flex-col items-start gap-0.5">
+                      <span className="text-[13px]">{d.admin.modes[m].titre}</span>
+                      <span className="text-[11px] opacity-70">
+                        {d.admin.modes[m].detail}
+                      </span>
+                    </span>
+                    <span className="shrink-0 text-right text-[11px] opacity-80">
+                      <span className="block">
+                        {remplir(t.parHeure, { taille: enTaille(mo, langue) })}
+                      </span>
+                      <span className="block">
+                        {montant === 0
+                          ? d.admin.sansMontant
+                          : remplir(d.admin.montantExige, {
+                              debit: String(montant),
+                            })}
+                      </span>
+                    </span>
+                  </BoutonAction>
+                )
+              })}
             </form>
+
+            {/* Le son et l'image ne se règlent que si on les capte. Afficher
+                un curseur de débit vidéo quand on n'enregistre que le cahier,
+                c'est inviter à régler une chose sans effet. */}
+            {parametres.mode_enregistrement !== "cahier" ? (
+              <>
+                <div className="mt-5 text-[13px] font-medium">{t.debitAudioTitre}</div>
+                <p className="doux mt-1 text-[12px] leading-relaxed">
+                  {d.admin.debitAudioDetail}
+                </p>
+                <form action={changerDebit} className="mt-2 flex flex-wrap gap-2">
+                  <input type="hidden" name="langue" value={langue} />
+                  <input type="hidden" name="quoi" value="audio" />
+                  {DEBITS_AUDIO.map((kb) => (
+                    <BoutonAction
+                      key={kb}
+                      nom="debit"
+                      valeur={String(kb)}
+                      className={parametres.debit_audio === kb ? "bt1" : "bt2"}
+                    >
+                      {remplir(t.kbits, { debit: String(kb) })}
+                    </BoutonAction>
+                  ))}
+                </form>
+              </>
+            ) : null}
+
+            {parametres.mode_enregistrement === "video" ? (
+              <>
+                <div className="mt-5 text-[13px] font-medium">{t.debitVideoTitre}</div>
+                <p className="doux mt-1 text-[12px] leading-relaxed">
+                  {d.admin.debitVideoDetail}
+                </p>
+                <form action={changerDebit} className="mt-2 flex flex-wrap gap-2">
+                  <input type="hidden" name="langue" value={langue} />
+                  <input type="hidden" name="quoi" value="video" />
+                  {DEBITS_VIDEO.map((kb) => (
+                    <BoutonAction
+                      key={kb}
+                      nom="debit"
+                      valeur={String(kb)}
+                      className={parametres.debit_video === kb ? "bt1" : "bt2"}
+                    >
+                      {remplir(t.kbits, { debit: String(kb) })}
+                    </BoutonAction>
+                  ))}
+                </form>
+
+                <div className="mt-5 text-[13px] font-medium">{t.resolutionTitre}</div>
+                <p className="doux mt-1 text-[12px] leading-relaxed">
+                  {d.admin.resolutionDetail}
+                </p>
+                <form action={changerResolution} className="mt-2 flex flex-wrap gap-2">
+                  <input type="hidden" name="langue" value={langue} />
+                  {RESOLUTIONS.map((r) => (
+                    <BoutonAction
+                      key={r}
+                      nom="resolution"
+                      valeur={r}
+                      className={parametres.resolution_video === r ? "bt1" : "bt2"}
+                    >
+                      {r}
+                    </BoutonAction>
+                  ))}
+                </form>
+
+                {/* Filmer en 720p à 150 kbit/s donne une bouillie où l'on ne
+                    reconnaît pas un visage : un enregistrement de sécurité
+                    qui ne sécurise rien, au prix du réseau quand même. On le
+                    dit plutôt que de laisser faire. */}
+                {!resolutionTenable(
+                  parametres.resolution_video,
+                  parametres.debit_video,
+                ) ? (
+                  <p
+                    className="mt-3 rounded-[10px] px-3 py-2.5 text-[12px] leading-relaxed"
+                    style={{
+                      background:
+                        "color-mix(in srgb, var(--erreur-texte) 10%, transparent)",
+                      color: "var(--erreur-texte)",
+                    }}
+                  >
+                    {remplir(d.admin.resolutionIntenable, {
+                      resolution: parametres.resolution_video,
+                      minimum: String(minimumPour(parametres.resolution_video)),
+                    })}
+                  </p>
+                ) : null}
+              </>
+            ) : null}
           </section>
         ) : null}
 

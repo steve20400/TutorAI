@@ -1009,6 +1009,11 @@ modeleEssai: "Served to those trying without an account",
       fournisseurTitre: "Where the tutor comes from",
       fournisseurDetail: "Context, syllabus and the pupil's memory are the same for all three. Only the required key changes. No pupil ever sees which one is used.",
       resolutionTitre: "Recording quality",
+      captureTitre: "What is captured",
+      parHeure: "{taille} / hour",
+      kbits: "{debit} kbit/s",
+      debitAudioTitre: "Speech bitrate",
+      debitVideoTitre: "Picture bitrate",
       introuvable: "This module does not exist.",
     },
     cles: {
@@ -1196,6 +1201,31 @@ modeleEssai: "Served to those trying without an account",
     avertissementEnregistrement:
       "⚠ No lesson is recorded while this is off.",
     resolutionTitre: "Recording quality",
+    captureDetail:
+      "Only the notebook is captured today: every stroke, every formula, every keystroke, put back in order and replayable. Sound and picture have NO capture yet — choosing one of those modes sets what will happen the day the microphone and camera are in place, and nothing more for now. We do not let a setting pretend it acts.",
+    modes: {
+      cahier: {
+        titre: "The notebook",
+        detail: "Every gesture of the lesson, replayable. Gets through anywhere.",
+      },
+      audio: {
+        titre: "The notebook and the sound",
+        detail: "What an adult says to a child. The most useful per franc spent.",
+      },
+      video: {
+        titre: "The notebook, the sound and the picture",
+        detail: "Needs a network held on both sides, for the whole lesson.",
+      },
+    },
+    sansMontant: "no bitrate needed",
+    montantExige: "{debit} kbit/s upstream",
+    debitAudioTitre: "Speech bitrate",
+    debitAudioDetail:
+      "Speech, not music. 16 kbit/s is intelligible, 24 is comfortable, 32 is generous. Beyond that you pay for quality no safety review will ever use.",
+    debitVideoDetail:
+      "This is the number that decides. In Cameroon the constraint is not disk but upload: an hour filmed at 600 kbit/s needs 600 kbit/s of CONTINUOUS upstream, on both sides. On a shared mobile connection, the recording degrades the lesson while failing to arrive.",
+    resolutionIntenable:
+      "{resolution} needs at least {minimum} kbit/s. Below that you cannot recognise a face: a safety recording that secures nothing, at the cost of the network anyway. Raise the bitrate, or lower the resolution.",
     resolutionDetail:
       "This setting is waiting for the camera, which is not in place yet. What is recorded today is the notebook itself — every stroke, every formula, every keystroke, put back in order — and that has no resolution. A safety recording has to be readable, not beautiful: the day video arrives, the lower the resolution, the better it will travel on your users' networks.",
     resolutionCout: "≈ {taille} per hour of lesson.",

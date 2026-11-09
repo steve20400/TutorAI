@@ -1128,6 +1128,11 @@ modeleEssai: "Servi à qui essaie sans compte",
       fournisseurTitre: "D'où vient le tuteur",
       fournisseurDetail: "Le contexte, le programme et la mémoire de l'élève sont les mêmes pour les trois. Seule la clé exigée change. Personne, côté élève, ne voit lequel est employé.",
       resolutionTitre: "Résolution des enregistrements",
+      captureTitre: "Ce qui est capté",
+      parHeure: "{taille} / heure",
+      kbits: "{debit} kbit/s",
+      debitAudioTitre: "Débit de la parole",
+      debitVideoTitre: "Débit de l'image",
       introuvable: "Ce module n'existe pas.",
     },
     cles: {
@@ -1317,6 +1322,31 @@ modeleEssai: "Servi à qui essaie sans compte",
     avertissementEnregistrement:
       "⚠ Aucune séance n'est enregistrée tant que c'est éteint.",
     resolutionTitre: "Résolution des enregistrements",
+    captureDetail:
+      "Seul le cahier est capté aujourd'hui : chaque trait, chaque formule, chaque frappe, remis dans l'ordre et rejouables. Le son et l'image n'ont PAS encore de capture — choisir l'un de ces modes règle ce qui se passera le jour où le micro et la caméra seront en place, et rien de plus pour l'instant. On ne laisse pas un réglage faire croire qu'il agit.",
+    modes: {
+      cahier: {
+        titre: "Le cahier",
+        detail: "Chaque geste de la séance, rejouable. Passe partout.",
+      },
+      audio: {
+        titre: "Le cahier et le son",
+        detail: "Ce qu'un adulte dit à un enfant. Le plus utile par franc dépensé.",
+      },
+      video: {
+        titre: "Le cahier, le son et l'image",
+        detail: "Exige un réseau tenu des deux côtés, pendant toute la séance.",
+      },
+    },
+    sansMontant: "aucun débit exigé",
+    montantExige: "{debit} kbit/s montants",
+    debitAudioTitre: "Débit de la parole",
+    debitAudioDetail:
+      "De la parole, pas de la musique. 16 kbit/s est intelligible, 24 est confortable, 32 est généreux. Au-delà, on paie une qualité qu'aucune relecture de sécurité n'exploitera.",
+    debitVideoDetail:
+      "C'est le chiffre qui décide. Au Cameroun la contrainte n'est pas le disque mais le téléversement : une heure filmée à 600 kbit/s exige 600 kbit/s de montant CONTINU, des deux côtés. Sur une connexion mobile partagée, l'enregistrement dégrade la séance pendant qu'il échoue à arriver.",
+    resolutionIntenable:
+      "Le {resolution} demande au moins {minimum} kbit/s. En dessous, on ne reconnaît pas un visage : c'est un enregistrement de sécurité qui ne sécurise rien, au prix du réseau quand même. Montez le débit, ou descendez la résolution.",
     resolutionDetail:
       "Ce réglage attend la caméra, qui n'est pas encore en place. Ce qui est enregistré aujourd'hui est le cahier lui-même — chaque trait, chaque formule, chaque frappe, remis dans l'ordre — et cela n'a pas de résolution. Un enregistrement de sécurité doit être lisible, pas beau : le jour où la vidéo arrivera, plus la résolution sera basse, mieux elle passera sur les réseaux de tes utilisateurs.",
     resolutionCout: "≈ {taille} par heure de cours.",
