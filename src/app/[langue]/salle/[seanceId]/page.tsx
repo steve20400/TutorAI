@@ -102,6 +102,8 @@ export default async function PageSalle({
     <Salle
       seanceId={seanceId}
       enregistre={parametres.enregistrement_actif}
+      modeEnregistrement={parametres.mode_enregistrement}
+      debitAudio={parametres.debit_audio}
       debutLe={(seance.demarree_le as string | null) ?? null}
       feuilles={feuilles}
       moi={{

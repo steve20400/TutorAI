@@ -752,6 +752,14 @@ ajouter: "Add",
   salle: {
     titre: "Lesson",
     sansEnregistrement: "This session is not being recorded.",
+    micro: {
+      demande: "allow the microphone",
+      refusee: "microphone refused — speech is not being recorded",
+      impossible: "this browser cannot record sound",
+      capte: "microphone on",
+      en_retard: "some passages have not been sent yet",
+      eteinte: "",
+    },
     feuille: "Sheet",
     outils: {
       main_levee: "freehand",

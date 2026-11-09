@@ -14,6 +14,8 @@ import { Texte } from "./texte"
 import { Traceur } from "./traceur"
 import { Calcul } from "./calcul"
 import { Retour } from "@/composants/retour"
+import { type ModeEnregistrement } from "@/lib/enregistrement"
+import { ouvrirLaVoix, type EtatVoix, type Voix } from "@/lib/salle/voix"
 
 export type Feuille = {
   id: string
@@ -60,6 +62,8 @@ export function Salle({
   titre,
   sortieVers,
   enregistre,
+  modeEnregistrement,
+  debitAudio,
   debutLe,
   d,
 }: {
@@ -80,6 +84,10 @@ export function Salle({
    * mensonge qu'une application de protection ne peut pas se permettre.
    */
   enregistre: boolean
+  /** Ce qui est capté : le cahier seul, la parole en plus, ou l'image aussi. */
+  modeEnregistrement: ModeEnregistrement
+  /** Le débit de la parole, en kbit/s, tel que l'administration l'a réglé. */
+  debitAudio: number
   /**
    * L'ouverture de la séance, en ISO, ou `null` si elle n'a pas démarré.
    *
@@ -151,6 +159,51 @@ export function Salle({
       if (a) void a.fermer()
     }
   }, [active, seanceId, moi.id, moi.nom, role, debutMs, enregistre, lecture])
+
+  // ── Le micro ────────────────────────────────────────────────────────────
+  //
+  // Hors de l'effet des feuilles, et c'est voulu : la voix suit la SÉANCE, pas
+  // la feuille. Changer de feuille en cours de cours ne doit pas couper
+  // l'enregistrement, ni rouvrir le bandeau du navigateur à chaque fois.
+  //
+  // Celui qui regarde sans écrire n'enregistre rien : il n'était pas dans la
+  // salle, et la politique refuserait son dépôt de toute façon.
+  const [voix, poserVoix] = useState<EtatVoix>("eteinte")
+  const capteLaVoix =
+    enregistre && !lecture && modeEnregistrement !== "cahier"
+
+  useEffect(() => {
+    if (!capteLaVoix) {
+      poserVoix("eteinte")
+      return
+    }
+    let vivant = true
+    let ouverte: Voix | null = null
+
+    void (async () => {
+      const v = await ouvrirLaVoix({
+        seanceId,
+        moi: moi.id,
+        debutMs,
+        debitAudio,
+        surEtat: (e) => {
+          if (vivant) poserVoix(e)
+        },
+      })
+      if (!vivant) {
+        void v.fermer()
+        return
+      }
+      ouverte = v
+    })()
+
+    return () => {
+      vivant = false
+      // Fermer dépose les dernières secondes : quitter la salle ne doit pas
+      // les coûter.
+      if (ouverte) void ouverte.fermer()
+    }
+  }, [capteLaVoix, seanceId, moi.id, debutMs, debitAudio])
 
   const feuilleActive = liste.find((f) => f.id === active)
 
@@ -430,8 +483,42 @@ export function Salle({
             répétiteur pendant que rien ne l'était. Et dans l'autre sens, le
             jour où le module s'allume, les deux doivent le savoir — on ne
             capte pas quelqu'un en silence. */}
+        {/* L'état du micro, en toutes lettres.
+
+            Un micro refusé qui ne se dit pas, c'est une séance qu'on croit
+            enregistrée et qui ne l'est pas — exactement ce qui a fait croire
+            pendant des mois que les cours étaient captés. L'élève comme le
+            répétiteur doivent voir ce qui se passe, dans les deux sens : que
+            ça enregistre, ou que ça n'enregistre pas. */}
+        {voix !== "eteinte" ? (
+          <span
+            className="ml-auto flex shrink-0 items-center gap-1.5 truncate text-[11px]"
+            style={{
+              color:
+                voix === "capte"
+                  ? "var(--salle-encre-douce)"
+                  : "var(--salle-ambre)",
+            }}
+          >
+            <svg
+              width="11"
+              height="11"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              aria-hidden="true"
+            >
+              <rect x="9" y="2" width="6" height="11" rx="3" />
+              <path d="M5 11a7 7 0 0 0 14 0M12 18v4" />
+            </svg>
+            {t.micro[voix]}
+          </span>
+        ) : null}
+
         <span
-          className="ml-auto h-2 w-2 shrink-0 rounded-full"
+          className={`${voix === "eteinte" ? "ml-auto " : ""}h-2 w-2 shrink-0 rounded-full`}
           style={{
             background: enregistre
               ? "var(--salle-voyant)"

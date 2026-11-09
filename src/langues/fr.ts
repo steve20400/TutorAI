@@ -860,6 +860,14 @@ ajouter: "Ajouter",
   salle: {
     titre: "Séance",
     sansEnregistrement: "Cette séance n'est pas enregistrée.",
+    micro: {
+      demande: "autorisez le micro",
+      refusee: "micro refusé — la parole n'est pas enregistrée",
+      impossible: "ce navigateur n'enregistre pas le son",
+      capte: "micro actif",
+      en_retard: "des passages ne sont pas encore partis",
+      eteinte: "",
+    },
     feuille: "Feuille",
     outils: {
       main_levee: "main levée",
