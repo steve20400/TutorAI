@@ -885,6 +885,8 @@ ajouter: "Ajouter",
 
   relecture: {
     etiquette: "Relecture",
+    voix: "Voix : {qui}",
+    uneVoix: "une voix",
     lire: "Lire",
     pause: "Pause",
     position: "Position dans la séance",

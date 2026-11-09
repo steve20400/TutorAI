@@ -81,12 +81,30 @@ export default async function PageRejouer({
     ? seance.contrat[0]
     : seance.contrat
 
+  // Qui parle sur chaque piste.
+  //
+  // Une piste intitulée par un identifiant ne dit rien à un parent, et c'est
+  // lui qui vient écouter. `noms_de_la_seance` ne rend que les prénoms des
+  // deux personnes qui étaient dans la salle — élargir la lecture de
+  // `profils` aurait donné la ligne entière, téléphone compris.
+  const noms: Record<string, string> = {}
+  try {
+    const { data } = await supabase.rpc("noms_de_la_seance", { cible: seanceId })
+    for (const l of (data ?? []) as { id: string; prenom: string | null }[]) {
+      if (l.prenom) noms[l.id] = l.prenom
+    }
+  } catch (erreur) {
+    // Les pistes garderont une étiquette neutre. Le son reste écoutable.
+    console.error("[relecture] noms illisibles :", erreur)
+  }
+
   return (
     <div className="flex h-dvh flex-col">
       <Coque langue={langue} />
       <Lecteur
         seanceId={seanceId}
         feuilles={(feuilles ?? []) as { id: string; rang: number; titre: string | null; outil: string }[]}
+        noms={noms}
         titre={
           (seance.lecon_id as string | null) ??
           (contrat?.matiere as string | null) ??

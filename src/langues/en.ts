@@ -772,6 +772,8 @@ ajouter: "Add",
 
   relecture: {
     etiquette: "Replay",
+    voix: "Voices: {qui}",
+    uneVoix: "a voice",
     lire: "Play",
     pause: "Pause",
     position: "Position in the lesson",

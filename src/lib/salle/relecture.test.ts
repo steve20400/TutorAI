@@ -56,3 +56,48 @@ test("l'horloge ne montre l'heure que si elle existe", () => {
   assert.equal(enHorloge(754_000), "12:34")
   assert.equal(enHorloge(3_723_000), "1:02:03")
 })
+
+import { doitRecaler, dureeDeLaPiste, tempsDansLaPiste } from "./relecture.ts"
+
+// Une piste de trois morceaux de 10 s, avec un TROU de 10 s au milieu :
+// le morceau qui aurait dû commencer à 10 000 n'est jamais parti.
+const PISTE = [
+  { t: 0, duree: 10_000 },
+  { t: 20_000, duree: 10_000 },
+  { t: 30_000, duree: 10_000 },
+]
+
+test("avant le trou, le temps du son suit la séance", () => {
+  assert.equal(tempsDansLaPiste(PISTE, 0), 0)
+  assert.equal(tempsDansLaPiste(PISTE, 5000), 5000)
+})
+
+test("après le trou, le son a pris de l'avance sur la séance", () => {
+  // À 20 s de séance on est au début du DEUXIÈME morceau, donc à 10 s de
+  // fichier. « Position moins début » aurait dit 20 s — et on aurait relu
+  // une phrase en croyant en relire une autre.
+  assert.equal(tempsDansLaPiste(PISTE, 20_000), 10_000)
+  assert.equal(tempsDansLaPiste(PISTE, 35_000), 25_000)
+})
+
+test("dans le trou, il n'y a rien à entendre", () => {
+  // Et l'écran doit pouvoir le dire plutôt que de jouer autre chose.
+  assert.equal(tempsDansLaPiste(PISTE, 15_000), null)
+})
+
+test("hors de la piste, rien non plus", () => {
+  assert.equal(tempsDansLaPiste(PISTE, 99_000), null)
+  assert.equal(tempsDansLaPiste([], 0), null)
+})
+
+test("la durée de la piste ignore les trous", () => {
+  // Trente secondes de son pour quarante secondes de séance.
+  assert.equal(dureeDeLaPiste(PISTE), 30_000)
+})
+
+test("on ne recale que ce qui s'entend", () => {
+  // Sous la demi-seconde personne n'entend la différence, et recaler à chaque
+  // image ferait hoqueter la lecture.
+  assert.equal(doitRecaler(1000, 1200), false)
+  assert.equal(doitRecaler(1000, 2000), true)
+})

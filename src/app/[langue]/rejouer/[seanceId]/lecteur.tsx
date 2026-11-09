@@ -5,14 +5,21 @@ import * as Y from "yjs"
 import { Awareness } from "y-protocols/awareness"
 
 import { Retour } from "@/composants/retour"
-import { type Dictionnaire } from "@/langues"
+import { remplir, type Dictionnaire } from "@/langues"
 import { depuisHexa, enOctets } from "@/lib/salle/octets"
 import {
+  chargerLesPistes,
+  libererLesPistes,
+  type Piste,
+} from "@/lib/salle/pistes"
+import {
   avancer,
+  doitRecaler,
   dureeTotale,
   enHorloge,
   faudraitReconstruire,
   fenetre,
+  tempsDansLaPiste,
   VITESSES,
 } from "@/lib/salle/relecture"
 import { supabaseNavigateur } from "@/lib/supabase/client"
@@ -55,12 +62,15 @@ export function Lecteur({
   seanceId,
   feuilles,
   titre,
+  noms,
   retourVers,
   d,
 }: {
   seanceId: string
   feuilles: Feuille[]
   titre: string
+  /** Qui parle, par identifiant. Un UUID ne dit rien à un parent. */
+  noms: Record<string, string>
   retourVers: string
   d: Dictionnaire
 }) {
@@ -151,6 +161,40 @@ export function Lecteur({
     }
   }, [seanceId, neufs])
 
+  // ── La parole ───────────────────────────────────────────────────────────
+  //
+  // Chargée à part et APRÈS le cahier : les morceaux pèsent, et on doit
+  // pouvoir commencer à regarder pendant qu'ils arrivent. Une relecture qui
+  // attend dix mégaoctets avant d'afficher le premier trait est une
+  // relecture qu'on n'ouvre pas.
+  const [pistes, poserPistes] = useState<Piste[]>([])
+  const sons = useRef(new Map<string, HTMLAudioElement>())
+
+  useEffect(() => {
+    let vivant = true
+    let chargees: Piste[] = []
+
+    void (async () => {
+      try {
+        const p = await chargerLesPistes(seanceId, (a) => noms[a] ?? t.uneVoix)
+        if (!vivant) {
+          libererLesPistes(p)
+          return
+        }
+        chargees = p
+        poserPistes(p)
+      } catch (e) {
+        // La séance reste regardable sans son. Le dire, et continuer.
+        console.error("[relecture] parole illisible :", e)
+      }
+    })()
+
+    return () => {
+      vivant = false
+      libererLesPistes(chargees)
+    }
+  }, [seanceId, noms, t.uneVoix])
+
   const duree = gestes ? dureeTotale(gestes) : 0
 
   // ── Appliquer ce qui est dû à la position courante ──────────────────────
@@ -195,6 +239,34 @@ export function Lecteur({
     image = requestAnimationFrame(battre)
     return () => cancelAnimationFrame(image)
   }, [enLecture, vitesse, duree])
+
+  // ── Recaler le son sur l'image ──────────────────────────────────────────
+  //
+  // À chaque changement de position, et pas à chaque image : on ne corrige
+  // que si l'écart s'entend. Recaler en permanence ferait hoqueter la voix.
+  useEffect(() => {
+    for (const piste of pistes) {
+      const son = sons.current.get(piste.auteur)
+      if (!son) continue
+
+      const attendu = tempsDansLaPiste(piste.morceaux, position)
+
+      // Rien à entendre ici : un trou dans la piste, ou le micro pas encore
+      // ouvert. On se tait plutôt que de jouer un autre passage.
+      if (attendu === null) {
+        if (!son.paused) son.pause()
+        continue
+      }
+
+      if (doitRecaler(son.currentTime * 1000, attendu)) {
+        son.currentTime = attendu / 1000
+      }
+      son.playbackRate = vitesse
+
+      if (enLecture && son.paused) void son.play().catch(() => undefined)
+      if (!enLecture && !son.paused) son.pause()
+    }
+  }, [pistes, position, enLecture, vitesse])
 
   const feuille = feuilles.find((f) => f.id === active)
   const doc = active ? docs.current.get(active) : undefined
@@ -295,6 +367,24 @@ export function Lecteur({
         </div>
       </div>
 
+      {/* Les pistes, une par personne. Invisibles mais nommées : c'est
+          `aria-label` qui porte le nom, et l'étiquette sous le rail qui le
+          montre. On ne mélange pas deux voix — sur une piste unique, deux
+          personnes qui parlent en même temps ne s'attribuent plus. */}
+      {pistes.map((p) => (
+        <audio
+          key={p.auteur}
+          ref={(n) => {
+            if (n) sons.current.set(p.auteur, n)
+            else sons.current.delete(p.auteur)
+          }}
+          src={p.url}
+          preload="auto"
+          aria-label={p.nom}
+          className="hidden"
+        />
+      ))}
+
       {/* ── La barre de lecture ── */}
       <div
         className="flex shrink-0 flex-wrap items-center gap-3 px-3.5 py-3"
@@ -337,6 +427,15 @@ export function Lecteur({
           className="min-w-[140px] flex-1"
           style={{ accentColor: "var(--salle-ambre)" }}
         />
+
+        {pistes.length > 0 ? (
+          <span
+            className="shrink-0 truncate text-[11px]"
+            style={{ color: "var(--salle-encre-douce)" }}
+          >
+            {remplir(t.voix, { qui: pistes.map((p) => p.nom).join(" · ") })}
+          </span>
+        ) : null}
 
         <div className="flex shrink-0 gap-1">
           {VITESSES.map((v) => (

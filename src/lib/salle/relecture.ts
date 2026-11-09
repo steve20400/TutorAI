@@ -100,3 +100,57 @@ export function enHorloge(ms: number): string {
  * parce qu'un trait tracé vite se relit lentement.
  */
 export const VITESSES = [0.5, 1, 2, 4] as const
+
+/** Un morceau de parole, réduit à sa place dans la séance. */
+export type MorceauPiste = { t: number; duree: number }
+
+/**
+ * À quelle seconde du fichier recollé se trouve cette position de séance ?
+ *
+ * ── POURQUOI CE N'EST PAS UNE SOUSTRACTION ──
+ *
+ * `MediaRecorder` ne produit pas des fichiers indépendants : seul le premier
+ * morceau porte l'en-tête, les suivants sont des fragments. Pour entendre une
+ * piste il faut donc recoller tous ses morceaux dans l'ordre — et le fichier
+ * obtenu n'a pas de trous.
+ *
+ * Mais la SÉANCE, elle, peut en avoir : un morceau refusé, une mémoire
+ * saturée, un micro ouvert en retard. Le fichier dure alors moins longtemps
+ * que la séance, et « position moins début » désignerait le mauvais passage —
+ * de plus en plus faux à mesure qu'on avance. On relirait une phrase en
+ * croyant en relire une autre, ce qui est pire que de ne rien relire.
+ *
+ * On additionne donc les durées réellement présentes.
+ *
+ * `null` quand la position tombe dans un trou ou hors de la piste : il n'y a
+ * rien à entendre à cet instant, et l'écran doit pouvoir le dire plutôt que
+ * de jouer autre chose.
+ */
+export function tempsDansLaPiste(
+  morceaux: readonly MorceauPiste[],
+  position: number,
+): number | null {
+  let cumul = 0
+  for (const m of morceaux) {
+    if (position < m.t) return null
+    if (position < m.t + m.duree) return cumul + (position - m.t)
+    cumul += m.duree
+  }
+  return null
+}
+
+/** Ce que la piste couvre réellement, en millisecondes de son. */
+export function dureeDeLaPiste(morceaux: readonly MorceauPiste[]): number {
+  return morceaux.reduce((somme, m) => somme + m.duree, 0)
+}
+
+/**
+ * Faut-il recaler le son sur l'image ?
+ *
+ * Une demi-seconde. En dessous, personne n'entend la différence et recaler à
+ * chaque image ferait hoqueter la lecture. Au-dessus, une voix décalée d'une
+ * seconde sur un trait qu'on regarde se remarque immédiatement.
+ */
+export function doitRecaler(sonMs: number, attenduMs: number): boolean {
+  return Math.abs(sonMs - attenduMs) > 500
+}
