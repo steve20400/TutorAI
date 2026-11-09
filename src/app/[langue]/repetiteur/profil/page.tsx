@@ -9,6 +9,7 @@ import { FormulaireProfil } from "./formulaire"
 import { lireReferentiel } from "@/lib/referentiel"
 import { PiecesRepetiteur, type Piece } from "@/composants/pieces-repetiteur"
 import { Coque } from "@/composants/coque"
+import { Retour } from "@/composants/retour"
 
 /** Un statut inconnu en base ne doit pas faire disparaître le bandeau. */
 const STATUTS = ["brouillon", "en_attente", "verifie", "refuse"] as const
@@ -113,6 +114,7 @@ export default async function PageProfilRepetiteur({
       <Coque langue={langue} />
 
       <main className="mx-auto flex w-full max-w-2xl flex-col gap-5 px-4 pb-10 pt-6 lg:px-6">
+        <Retour vers={chemin(langue, "/repetiteur")} />
         <header className="pt-2">
           {/* Le retour vers le dossier. Cette page n'est plus l'accueil du
               répétiteur mais l'atelier derrière : sans ce lien, on modifie

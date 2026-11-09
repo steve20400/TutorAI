@@ -2,6 +2,7 @@ import Link from "next/link"
 import { redirect } from "next/navigation"
 
 import { Coque } from "@/composants/coque"
+import { Retour } from "@/composants/retour"
 import { Fiche, type Repetiteur } from "./fiche"
 import { BandePastilles, Filtres, Tri, type Etat, type Ville } from "./filtres"
 import {
@@ -182,6 +183,8 @@ export default async function PageAnnuaire({
         </div>
 
         <div className="min-w-0 flex-1">
+          <Retour vers={chemin(langue, "/")} />
+
           {demandesMdp > 0 ? (
             <Link
               href={chemin(langue, "/parent/mots-de-passe")}

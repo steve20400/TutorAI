@@ -1,5 +1,6 @@
 import Link from "next/link"
 
+import { Retour } from "@/composants/retour"
 import { Logo } from "@/composants/marque"
 import { BasculeLangue } from "@/composants/langue"
 import { BasculeMode } from "@/composants/theme"
@@ -42,9 +43,12 @@ export default async function PageEssai({
       <div className="motif-fond" />
 
       <header className="relative z-10 flex items-center justify-between px-5 pt-5 sm:px-7">
-        <Link href={chemin(langue, "/")} className="transition hover:opacity-80">
-          <Logo taille={24} />
-        </Link>
+        <div className="flex items-center gap-3">
+          <Retour vers={chemin(langue, "/")} />
+          <Link href={chemin(langue, "/")} className="transition hover:opacity-80">
+            <Logo taille={24} />
+          </Link>
+        </div>
         <div className="flex items-center gap-1">
           <BasculeLangue />
           <BasculeMode />

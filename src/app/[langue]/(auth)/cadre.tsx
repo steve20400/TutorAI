@@ -1,7 +1,8 @@
+import { Retour } from "@/composants/retour"
 import { Logo } from "@/composants/marque"
 import { BasculeLangue } from "@/composants/langue"
 import { BasculeMode } from "@/composants/theme"
-import { dictionnaire, type Langue } from "@/langues"
+import { chemin, dictionnaire, type Langue } from "@/langues"
 
 /**
  * Cadre commun aux écrans d'authentification.
@@ -50,7 +51,13 @@ export function CadreAuth({
 
       <div className="relative z-10 flex min-h-dvh flex-col">
         <header className="flex items-center justify-between px-6 pt-6 lg:px-12 lg:pt-8">
-          <Logo taille={26} />
+          {/* Le retour tient sur la ligne du logo, et ne coûte donc aucune
+              hauteur : sur un téléphone, c'est la question de l'écran qu'on
+              veut voir sans faire défiler, pas une barre de plus. */}
+          <div className="flex items-center gap-3">
+            <Retour vers={chemin(langue, "/")} />
+            <Logo taille={26} />
+          </div>
           <div className="flex items-center gap-1">
             <BasculeLangue />
             <BasculeMode />

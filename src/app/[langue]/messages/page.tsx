@@ -13,6 +13,7 @@ import { api } from "@/lib/api"
 import { supabaseServeur } from "@/lib/supabase/server"
 import { redirect } from "next/navigation"
 import { Coque } from "@/composants/coque"
+import { Retour } from "@/composants/retour"
 
 type Fil = {
   id: string
@@ -79,6 +80,7 @@ export default async function PageMessages({
       <TempsReel tables={["messages_familles", "conversations"]} />
 
       <main className="mx-auto flex w-full max-w-2xl flex-col gap-4 px-4 pb-10 pt-6 lg:px-6">
+        <Retour vers={chemin(langue, "/")} />
         <header className="pt-2">
           <p className="doux text-[10px] font-semibold uppercase tracking-[0.14em]">
             {t.etiquette}

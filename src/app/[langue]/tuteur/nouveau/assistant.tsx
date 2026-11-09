@@ -2,7 +2,8 @@
 
 import { useActionState, useMemo, useState } from "react"
 
-import { remplir } from "@/langues"
+import { Retour } from "@/composants/retour"
+import { chemin, remplir } from "@/langues"
 import { useLangue } from "@/langues/contexte"
 import { Message } from "../../(auth)/champs"
 import { creerTuteur, type EtatCreation } from "@/actions/tuteur"
@@ -243,6 +244,7 @@ export function Assistant({
 
   return (
     <main className="mx-auto flex min-h-dvh max-w-md flex-col gap-6 p-6">
+      <Retour vers={chemin(langue, "/tuteur")} />
       <header className="pt-6">
         <p className="text-xs uppercase tracking-wide opacity-50">
           {remplir(d.tuteur.etapeSur, {

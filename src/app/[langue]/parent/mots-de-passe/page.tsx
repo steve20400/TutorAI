@@ -11,6 +11,7 @@ import { redirect } from "next/navigation"
 import Link from "next/link"
 import { Liste, type DemandeMotDePasse } from "./liste"
 import { Coque } from "@/composants/coque"
+import { Retour } from "@/composants/retour"
 
 /**
  * Les demandes de mot de passe des enfants.
@@ -53,6 +54,7 @@ export default async function PageMotsDePasse({
       <Coque langue={langue} />
 
       <main className="mx-auto flex w-full max-w-2xl flex-col gap-5 px-4 pb-10 pt-6 lg:px-6">
+        <Retour vers={chemin(langue, "/parent")} />
         <header className="pt-2">
           <Link
             href={chemin(langue, "/parent")}

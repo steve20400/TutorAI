@@ -2,6 +2,7 @@ import Link from "next/link"
 import { redirect } from "next/navigation"
 
 import { Coque, ENCRE, ENCRE_DOUX, ENCRE_TEXTE } from "@/composants/coque"
+import { Retour } from "@/composants/retour"
 import {
   PropositionsRepetiteur,
   type Proposition,
@@ -168,6 +169,11 @@ export default async function PageEspaceRepetiteur({
         className="relative h-[360px] flex-shrink-0 overflow-hidden lg:h-[520px]"
         style={{ background: ENCRE, color: ENCRE_TEXTE }}
       >
+        {/* Le retour, posé sur le bandeau comme sur la fiche d'annuaire. */}
+        <div className="absolute left-0 top-0 z-20 p-3">
+          <Retour vers={chemin(langue, "/")} surBandeau />
+        </div>
+
         <div className="absolute inset-0 lg:hidden">
           <Photo
             photo={photo}

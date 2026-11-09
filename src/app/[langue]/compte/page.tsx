@@ -15,6 +15,7 @@ import { FormulairesCompte } from "@/composants/formulaires-compte"
 
 import { ChoixCompte } from "./choix"
 import { Coque } from "@/composants/coque"
+import { Retour } from "@/composants/retour"
 
 type Compte = {
   id: string
@@ -93,6 +94,7 @@ export default async function PageCompte({
       <Coque langue={langue} />
 
       <main className="mx-auto flex w-full max-w-2xl flex-col gap-5 px-4 pb-10 pt-6 lg:px-6">
+        <Retour vers={chemin(langue, "/")} />
         <header className="pt-2">
           <h1 className="text-[27px] font-medium tracking-[-0.02em] lg:text-[34px]">
             {adulte ? t.titreAdulte : t.titre}

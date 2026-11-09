@@ -18,6 +18,7 @@ import { Rattacher } from "./rattacher"
 import { supabaseServeur } from "@/lib/supabase/server"
 import { TempsReel } from "@/composants/temps-reel"
 import { Coque } from "@/composants/coque"
+import { Retour } from "@/composants/retour"
 
 /**
  * Accueil parent — volontairement minimal à ce stade.
@@ -114,6 +115,7 @@ export default async function AccueilParent({
       <Coque langue={langue} />
 
       <main className="mx-auto flex w-full max-w-2xl flex-col gap-5 px-4 pb-10 pt-6 lg:px-6">
+        <Retour vers={chemin(langue, "/")} />
         {/* Le parent ne démarre pas la séance et ne la clôt pas — une séance
             qu'on peut terminer sans trace est une séance qu'on peut effacer.
             Il la rejoint, et c'est tout ce dont il a besoin ici. */}

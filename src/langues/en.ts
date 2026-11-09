@@ -55,6 +55,7 @@ export const en: Dictionnaire = {
   },
 
   commun: {
+    retour: "Back",
     choisirPhoto: "Choose a photo",
     changerPhoto: "Change photo",
     retirerPhoto: "Remove",

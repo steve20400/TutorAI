@@ -99,6 +99,7 @@ export default async function PageSalle({
       }}
       lecture={lecture}
       titre={titre}
+      sortieVers={chemin(langue, "/")}
       d={d}
     />
   )

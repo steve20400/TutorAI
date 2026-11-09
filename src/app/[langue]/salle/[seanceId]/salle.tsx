@@ -13,6 +13,7 @@ import { MainLevee } from "./main-levee"
 import { Texte } from "./texte"
 import { Traceur } from "./traceur"
 import { Calcul } from "./calcul"
+import { Retour } from "@/composants/retour"
 
 export type Feuille = {
   id: string
@@ -57,6 +58,7 @@ export function Salle({
   moi,
   lecture,
   titre,
+  sortieVers,
   d,
 }: {
   seanceId: string
@@ -65,6 +67,8 @@ export function Salle({
   /** Le parent et l'administration regardent sans écrire. */
   lecture: boolean
   titre: string
+  /** Où l'on atterrit en quittant la salle si rien ne précède dans l'histoire. */
+  sortieVers: string
   d: Dictionnaire
 }) {
   const t = d.salle
@@ -203,6 +207,11 @@ export function Salle({
         className="flex h-11 shrink-0 items-center gap-3 px-3.5"
         style={{ background: "var(--salle-barre)" }}
       >
+        {/* La sortie. Il n'y en avait aucune : une fois entré dans la salle,
+            on ne pouvait en partir qu'avec le bouton du navigateur — celui-là
+            même qui, sur un Android, ferme l'onglet au lieu de remonter. */}
+        <Retour vers={sortieVers} couleur="var(--salle-encre-douce)" />
+
         <span className="min-w-0 flex-1 truncate text-[13px] font-medium">
           {titre}
         </span>

@@ -1,6 +1,6 @@
-import Link from "next/link"
 import { notFound } from "next/navigation"
 
+import { Retour } from "@/composants/retour"
 import { Coque, ENCRE, ENCRE_DOUX, ENCRE_TEXTE } from "@/composants/coque"
 import { francs, initiales } from "../fiche"
 import { Proposer, type EnfantChoisissable } from "./proposer"
@@ -209,28 +209,20 @@ export default async function PageDossier({
           )}
         </div>
 
-        <div className="absolute left-0 right-0 top-0 flex items-center p-3 lg:hidden">
-          <Link
-            href={chemin(langue, "/annuaire")}
-            aria-label={d.annuaire.retour}
-            className="flex rounded-full p-[7px]"
-            style={{ background: "rgb(20 32 58 / 0.55)", color: ENCRE_TEXTE }}
-          >
-            <svg
-              width="20"
-              height="20"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="1.8"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              aria-hidden
-              className="block shrink-0"
-            >
-              <path d="M14 7l-5 5 5 5" />
-            </svg>
-          </Link>
+        {/* Le retour, et sur TOUS les écrans.
+            Il était en `lg:hidden` : sur un grand écran on entrait dans une
+            fiche sans pouvoir en ressortir. La pastille translucide se lit
+            par-dessus la photo, qui tient la moitié gauche du bandeau.
+
+            Et il remonte par l'histoire plutôt que vers `/annuaire` : un
+            parent qui avait filtré sur Yaoundé et les mathématiques repartait
+            sinon devant l'annuaire entier, sa recherche perdue. */}
+        <div className="absolute left-0 right-0 top-0 flex items-center p-3">
+          <Retour
+            vers={chemin(langue, "/annuaire")}
+            etiquette={d.annuaire.retour}
+            surBandeau
+          />
         </div>
 
         {/* Le titre : en bas sur téléphone, à droite de la photo sur grand

@@ -1,6 +1,7 @@
 import Link from "next/link"
 import { redirect } from "next/navigation"
 
+import { Retour } from "@/composants/retour"
 import { chemin, dictionnaire, estLangue, LANGUE_PAR_DEFAUT } from "@/langues"
 import { exigerModulePage } from "@/lib/parametres"
 import { api } from "@/lib/api"
@@ -38,6 +39,7 @@ export default async function PageTuteurs({
 
   return (
     <main className="mx-auto flex min-h-dvh max-w-md flex-col gap-4 p-6">
+      <Retour vers={chemin(langue, "/")} />
       <header className="flex items-baseline justify-between pt-8">
         <h1 className="text-2xl font-medium">{d.tuteur.mesTuteurs}</h1>
         <Link

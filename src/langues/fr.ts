@@ -51,6 +51,7 @@ export const fr = {
   },
 
   commun: {
+    retour: "Retour",
     choisirPhoto: "Choisir une photo",
     changerPhoto: "Changer la photo",
     retirerPhoto: "Retirer",
