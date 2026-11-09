@@ -175,6 +175,23 @@ export default async function PageSeance({
             {t.enregistrement}
           </div>
 
+          {/* La relecture du cahier, toujours proposée.
+
+              Cet écran n'offrait qu'un lecteur vidéo, et il n'y a pas de
+              vidéo — donc il disait « aucun enregistrement » même quand la
+              trace existait. Or c'est elle qu'on vient lire quand un parent
+              conteste : chaque trait, chaque formule, remis dans l'ordre.
+
+              La vidéo reste proposée à côté le jour où la caméra arrivera.
+              Elles ne se remplacent pas : l'une montre ce qui a été écrit,
+              l'autre ce qui s'est passé dans la pièce. */}
+          <Link
+            href={chemin(langue, `/rejouer/${seance.id}`)}
+            className="bt1 mt-3 inline-flex px-4 py-2 text-[13px]"
+          >
+            {d.relecture.ouvrir}
+          </Link>
+
           {enregistrement ? (
             <video
               src={enregistrement}

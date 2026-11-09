@@ -883,6 +883,23 @@ ajouter: "Ajouter",
       "La séance n'a pas pu s'ouvrir. Réessayez dans un moment — rien n'est perdu.",
   },
 
+  relecture: {
+    etiquette: "Relecture",
+    lire: "Lire",
+    pause: "Pause",
+    position: "Position dans la séance",
+    vide: "Cette séance n'a rien enregistré.",
+    videDetail:
+      "Soit l'enregistrement n'était pas allumé ce jour-là, soit la séance s'est tenue sans que rien ne soit écrit. Rien n'a été perdu : rien n'a été capté.",
+    illisible: "L'enregistrement n'a pas pu être lu.",
+    illisibleDetail:
+      "La connexion a peut-être été coupée. L'enregistrement n'est pas perdu — réessayez dans un moment.",
+    absente: "Cette séance n'existe pas, ou ne vous est pas accessible.",
+    absenteDetail:
+      "Un enregistrement ne se lit que par les deux personnes qui étaient dans la salle, l'adulte qui a engagé le répétiteur, et l'administration.",
+    ouvrir: "Rejouer la séance",
+  },
+
   salle: {
     titre: "Séance",
     sansEnregistrement: "Cette séance n'est pas enregistrée.",

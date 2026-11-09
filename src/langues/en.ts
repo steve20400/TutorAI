@@ -770,6 +770,23 @@ ajouter: "Add",
       "The lesson could not be opened. Try again in a moment — nothing is lost.",
   },
 
+  relecture: {
+    etiquette: "Replay",
+    lire: "Play",
+    pause: "Pause",
+    position: "Position in the lesson",
+    vide: "This lesson recorded nothing.",
+    videDetail:
+      "Either recording was not on that day, or the lesson took place without anything being written. Nothing was lost: nothing was captured.",
+    illisible: "The recording could not be read.",
+    illisibleDetail:
+      "The connection may have dropped. The recording is not lost — try again in a moment.",
+    absente: "This lesson does not exist, or is not open to you.",
+    absenteDetail:
+      "A recording can only be read by the two people who were in the room, the adult who engaged the tutor, and the administration.",
+    ouvrir: "Replay the lesson",
+  },
+
   salle: {
     titre: "Lesson",
     sansEnregistrement: "This session is not being recorded.",
