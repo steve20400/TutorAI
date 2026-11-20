@@ -4,6 +4,7 @@ import { redirect } from "next/navigation"
 import { BoutonAction } from "@/composants/bouton-action"
 import { Retour } from "@/composants/retour"
 import { chemin, dictionnaire, estLangue, LANGUE_PAR_DEFAUT } from "@/langues"
+import { registreTuteur } from "@/langues/registre"
 import { exigerModulePage } from "@/lib/parametres"
 import { api } from "@/lib/api"
 import { supabaseServeur } from "@/lib/supabase/server"
@@ -30,6 +31,16 @@ export default async function PageTuteur({
   } = await supabase.auth.getUser()
 
   if (!user) redirect(chemin(langue, "/connexion"))
+
+  // Qui lit cet écran. Un étudiant majeur qui révise pour lui-même n'est pas
+  // un enfant : on le vouvoie, et on ne lui dit pas de prévenir un adulte.
+  const { data: profil } = await supabase
+    .from("profils")
+    .select("role")
+    .eq("id", user.id)
+    .maybeSingle()
+
+  const tut = registreTuteur(d, profil?.role === "parent")
 
   let reponse: {
     tuteur: { id: string; matiere: string; niveau: string } | null
@@ -72,15 +83,15 @@ export default async function PageTuteur({
           href={chemin(langue, "/tuteur")}
           className="doux text-sm underline underline-offset-4"
         >
-          {d.tuteur.retour}
+          {tut.retour}
         </Link>
       </header>
 
       {enCours ? (
         <Link href={chemin(langue, `/seance/${enCours.id}`)} className="choix-role">
-          <span className="font-medium">{d.tuteur.reprendre}</span>
+          <span className="font-medium">{tut.reprendre}</span>
           <span className="doux mt-0.5 block text-sm">
-            {enCours.lecon_titre ?? d.tuteur.leconNonIdentifiee}
+            {enCours.lecon_titre ?? tut.leconNonIdentifiee}
           </span>
         </Link>
       ) : (
@@ -92,18 +103,18 @@ export default async function PageTuteur({
               cliquer trois fois — donc trois séances ouvertes, et des jetons
               consommés pour rien. */}
           <BoutonAction className="bouton w-full px-4 py-4">
-            {d.tuteur.commencer}
+            {tut.commencer}
           </BoutonAction>
         </form>
       )}
 
       <section className="flex flex-col gap-2">
         <h2 className="doux text-sm font-medium uppercase tracking-wide">
-          {d.tuteur.seancesPassees}
+          {tut.seancesPassees}
         </h2>
 
         {passees.length === 0 ? (
-          <p className="doux text-sm">{d.tuteur.aucuneSeance}</p>
+          <p className="doux text-sm">{tut.aucuneSeance}</p>
         ) : (
           <ul className="flex flex-col gap-2">
             {passees.map((s) => (
@@ -113,7 +124,7 @@ export default async function PageTuteur({
                   className="choix-role block"
                 >
                   <span className="text-sm">
-                    {s.lecon_titre ?? d.tuteur.leconNonIdentifiee}
+                    {s.lecon_titre ?? tut.leconNonIdentifiee}
                   </span>
                   {/* La date suit la langue de la page : « 4 mars » en
                       français, « 4 March » en anglais. Une séance créée mais

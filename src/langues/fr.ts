@@ -37,6 +37,8 @@ export const fr = {
     monProfilDetail: "Photo, mot de passe",
     mesEnfants: "Mes enfants",
     mesEnfantsDetail: "Rattachements et jetons",
+    monTuteur: "Mon tuteur",
+    monTuteurDetail: "Réviser pour moi-même",
     mesAdultes: "Mes adultes",
     mesAdultesDetail: "Qui est rattaché à moi",
     messages: "Messages",
@@ -869,6 +871,54 @@ ajouter: "Ajouter",
    * séance — une séance qu'on peut terminer sans trace est une séance qu'on
    * peut effacer.
    */
+  /**
+   * Ce que le tuteur IA dit à un ADULTE.
+   *
+   * Une surcharge, pas une copie. Soixante phrases recopiées finiraient par
+   * diverger, et c'est la copie oubliée qui tutoierait un étudiant de trente
+   * ans. On ne redéfinit donc que ce qui s'adresse à la personne.
+   *
+   * Le tutoiement n'est pas le seul problème, ni le pire. L'écran d'un enfant
+   * dit « Préviens un adulte » et « Demande à un adulte de ta famille de
+   * recharger ton compte » — à quelqu'un qui EST l'adulte et qui paie, cela
+   * ne veut rien dire. C'est pour ces phrases-là que cette surcharge existe.
+   *
+   * L'inscription promet « Je suis adulte — pour moi ou pour mon enfant ».
+   * Un étudiant majeur qui révise est donc un cas prévu, pas une tolérance.
+   */
+  tuteurAdulte: {
+    tuteurIndisponible: {
+      surcharge:
+        "Votre tuteur est très demandé en ce moment. Attendez quelques instants et renvoyez votre message.",
+      cle: "Votre tuteur n'est pas disponible : l'accès doit être renouvelé par l'administration.",
+      modele: "Votre tuteur n'est pas disponible : un réglage doit être corrigé par l'administration.",
+      autre: "Votre tuteur ne répond pas pour l'instant. Réessayez dans un moment.",
+    },
+    aucuneSeance: "Aucune séance pour l'instant. Votre tuteur vous attend.",
+    creerTitre: "Créer votre tuteur",
+    quelPays: "Dans quel pays êtes-vous ?",
+    quelSysteme: "Quel système suivez-vous ?",
+    quelleClasse: "Quel est votre niveau ?",
+    choisisUneMatiere: "Choisissez au moins une matière.",
+    creationEchouee: "La création a échoué. Réessayez.",
+    autreClasse: "Votre niveau n'est pas dans la liste ?",
+    autreMatiere: "Votre matière n'est pas dans la liste ?",
+    aideMatieres: "Une matière = un tuteur. Vous pouvez en choisir plusieurs.",
+    manuels: "Vos manuels (facultatif)",
+    aideManuels:
+      "Un titre par ligne. Cela aide votre tuteur à suivre votre progression. Vous pouvez passer cette étape.",
+  },
+
+  jaugeAdulte: {
+    titre: "Vos séances avec le tuteur",
+    detail:
+      "La barre montre ce qu'il vous reste. Elle baisse à chaque réponse du tuteur, et se remplit quand vous rechargez votre compte.",
+    epuise: "Il n'y a plus de jetons. Rechargez votre compte pour continuer.",
+    etiquette: "Voir ce qu'il vous reste",
+    quiPaie: "Qui porte vos séances",
+    enCours: "en cours",
+  },
+
   cours: {
     titre: "Vos cours",
     detail:

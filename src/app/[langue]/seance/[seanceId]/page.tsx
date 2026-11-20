@@ -23,6 +23,17 @@ export default async function PageSeance({
 
   if (!user) redirect(chemin(langue, "/connexion"))
 
+  // Qui tient cette séance. Un adulte qui révise pour lui-même recharge son
+  // propre compte : lui dire de « demander à un adulte de sa famille » le
+  // ferait chercher quelqu'un qui est lui-même.
+  const { data: profil } = await supabase
+    .from("profils")
+    .select("role")
+    .eq("id", user.id)
+    .maybeSingle()
+
+  const adulte = profil?.role === "parent"
+
   // La RLS filtre : une séance qui n'est pas la sienne ne remonte pas.
   const { data: seance } = await supabase
     .from("seances")
@@ -135,6 +146,7 @@ export default async function PageSeance({
         </>
       ) : (
         <Conversation
+          adulte={adulte}
           seanceId={seance.id}
           messagesInitiaux={(messages ?? []).map((m) => ({
             id: String(m.id),

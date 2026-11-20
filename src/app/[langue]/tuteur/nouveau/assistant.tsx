@@ -5,6 +5,7 @@ import { useActionState, useMemo, useState } from "react"
 import { Retour } from "@/composants/retour"
 import { chemin, remplir } from "@/langues"
 import { useLangue } from "@/langues/contexte"
+import { registreTuteur } from "@/langues/registre"
 import { Message } from "../../(auth)/champs"
 import { creerTuteur, type EtatCreation } from "@/actions/tuteur"
 
@@ -111,11 +112,14 @@ function ChampLibre({
  * Une étape qui n'a qu'une seule réponse possible n'est pas affichée.
  */
 export function Assistant({
+  adulte,
   options,
   catalogue,
   niveaux,
   paysEleve,
 }: {
+  /** Vouvoyer, et ne pas renvoyer vers « un adulte ». */
+  adulte: boolean
   options: OptionProgramme[]
   /**
    * Toutes les matières connues, programme chargé ou non.
@@ -143,6 +147,7 @@ export function Assistant({
   paysEleve: string
 }) {
   const { langue, d } = useLangue()
+  const tut = registreTuteur(d, adulte)
 
   const paysDisponibles = useMemo(
     () => uniques(options.map((o) => o.pays)),
@@ -247,16 +252,16 @@ export function Assistant({
       <Retour vers={chemin(langue, "/tuteur")} />
       <header className="pt-6">
         <p className="text-xs uppercase tracking-wide opacity-50">
-          {remplir(d.tuteur.etapeSur, {
+          {remplir(tut.etapeSur, {
             n: Math.min(indice + 1, etapes.length),
             total: etapes.length,
           })}
         </p>
-        <h1 className="mt-1 text-2xl font-medium">{d.tuteur.creerTitre}</h1>
+        <h1 className="mt-1 text-2xl font-medium">{tut.creerTitre}</h1>
       </header>
 
       {etape === "pays" && (
-        <Etape titre={d.tuteur.quelPays}>
+        <Etape titre={tut.quelPays}>
           {paysDisponibles.map((p) => (
             <Choix
               key={p}
@@ -269,14 +274,14 @@ export function Assistant({
                 suivant()
               }}
             >
-              {d.tuteur.pays[p] ?? p}
+              {tut.pays[p] ?? p}
             </Choix>
           ))}
         </Etape>
       )}
 
       {etape === "sousSysteme" && (
-        <Etape titre={d.tuteur.quelSysteme}>
+        <Etape titre={tut.quelSysteme}>
           {sousSystemesDisponibles.map((s) => (
             <Choix
               key={s}
@@ -288,14 +293,14 @@ export function Assistant({
                 suivant()
               }}
             >
-              {s === "francophone" ? d.tuteur.francophone : d.tuteur.anglophone}
+              {s === "francophone" ? tut.francophone : tut.anglophone}
             </Choix>
           ))}
         </Etape>
       )}
 
       {etape === "niveau" && (
-        <Etape titre={d.tuteur.quelleClasse}>
+        <Etape titre={tut.quelleClasse}>
           {niveauxDisponibles.map((n) => (
             <Choix
               key={n}
@@ -314,11 +319,11 @@ export function Assistant({
               pas tout prévoir, et un adulte qui révise pour lui-même n'est dans
               aucune de ces classes. */}
           <ChampLibre
-            etiquette={d.tuteur.autreClasse}
-            exemple={d.tuteur.autreClassePlaceholder}
+            etiquette={tut.autreClasse}
+            exemple={tut.autreClassePlaceholder}
             suggestions={niveaux}
             identifiantListe="catalogue-niveaux"
-            ajouterLibelle={d.tuteur.continuer}
+            ajouterLibelle={tut.continuer}
             onAjouter={(v) => {
               setNiveau(v)
               setMatieres([])
@@ -329,7 +334,7 @@ export function Assistant({
       )}
 
       {etape === "matieres" && (
-        <Etape titre={d.tuteur.quellesMatieres} aide={d.tuteur.aideMatieres}>
+        <Etape titre={tut.quellesMatieres} aide={tut.aideMatieres}>
           {matieresDisponibles.map((o) => (
             <Choix
               key={o.id}
@@ -341,9 +346,9 @@ export function Assistant({
                 {/* Le programme officiel est ce qui distingue ce tuteur d'un
                     robot bavard : quand il est là, on le dit. */}
                 <span className="badge-verifie shrink-0 text-[10px]">
-                  {d.tuteur.suitLeProgramme}
+                  {tut.suitLeProgramme}
                   {paysEleve && o.pays !== paysEleve
-                    ? ` · ${d.tuteur.pays[o.pays] ?? o.pays}`
+                    ? ` · ${tut.pays[o.pays] ?? o.pays}`
                     : ""}
                 </span>
               </span>
@@ -355,7 +360,7 @@ export function Assistant({
               <span className="flex items-center justify-between gap-2">
                 <span>{m}</span>
                 <span className="doux shrink-0 text-[10px]">
-                  {d.tuteur.sansProgramme}
+                  {tut.sansProgramme}
                 </span>
               </span>
             </Choix>
@@ -364,11 +369,11 @@ export function Assistant({
           {/* La porte de secours. Elle vient APRÈS les matières officielles,
               pour que celles-ci restent le chemin normal. */}
           <ChampLibre
-            etiquette={d.tuteur.autreMatiere}
-            exemple={d.tuteur.autreMatierePlaceholder}
+            etiquette={tut.autreMatiere}
+            exemple={tut.autreMatierePlaceholder}
             suggestions={catalogue}
             identifiantListe="catalogue-matieres"
-            ajouterLibelle={d.tuteur.ajouter}
+            ajouterLibelle={tut.ajouter}
             onAjouter={ajouterLibre}
           />
 
@@ -378,7 +383,7 @@ export function Assistant({
             onClick={suivant}
             className="bouton mt-2 px-4 py-2.5"
           >
-            {d.tuteur.continuer}
+            {tut.continuer}
           </button>
         </Etape>
       )}
@@ -386,8 +391,8 @@ export function Assistant({
       {etape === "manuels" && (
         <form action={action} className="flex flex-col gap-4">
           <div>
-            <h2 className="text-lg font-medium">{d.tuteur.manuels}</h2>
-            <p className="doux mt-1 text-sm">{d.tuteur.aideManuels}</p>
+            <h2 className="text-lg font-medium">{tut.manuels}</h2>
+            <p className="doux mt-1 text-sm">{tut.aideManuels}</p>
           </div>
 
           <input type="hidden" name="langue" value={langue} />
@@ -407,9 +412,9 @@ export function Assistant({
           />
 
           <div className="carte p-4 text-sm">
-            <div className="font-medium">{d.tuteur.recapitulatif}</div>
+            <div className="font-medium">{tut.recapitulatif}</div>
             <div className="doux mt-1">
-              {paysEleve ? `${d.tuteur.pays[paysEleve] ?? paysEleve} · ` : ""}
+              {paysEleve ? `${tut.pays[paysEleve] ?? paysEleve} · ` : ""}
               {d.niveaux[niveau] ?? niveau}
             </div>
             <div className="doux">
@@ -429,7 +434,7 @@ export function Assistant({
             disabled={enCours}
             className="bouton px-4 py-2.5"
           >
-            {enCours ? d.tuteur.creation : d.tuteur.creerMonTuteur}
+            {enCours ? tut.creation : tut.creerMonTuteur}
           </button>
         </form>
       )}
@@ -440,7 +445,7 @@ export function Assistant({
           onClick={precedent}
           className="doux self-start text-sm underline underline-offset-4"
         >
-          {d.tuteur.retour}
+          {tut.retour}
         </button>
       )}
     </main>

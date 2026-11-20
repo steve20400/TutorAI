@@ -21,9 +21,12 @@ type Bulle = { id: string; auteur: AuteurMessage; contenu: string }
 export function Conversation({
   seanceId,
   messagesInitiaux,
+  adulte,
 }: {
   seanceId: string
   messagesInitiaux: Bulle[]
+  /** Un adulte recharge son propre compte, il n'a pas « un adulte » à prévenir. */
+  adulte: boolean
 }) {
   const { langue, d } = useLangue()
   const [bulles, setBulles] = useState<Bulle[]>(messagesInitiaux)
@@ -146,7 +149,7 @@ export function Conversation({
         {/* À côté du champ, comme sur l'écran d'essai : au moment où la
             question « est-ce que je peux continuer ? » se pose, et non dans
             un écran de réglages qu'un enfant n'ouvrira jamais. */}
-        <JaugeEleve langue={langue} />
+        <JaugeEleve langue={langue} adulte={adulte} />
 
         <textarea
           value={saisie}

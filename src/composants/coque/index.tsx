@@ -74,6 +74,21 @@ export async function Coque({
       detail: t.mesEnfantsDetail,
       icone: "enfants",
     })
+    // Le tuteur IA, pour l'adulte lui-même.
+    //
+    // La page ne lui était pas fermée — elle ne vérifie que la session et le
+    // module — mais aucune porte n'y menait. Ni ouverte ni fermée : l'état
+    // le plus ambigu, et celui où personne ne trouve rien.
+    //
+    // L'inscription promet pourtant « Je suis adulte — pour moi ou pour mon
+    // enfant ». Un étudiant majeur qui révise est un cas prévu, et il a le
+    // droit au tuteur comme n'importe quel apprenant.
+    entrees.push({
+      href: chemin(langue, "/tuteur"),
+      titre: t.monTuteur,
+      detail: t.monTuteurDetail,
+      icone: "profil",
+    })
     entrees.push({
       href: chemin(langue, "/messages"),
       titre: t.messages,

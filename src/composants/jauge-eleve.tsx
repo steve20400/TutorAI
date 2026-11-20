@@ -5,6 +5,7 @@ import { useEffect, useState } from "react"
 import { Avatar } from "@/composants/avatar"
 import { Jauge } from "@/composants/jauge"
 import { dictionnaire, type Langue } from "@/langues"
+import { registreJauge } from "@/langues/registre"
 
 type Parent = {
   id: string
@@ -36,9 +37,22 @@ type Etat = {
  * adultes passe de l'un à l'autre — au moment exact où la question se pose,
  * plutôt que dans un écran de réglages qu'il n'ouvrira jamais.
  */
-export function JaugeEleve({ langue }: { langue: Langue }) {
+export function JaugeEleve({
+  langue,
+  adulte = false,
+}: {
+  langue: Langue
+  /**
+   * Un adulte recharge SON compte.
+   *
+   * L'enfant lit « demande à un adulte de ta famille de recharger ton
+   * compte ». Dit à celui qui paie, c'est une phrase qui ne veut rien dire —
+   * et qui lui fait chercher un adulte qui est lui-même.
+   */
+  adulte?: boolean
+}) {
   const d = dictionnaire(langue)
-  const t = d.jaugeEleve
+  const t = registreJauge(d, adulte)
 
   const [etat, setEtat] = useState<Etat | null>(null)
   const [enCours, setEnCours] = useState<string | null>(null)

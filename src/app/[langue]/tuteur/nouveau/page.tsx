@@ -45,7 +45,7 @@ export default async function PageNouveauTuteur({
   // en base est ivoirien n'a aucun sens de son point de vue.
   const { data: profil } = await supabase
     .from("profils")
-    .select("pays")
+    .select("pays, role")
     .eq("id", user.id)
     .maybeSingle()
 
@@ -56,6 +56,9 @@ export default async function PageNouveauTuteur({
 
   return (
     <Assistant
+      // Un étudiant majeur qui révise n'est pas un enfant : l'écran le
+      // vouvoie, et ne lui dit pas de prévenir un adulte.
+      adulte={profil?.role === "parent"}
       options={options}
       catalogue={catalogue}
       niveaux={niveaux}

@@ -41,6 +41,8 @@ export const en: Dictionnaire = {
     monProfilDetail: "Photo, password",
     mesEnfants: "My children",
     mesEnfantsDetail: "Links and tokens",
+    monTuteur: "My tutor",
+    monTuteurDetail: "Revise for myself",
     mesAdultes: "My adults",
     mesAdultesDetail: "Who is linked to me",
     messages: "Messages",
@@ -754,6 +756,39 @@ ajouter: "Add",
     creation: "Setting up…",
     creerMonTuteur: "Set up my tutor",
     pays: { CM: "Cameroon", CI: "Ivory Coast" },
+  },
+
+  tuteurAdulte: {
+    tuteurIndisponible: {
+      surcharge:
+        "Your tutor is in high demand right now. Wait a moment and send your message again.",
+      cle: "Your tutor is unavailable: access has to be renewed by the administration.",
+      modele: "Your tutor is unavailable: a setting has to be corrected by the administration.",
+      autre: "Your tutor is not answering right now. Try again in a moment.",
+    },
+    aucuneSeance: "No lesson yet. Your tutor is waiting for you.",
+    creerTitre: "Create your tutor",
+    quelPays: "Which country are you in?",
+    quelSysteme: "Which system do you follow?",
+    quelleClasse: "What is your level?",
+    choisisUneMatiere: "Choose at least one subject.",
+    creationEchouee: "Creation failed. Try again.",
+    autreClasse: "Your level is not in the list?",
+    autreMatiere: "Your subject is not in the list?",
+    aideMatieres: "One subject = one tutor. You can choose several.",
+    manuels: "Your textbooks (optional)",
+    aideManuels:
+      "One title per line. It helps your tutor follow your progress. You can skip this step.",
+  },
+
+  jaugeAdulte: {
+    titre: "Your lessons with the tutor",
+    detail:
+      "The bar shows what is left. It goes down with each answer from the tutor, and fills up when you top up your account.",
+    epuise: "No tokens left. Top up your account to carry on.",
+    etiquette: "See what is left",
+    quiPaie: "Who carries your lessons",
+    enCours: "in progress",
   },
 
   cours: {
